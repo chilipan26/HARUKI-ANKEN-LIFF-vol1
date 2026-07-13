@@ -4,51 +4,45 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="アサイン">
 <title>アサイン</title>
 <style>
-  /* ===== デザインは後で差し替え可能（このstyleブロックだけ入れ替える） ===== */
   :root{
-    --ink:#1c1c1e; --sub:#8e8e93; --line:#e5e5ea;
+    --ink:#1c1c1e; --sub:#8e8e93; --line:#e5e5ea; --line2:#d1d1d6;
     --bg:#f2f2f7; --card:#fff; --field:#f2f2f7;
-    --ok:#34c759; --warn:#ff9500;
+    --ok:#34c759; --warn:#ff9500; --off:#f7f7f9;
   }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  /* iOS入力ズーム防止：入力系は16px */
   input,select,textarea{ font-size:16px !important; }
   html,body{ background:var(--bg); color:var(--ink);
     font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
     font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
-  body{ padding:12px 8px 90px; max-width:480px; margin:0 auto; }
-
+  body{ padding:12px 8px 90px; max-width:520px; margin:0 auto; }
   .hide{ display:none !important; }
 
   /* ── ヘッダー ── */
-  .head{ padding:6px 4px 14px; display:flex; align-items:flex-start; gap:10px; }
-  .head .back{ font-size:20px; color:var(--sub); background:none; border:none;
-    cursor:pointer; padding:0 4px 0 0; line-height:1.2; }
+  .head{ padding:6px 4px 12px; display:flex; align-items:flex-start; gap:8px; }
+  .head .back{ font-size:20px; color:var(--sub); background:none; border:none; cursor:pointer; padding:0 4px 0 0; }
   .head .ttl{ flex:1; min-width:0; }
-  .head .name{ font-size:20px; font-weight:700; letter-spacing:-.01em; }
-  .head .sub{ font-size:13px; color:var(--sub); margin-top:2px; }
+  .head .name{ font-size:19px; font-weight:700; letter-spacing:-.01em; }
+  .head .sub{ font-size:12px; color:var(--sub); margin-top:2px; }
 
   /* ── 案件一覧 ── */
-  .caseItem{ background:var(--card); border-radius:12px; padding:12px 12px 12px 14px;
-    margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.04); cursor:pointer;
-    display:flex; align-items:flex-start; gap:8px; }
+  .caseItem{ background:var(--card); border-radius:12px; padding:12px 12px 12px 14px; margin-bottom:8px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04); cursor:pointer; display:flex; align-items:flex-start; gap:8px; }
   .caseItem:active{ background:#f0f0f5; }
-  .caseItem.pinned{ background:#fffdf5; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+  .caseItem.pinned{ background:#fffdf5; }
   .caseItem .ci-main{ flex:1; min-width:0; }
   .caseItem .cn{ font-weight:650; font-size:15px; }
   .caseItem .cd{ font-size:12px; color:var(--sub); margin-top:3px; }
-  .caseItem .cc{ font-size:11px; color:var(--sub); margin-top:5px;
-    display:inline-block; background:var(--field); border-radius:5px; padding:2px 7px; }
+  .caseItem .cc{ font-size:11px; color:var(--sub); margin-top:5px; display:inline-block;
+    background:var(--field); border-radius:5px; padding:2px 7px; }
   .caseItem .pin{ flex:0 0 30px; border:none; background:none; cursor:pointer;
-    font-size:16px; opacity:.25; padding:2px; line-height:1; }
+    font-size:16px; opacity:.25; padding:2px; }
   .caseItem .pin.on{ opacity:1; }
 
   /* ── アコーディオン ── */
-  .acc{ background:var(--card); border-radius:12px; margin-bottom:10px;
+  .acc{ background:var(--card); border-radius:12px; margin-bottom:9px;
     box-shadow:0 1px 2px rgba(0,0,0,.04); overflow:hidden; }
   .acc>.bar{ display:flex; align-items:center; justify-content:space-between;
     padding:13px 12px; cursor:pointer; user-select:none; }
@@ -56,98 +50,129 @@
   .acc>.bar .arrow{ font-size:12px; color:#c7c7cc; transition:transform .22s; }
   .acc.open>.bar .arrow{ transform:rotate(90deg); }
   .acc>.body{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
-  .acc.open>.body{ max-height:6000px; }
+  .acc.open>.body{ max-height:9000px; }
   .acc>.body .inner{ padding:0 11px 14px; }
-
-  .hint{ font-size:12px; color:var(--sub); margin:15px 0 7px; }
+  .hint{ font-size:12px; color:var(--sub); margin:14px 0 7px; }
 
   /* ── 入力行 ── */
-  .row{ display:flex; align-items:center; gap:9px; margin-bottom:7px; }
-  .row .lbl{ width:54px; flex-shrink:0; color:var(--sub); }
-  .row input,.row select{ flex:1; min-width:0; font-family:inherit;
-    border:none; background:var(--field); border-radius:8px;
-    padding:8px 10px; height:36px; color:var(--ink); }
-  .row input:focus,.row select:focus{ outline:1.5px solid var(--ink); }
+  .row{ display:flex; align-items:center; gap:8px; margin-bottom:7px; }
+  .row .lbl{ width:48px; flex-shrink:0; color:var(--sub); }
+  .row input{ flex:1; min-width:0; font-family:inherit; border:none; background:var(--field);
+    border-radius:8px; padding:8px 10px; height:36px; color:var(--ink); text-align:right; }
+  .row input:focus{ outline:1.5px solid var(--ink); }
   .row .unit{ color:var(--sub); }
 
-  /* ── 払出単価テーブル（会社×D/AD/ST）── */
-  .payhead,.payrow3{ display:flex; gap:7px; align-items:center; margin-bottom:6px; }
-  .payhead .pco,.payrow3 .pco{ flex:0 0 48px; color:var(--sub); font-size:12px; }
+  /* ── 払出単価表 ── */
+  .payhead,.payrow3{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .payhead .pco,.payrow3 .pco{ flex:0 0 44px; color:var(--sub); font-size:12px; }
   .payhead .pcol{ flex:1; text-align:center; font-size:12px; color:var(--sub); }
-  .payrow3 .paycell{ flex:1; min-width:0; border:none; background:var(--field);
-    border-radius:8px; height:36px; padding:0 8px; font-family:inherit;
-    text-align:right; color:var(--ink); }
+  .payrow3 .paycell{ flex:1; min-width:0; border:none; background:var(--field); border-radius:8px;
+    height:36px; padding:0 8px; font-family:inherit; text-align:right; color:var(--ink); }
   .payrow3 .paycell:focus{ outline:1.5px solid var(--ink); }
 
-  /* ── 大項目 ── */
-  .grp{ background:var(--field); border-radius:10px; margin-bottom:9px; overflow:hidden; }
-  .grp>.gbar{ display:flex; align-items:center; justify-content:space-between;
-    padding:9px 10px; cursor:pointer; }
-  .grp>.gbar .gname{ font-weight:600; }
-  .grp>.gbar .gright{ display:flex; align-items:center; gap:8px; }
-  .grp>.gbar .gcount{ font-size:12px; color:var(--sub); }
-  .grp>.gbar .garrow{ font-size:11px; color:#c7c7cc; transition:transform .2s; }
-  .grp.closed .garrow{ transform:rotate(-90deg); }
-  .grp.closed .gbody{ display:none; }
-  .grp>.gbody{ padding:4px 6px 10px; }
+  /* ══════ 盤面（スプシと同じビジュアル）══════ */
+  .boardWrap{ overflow-x:auto; -webkit-overflow-scrolling:touch;
+    background:var(--card); border-radius:8px; }
+  .board{ border-collapse:collapse; font-size:13px; }
+  .board th, .board td{ border:1px solid var(--line2); padding:0;
+    text-align:center; white-space:nowrap; }
 
-  /* ── アサイン枠 ── */
-  .slot{ background:var(--card); border-radius:8px; padding:7px 8px; margin-bottom:7px; }
-  .slotmain{ display:flex; align-items:center; gap:5px; }
-  .slot .rtag{ flex:0 0 26px; font-size:10px; font-weight:700; color:var(--sub); text-align:left; }
-  .slot select.role{ flex:0 0 44px; border:none; background:var(--field);
-    border-radius:6px; height:32px; font-family:inherit; padding:0 2px; }
-  .slot input.nm{ flex:1 1 auto; min-width:0; border:none; background:var(--field);
-    border-radius:6px; height:32px; padding:0 8px; font-family:inherit; color:var(--ink); }
-  .slot select.co{ flex:0 0 62px; border:none; background:var(--field);
-    border-radius:6px; height:32px; font-family:inherit; padding:0 2px; }
-  .slot input:focus,.slot select:focus{ outline:1.5px solid var(--ink); }
+  /* 枠名列（左に固定） */
+  .board .cLabel{ position:sticky; left:0; z-index:2; background:var(--card);
+    text-align:left; font-weight:600; padding:9px 9px; min-width:110px;
+    border-right:1.5px solid var(--line2); font-size:12px; }
+  .board thead .cLabel{ background:#efeff2; }
 
-  /* 下段：稼働日チェック ＋ 単価 ＋ 削除 */
-  .slotsub{ display:flex; align-items:center; gap:6px; margin-top:6px; }
-  .days{ display:flex; flex-wrap:wrap; gap:5px; flex:1; min-width:0; }
-  .days.hide{ display:none; }
-  .day{ display:inline-flex; align-items:center; gap:3px;
-    font-size:11px; color:var(--sub); background:var(--field);
-    border-radius:5px; padding:3px 6px; cursor:pointer; }
-  .day input{ width:13px; height:13px; margin:0; accent-color:var(--ink); }
-  .day input:not(:checked) + span{ opacity:.45; text-decoration:line-through; }
-  .slot .paytag{ flex:0 0 auto; font-size:10px; color:var(--sub);
-    font-variant-numeric:tabular-nums; white-space:nowrap; }
-  .slot .del{ flex:0 0 22px; height:24px; border:none; background:none;
-    color:#c7c7cc; font-size:15px; cursor:pointer; padding:0; }
+  /* ヘッダー行 */
+  .board thead th{ background:#efeff2; font-weight:600; padding:8px 12px; font-size:12px; min-width:88px; }
+  .board .trTime td, .board .trTime th{ background:#f7f7f9; font-size:11px;
+    color:var(--sub); font-weight:600; padding:5px 8px; }
 
-  /* ── ボタン ── */
-  .addbar{ display:flex; gap:6px; margin-top:7px; padding:0 2px; }
-  .btn{ font-size:13px; font-family:inherit; border:none; border-radius:8px;
-    background:var(--card); color:#3a3a3c; cursor:pointer; padding:7px 12px; }
-  .btn:active{ background:#e5e5ea; }
-  .btn.key{ font-weight:600; }
-  .addgrp{ display:flex; gap:7px; align-items:center; margin-top:11px; }
+  /* セル（人名） */
+  .board td.cell{ padding:0; min-width:88px; }
+  .board td.cell .cellIn{ display:block; width:100%; min-height:38px;
+    padding:9px 8px; cursor:pointer; font-size:13px; }
+  .board td.cell:active .cellIn{ background:#e8e8ed; }
+  .board td.cell.off .cellIn{ background:var(--off); }
+  .board td.cell.conly .cellIn{ color:var(--sub); font-size:12px; }
+
+  /* 会社列（罫線なし） */
+  .board .cCo{ border:none !important; text-align:left; padding:8px 8px;
+    color:var(--ink); font-size:11px; background:var(--bg); }
+
+  /* 区切り */
+  .board tr.sep td{ border:none; height:10px; background:var(--bg); }
+
+  /* ＋行 */
+  .board tr.addRow td.addCell{ border:1px dashed var(--line2); background:#fbfbfc; }
+  .board tr.addRow .addBtn{ display:block; width:100%; padding:9px;
+    background:none; border:none; color:var(--sub); font-size:12px;
+    font-family:inherit; cursor:pointer; text-align:left; padding-left:10px; }
+  .board tr.addRow .addBtn:active{ background:var(--field); }
+
+  .addgrp{ display:flex; gap:7px; align-items:center; margin-top:12px; }
   .addgrp select{ flex:1; border:none; background:var(--field); border-radius:8px;
     height:38px; font-family:inherit; padding:0 10px; }
-  .addgrp .btn{ background:var(--ink); color:#fff; padding:9px 15px; }
+  .addgrp .btnAdd{ border:none; border-radius:8px; background:var(--ink); color:#fff;
+    font-size:13px; font-weight:600; font-family:inherit; padding:10px 16px; cursor:pointer; }
+
+  /* ══════ ポップアップ ══════ */
+  .modalBg{ position:fixed; inset:0; background:rgba(0,0,0,.35);
+    display:flex; align-items:flex-end; justify-content:center; z-index:100;
+    opacity:0; pointer-events:none; transition:opacity .18s; }
+  .modalBg.on{ opacity:1; pointer-events:auto; }
+  .modal{ background:var(--card); width:100%; max-width:520px;
+    border-radius:16px 16px 0 0; padding:18px 16px 26px;
+    transform:translateY(24px); transition:transform .2s; }
+  .modalBg.on .modal{ transform:translateY(0); }
+  .modal h3{ font-size:16px; font-weight:700; margin-bottom:15px; }
+  .modal h3 .mSub{ color:var(--sub); font-weight:400; font-size:12px; margin-left:7px; }
+
+  .mRow{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .mRow .mLbl{ flex:0 0 42px; color:var(--sub); font-size:13px; }
+  .mRow select, .mRow input{ flex:1; min-width:0; border:none; background:var(--field);
+    border-radius:8px; height:42px; padding:0 11px; font-family:inherit; color:var(--ink); }
+  .mRow select:focus, .mRow input:focus{ outline:1.5px solid var(--ink); }
+
+  .mDaysLbl{ font-size:12px; color:var(--sub); margin:14px 0 7px; }
+  .mDays{ display:flex; flex-wrap:wrap; gap:6px; }
+  .mDay{ display:inline-flex; align-items:center; gap:5px; font-size:12px;
+    color:var(--ink); background:var(--field); border-radius:8px; padding:8px 11px; cursor:pointer; }
+  .mDay input{ width:16px; height:16px; margin:0; accent-color:var(--ink); }
+  .mDay input:not(:checked) + span{ opacity:.35; text-decoration:line-through; }
+
+  .mPay{ font-size:12px; color:var(--sub); margin:15px 0 16px;
+    background:var(--field); border-radius:8px; padding:10px 12px; }
+  .mPay b{ color:var(--ink); font-variant-numeric:tabular-nums; font-size:14px; }
+
+  .mBtns{ display:flex; gap:9px; }
+  .mBtns button{ border:none; border-radius:10px; font-size:15px; font-weight:600;
+    font-family:inherit; padding:13px; cursor:pointer; }
+  .mBtns .mDel{ flex:0 0 auto; background:var(--field); color:#ff3b30; padding:13px 20px; }
+  .mBtns .mOk{ flex:1; background:var(--ink); color:#fff; }
 
   /* ── LINE原文 ── */
   #rawText{ font-family:inherit; font-size:13px; line-height:1.75; white-space:pre-wrap;
     color:#3a3a3c; background:var(--field); border-radius:8px; padding:11px; }
   .rawnote{ display:flex; gap:6px; align-items:flex-start; margin-top:8px; }
   .rawadd{ flex:1; font-family:inherit; border:none; background:var(--field);
-    border-radius:8px; padding:9px; resize:vertical; color:var(--ink); line-height:1.6; }
+    border-radius:8px; padding:9px; resize:vertical; color:var(--ink); }
   .rawnote .del{ flex:0 0 20px; border:none; background:none; color:#c7c7cc;
     font-size:16px; cursor:pointer; padding-top:8px; }
+  .btn{ font-size:13px; font-family:inherit; border:none; border-radius:8px;
+    background:var(--field); color:#3a3a3c; cursor:pointer; padding:8px 13px; }
+  .btn.key{ font-weight:600; }
 
-  /* ── 保存バー（画面下に固定）── */
+  /* ── 保存バー ── */
   .savebar{ position:fixed; left:0; right:0; bottom:0; padding:10px 12px 20px;
-    background:rgba(242,242,247,.92); backdrop-filter:blur(10px);
-    border-top:1px solid var(--line); }
-  .savebar .inner{ max-width:480px; margin:0 auto; display:flex; align-items:center; gap:10px; }
+    background:rgba(242,242,247,.94); backdrop-filter:blur(10px);
+    border-top:1px solid var(--line); z-index:50; }
+  .savebar .inner{ max-width:520px; margin:0 auto; display:flex; align-items:center; gap:10px; }
   .savebar .status{ flex:1; font-size:12px; color:var(--sub); }
   .savebar .status.dirty{ color:var(--warn); font-weight:600; }
   .savebar .status.saved{ color:var(--ok); }
-  .savebar .save{ flex:0 0 auto; border:none; border-radius:10px;
-    background:var(--ink); color:#fff; font-size:15px; font-weight:600;
-    font-family:inherit; padding:11px 26px; cursor:pointer; }
+  .savebar .save{ border:none; border-radius:10px; background:var(--ink); color:#fff;
+    font-size:15px; font-weight:600; font-family:inherit; padding:11px 26px; cursor:pointer; }
   .savebar .save:disabled{ opacity:.4; }
 
   .loading{ text-align:center; color:var(--sub); padding:40px 0; }
@@ -156,18 +181,16 @@
 </head>
 <body>
 
-<!-- ═══════ 画面1：案件一覧 ═══════ -->
+<!-- ═══ 画面1：案件一覧 ═══ -->
 <div id="viewList">
-  <div class="head">
-    <div class="ttl">
-      <div class="name">案件を選ぶ</div>
-      <div class="sub" id="listSub">読み込み中…</div>
-    </div>
-  </div>
+  <div class="head"><div class="ttl">
+    <div class="name">案件を選ぶ</div>
+    <div class="sub" id="listSub">読み込み中…</div>
+  </div></div>
   <div id="caseList"><div class="loading">読み込み中…</div></div>
 </div>
 
-<!-- ═══════ 画面2：アサイン ═══════ -->
+<!-- ═══ 画面2：案件 ═══ -->
 <div id="viewCase" class="hide">
   <div class="head">
     <button class="back" onclick="backToList()">‹</button>
@@ -176,12 +199,11 @@
       <div class="sub" id="hSub">—</div>
     </div>
   </div>
-
   <div id="errBox"></div>
 
   <!-- ① LINE原文 -->
-  <div class="acc" id="acc3">
-    <div class="bar" onclick="toggle('acc3')"><span class="t">① LINE原文</span><span class="arrow">▶</span></div>
+  <div class="acc" id="acc1">
+    <div class="bar" onclick="toggle('acc1')"><span class="t">① LINE原文</span><span class="arrow">▶</span></div>
     <div class="body"><div class="inner">
       <div id="rawText">—</div>
       <div id="rawNotes"></div>
@@ -190,76 +212,82 @@
   </div>
 
   <!-- ② 案件設定 -->
-  <div class="acc" id="acc1">
-    <div class="bar" onclick="toggle('acc1')"><span class="t">② 案件設定</span><span class="arrow">▶</span></div>
+  <div class="acc" id="acc2">
+    <div class="bar" onclick="toggle('acc2')"><span class="t">② 案件設定</span><span class="arrow">▶</span></div>
     <div class="body"><div class="inner">
       <div class="hint">請求単価（クライアントへ）</div>
       <div class="row"><span class="lbl">D</span><input id="billD" type="text" inputmode="numeric" oninput="fmtMoney(this)" onfocus="this.select()"><span class="unit">円</span></div>
       <div class="row"><span class="lbl">AD</span><input id="billAD" type="text" inputmode="numeric" oninput="fmtMoney(this)" onfocus="this.select()"><span class="unit">円</span></div>
       <div class="row"><span class="lbl">ST</span><input id="billST" type="text" inputmode="numeric" oninput="fmtMoney(this)" onfocus="this.select()"><span class="unit">円</span></div>
-
       <div class="hint">払出単価（会社ごと）</div>
       <div id="payTable"></div>
-      <div class="hint" style="margin-top:8px;">※ ten / next は「その他」の単価が適用されます</div>
+      <div class="hint">※ ten / next は「その他」の単価が適用されます</div>
     </div></div>
   </div>
 
-  <!-- ③ アサイン -->
-  <div class="acc" id="acc2">
-    <div class="bar" onclick="toggle('acc2')"><span class="t">③ アサイン</span><span class="arrow">▶</span></div>
+  <!-- ③ アサイン（盤面） -->
+  <div class="acc open" id="acc3">
+    <div class="bar" onclick="toggle('acc3')"><span class="t">③ アサイン</span><span class="arrow">▶</span></div>
     <div class="body"><div class="inner">
-      <div id="groups"></div>
+      <div class="boardWrap"><table class="board" id="board"></table></div>
       <div class="addgrp">
-        <select id="newGrp">
-          <option value="">大項目を追加…</option>
-        </select>
-        <button class="btn key" onclick="addGroup()">追加</button>
+        <select id="newGrp"><option value="">大項目を追加…</option></select>
+        <button class="btnAdd" onclick="addGroup()">追加</button>
       </div>
     </div></div>
   </div>
 
-  <!-- 保存バー -->
-  <div class="savebar">
-    <div class="inner">
-      <span class="status" id="saveStatus">—</span>
-      <button class="save" id="saveBtn" onclick="save()">保存</button>
+  <div class="savebar"><div class="inner">
+    <span class="status" id="saveStatus">—</span>
+    <button class="save" id="saveBtn" onclick="save()">保存</button>
+  </div></div>
+</div>
+
+<!-- ═══ ポップアップ ═══ -->
+<div class="modalBg" id="modalBg" onclick="if(event.target===this) closeModal()">
+  <div class="modal">
+    <h3 id="mTitle">—</h3>
+    <div class="mRow">
+      <span class="mLbl">役割</span>
+      <select id="mRole" onchange="onModalChange()"></select>
+    </div>
+    <div class="mRow">
+      <span class="mLbl">名前</span>
+      <input id="mName" placeholder="名前（後で可）" onfocus="this.select()" oninput="onModalChange()">
+    </div>
+    <div class="mRow">
+      <span class="mLbl">会社</span>
+      <select id="mCo" onchange="onModalChange()"></select>
+    </div>
+    <div class="mDaysLbl">稼働日</div>
+    <div class="mDays" id="mDays"></div>
+    <div class="mPay">払出単価　<b id="mPay">—</b></div>
+    <div class="mBtns">
+      <button class="mDel" onclick="delFromModal()">削除</button>
+      <button class="mOk" onclick="closeModal()">完了</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ══════════════════════════════════════════
- *  設定
- * ══════════════════════════════════════════ */
+/* ════ 設定 ════ */
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzX7Pzhq2TFFOHCr0saeHG7qeWA5PuBptUe4-kAtzj-kYWIkJE7z7F1vkvkAMEUzQpPcA/exec';
-
-// 会社リスト（アサインで選べる6つ）
 let COMPANIES = ['自社','ZERO','ten','next','ハン','その他'];
-// 払出単価表の会社（4つ。ten/next は「その他」に内包）
 const PAY_COMPANIES = ['自社','ZERO','ハン','その他'];
 const ROLES = ['D','AD','ST'];
-
-// 大項目・会社の候補（GASのマスタから読み込む。初期値はフォールバック）
 let POS_OPTIONS = ['クローク','受付','ドリンク補充','誘導'];
 
-/* ══════════════════════════════════════════
- *  状態（ローカルで全部持つ＝ラグゼロ）
- * ══════════════════════════════════════════ */
-let CASES = [];        // 案件一覧
-let CURRENT = null;    // 選択中の案件 {ssId, tabName, caseName...}
-let DATA = null;       // 読み込んだ案件データ
-let DIRTY = false;     // 未保存の変更があるか
-let SAVING = false;
-let autoTimer = null;
+/* ════ 状態（全部ローカル＝ラグゼロ）════ */
+let CASES = [], CURRENT = null, DATA = null;
+let DIRTY = false, SAVING = false, autoTimer = null;
+let DATES = [];        // 日付
+let SLOTS = [];        // 枠 [{id,pos,role,name,company,days:[]}]
+let editingId = null;
 
-/* ══════════════════════════════════════════
- *  GAS通信
- * ══════════════════════════════════════════ */
+/* ════ GAS通信 ════ */
 async function callGas(payload){
   const res = await fetch(GAS_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain' },   // CORS回避
-    redirect: 'follow',
+    method:'POST', headers:{'Content-Type':'text/plain'}, redirect:'follow',
     body: JSON.stringify(payload),
   });
   const json = await res.json();
@@ -267,356 +295,270 @@ async function callGas(payload){
   return json;
 }
 
-/* ══════════════════════════════════════════
- *  画面1：案件一覧
- * ══════════════════════════════════════════ */
-const PIN_KEY = 'haruki_pinned_cases';
-
-function getPins(){
-  try{ return JSON.parse(localStorage.getItem(PIN_KEY) || '[]'); }
-  catch(e){ return []; }
+/* ════ 案件一覧 ════ */
+const PIN_KEY='haruki_pins', LIST_CACHE='haruki_list';
+function getPins(){ try{ return JSON.parse(localStorage.getItem(PIN_KEY)||'[]'); }catch(e){ return []; } }
+function setPins(a){ try{ localStorage.setItem(PIN_KEY, JSON.stringify(a)); }catch(e){} }
+function ckey(c){ return c.ssId+'::'+c.tabName; }
+function togglePin(i,ev){
+  ev.stopPropagation();
+  const k=ckey(CASES[i]), p=getPins(), at=p.indexOf(k);
+  if(at>=0) p.splice(at,1); else p.push(k);
+  setPins(p); renderCaseList();
 }
-function setPins(arr){
-  try{ localStorage.setItem(PIN_KEY, JSON.stringify(arr)); }catch(e){}
-}
-function caseKey(c){ return c.ssId + '::' + c.tabName; }
-
-function togglePin(i, ev){
-  ev.stopPropagation();   // 案件を開かない
-  const key = caseKey(CASES[i]);
-  const pins = getPins();
-  const at = pins.indexOf(key);
-  if(at >= 0) pins.splice(at, 1);
-  else pins.push(key);
-  setPins(pins);
-  renderCaseList();
-}
-
-const LIST_CACHE_KEY = 'haruki_caselist_cache';
+function dsort(d){ const m=String(d||'').match(/(\d{1,2})\/(\d{1,2})/); return m ? Number(m[1])*100+Number(m[2]) : 9999; }
 
 async function loadCaseList(){
-  // ① 前回の一覧をローカルから即表示（待たせない）
   try{
-    const cached = localStorage.getItem(LIST_CACHE_KEY);
-    if(cached){
-      CASES = JSON.parse(cached);
-      renderCaseList();
-      document.getElementById('listSub').textContent = CASES.length + '件（更新中…）';
-    }
+    const c = localStorage.getItem(LIST_CACHE);
+    if(c){ CASES = JSON.parse(c); renderCaseList(); }
   }catch(e){}
-
-  // ② 裏で最新を取りに行く
   try{
     const r = await callGas({ action:'getCaseList' });
     CASES = r.cases || [];
-    try{ localStorage.setItem(LIST_CACHE_KEY, JSON.stringify(CASES)); }catch(e){}
+    try{ localStorage.setItem(LIST_CACHE, JSON.stringify(CASES)); }catch(e){}
     renderCaseList();
   }catch(e){
-    if(CASES.length === 0){
-      document.getElementById('caseList').innerHTML =
-        '<div class="err">案件の読み込みに失敗しました<br>'+e.message+'</div>';
-      document.getElementById('listSub').textContent = 'エラー';
+    if(CASES.length===0){
+      document.getElementById('caseList').innerHTML='<div class="err">読み込みに失敗しました<br>'+e.message+'</div>';
+      document.getElementById('listSub').textContent='エラー';
     }
   }
 }
-
-// 「6/19(金)・6/20(土)」→ 並べ替え用の数値（最初の日付）
-function dateSortKey(dates){
-  const m = String(dates || '').match(/(\d{1,2})\/(\d{1,2})/);
-  if(!m) return 9999;
-  return Number(m[1]) * 100 + Number(m[2]);   // 6/19 → 619
-}
-
 function renderCaseList(){
   const wrap = document.getElementById('caseList');
   const pins = getPins();
-
-  // 並べ替え：ピン留めが上 → その中で日程順
-  const sorted = CASES.map((c,i)=>({ c, i, pinned: pins.indexOf(caseKey(c))>=0 }))
-    .sort((a,b)=>{
-      if(a.pinned !== b.pinned) return a.pinned ? -1 : 1;   // ピンが先
-      return dateSortKey(a.c.dates) - dateSortKey(b.c.dates); // 日程順
-    });
-
-  document.getElementById('listSub').textContent = CASES.length + '件';
-
-  if(CASES.length === 0){
-    wrap.innerHTML = '<div class="loading">案件がありません</div>';
-    return;
-  }
-
+  const sorted = CASES.map((c,i)=>({ c, i, p: pins.indexOf(ckey(c))>=0 }))
+    .sort((a,b)=> a.p!==b.p ? (a.p?-1:1) : dsort(a.c.dates)-dsort(b.c.dates));
+  document.getElementById('listSub').textContent = CASES.length+'件';
+  if(!CASES.length){ wrap.innerHTML='<div class="loading">案件がありません</div>'; return; }
   wrap.innerHTML = sorted.map(o=>
-    '<div class="caseItem'+(o.pinned?' pinned':'')+'" onclick="openCase('+o.i+')">'+
+    '<div class="caseItem'+(o.p?' pinned':'')+'" onclick="openCase('+o.i+')">'+
       '<div class="ci-main">'+
         '<div class="cn">'+esc(o.c.caseName)+'</div>'+
         '<div class="cd">'+esc(o.c.dates)+(o.c.area?' ／ '+esc(o.c.area):'')+'</div>'+
         '<div class="cc">'+esc(o.c.client)+'</div>'+
       '</div>'+
-      '<button class="pin'+(o.pinned?' on':'')+'" onclick="togglePin('+o.i+',event)">'+
-        (o.pinned ? '📌' : '📍') +
-      '</button>'+
-    '</div>'
-  ).join('');
+      '<button class="pin'+(o.p?' on':'')+'" onclick="togglePin('+o.i+',event)">'+(o.p?'📌':'📍')+'</button>'+
+    '</div>').join('');
 }
 
-/* ══════════════════════════════════════════
- *  画面2：案件を開く
- * ══════════════════════════════════════════ */
+/* ════ 案件を開く ════ */
 async function openCase(i){
   CURRENT = CASES[i];
   show('viewCase');
   document.getElementById('hName').textContent = CURRENT.caseName;
-  document.getElementById('hSub').textContent = CURRENT.dates + ' ／ ' + CURRENT.time;
+  document.getElementById('hSub').textContent  = CURRENT.dates+' ／ '+CURRENT.time;
   document.getElementById('errBox').innerHTML = '';
   setStatus('読み込み中…');
-
   try{
     const r = await callGas({ action:'getCase', ssId:CURRENT.ssId, tabName:CURRENT.tabName });
     DATA = r.data;
-    buildUI();
-    DIRTY = false;
-    setStatus('保存済み', 'saved');
+    buildAll();
+    DIRTY=false; setStatus('保存済み','saved');
   }catch(e){
-    document.getElementById('errBox').innerHTML =
-      '<div class="err">読み込みに失敗しました<br>'+e.message+'</div>';
+    document.getElementById('errBox').innerHTML='<div class="err">読み込みに失敗しました<br>'+e.message+'</div>';
     setStatus('エラー');
   }
 }
-
 function backToList(){
   if(DIRTY && !confirm('未保存の変更があります。破棄して戻りますか？')) return;
-  clearAuto();
-  DIRTY = false;
-  show('viewList');
+  clearAuto(); DIRTY=false; show('viewList');
 }
 
-/* ══════════════════════════════════════════
- *  UIを組み立てる
- * ══════════════════════════════════════════ */
-function buildUI(){
+/* ════ データ → 内部状態 ════ */
+function buildAll(){
   const s = DATA.settings;
 
-  // ① 請求単価
+  if(DATA.masters){
+    if(DATA.masters.positions && DATA.masters.positions.length) POS_OPTIONS = DATA.masters.positions;
+    if(DATA.masters.companies && DATA.masters.companies.length) COMPANIES  = DATA.masters.companies;
+  }
+
+  // 請求単価
   document.getElementById('billD').value  = comma(s.bill.D);
   document.getElementById('billAD').value = comma(s.bill.AD);
   document.getElementById('billST').value = comma(s.bill.ST);
 
-  // ① 払出単価テーブル
-  let html = '<div class="payhead"><span class="pco"></span>'+
-             ROLES.map(r=>'<span class="pcol">'+r+'</span>').join('')+'</div>';
+  // 払出単価表
+  let h = '<div class="payhead"><span class="pco"></span>'+
+          ROLES.map(r=>'<span class="pcol">'+r+'</span>').join('')+'</div>';
   PAY_COMPANIES.forEach(co=>{
-    html += '<div class="payrow3"><span class="pco">'+co+'</span>';
+    h += '<div class="payrow3"><span class="pco">'+esc(co)+'</span>';
     ROLES.forEach(role=>{
       const v = (s.pay[co] && s.pay[co][role]) ? s.pay[co][role] : '';
-      html += '<input class="paycell" type="text" inputmode="numeric" '+
-              'data-co="'+co+'" data-role="'+role+'" value="'+comma(v)+'" '+
-              'placeholder="¥" oninput="fmtMoney(this); onPayInput();" onfocus="this.select()">';
+      h += '<input class="paycell" type="text" inputmode="numeric" data-co="'+esc(co)+'" data-role="'+role+'" '+
+           'value="'+comma(v)+'" placeholder="¥" oninput="fmtMoney(this); renderBoard(); updateModalPay();" onfocus="this.select()">';
     });
-    html += '</div>';
+    h += '</div>';
   });
-  document.getElementById('payTable').innerHTML = html;
+  document.getElementById('payTable').innerHTML = h;
 
-  // マスタを反映（管理SSの「大項目マスタ」「会社マスタ」から）
-  if(DATA.masters){
-    if(DATA.masters.positions && DATA.masters.positions.length)
-      POS_OPTIONS = DATA.masters.positions;
-    if(DATA.masters.companies && DATA.masters.companies.length)
-      COMPANIES = DATA.masters.companies;
-  }
+  // 日付
+  DATES = [];
+  DATA.slots.forEach(x=>{ if(x.date && DATES.indexOf(x.date)<0) DATES.push(x.date); });
 
-  // ③ 大項目の選択肢
-  const sel = document.getElementById('newGrp');
-  sel.innerHTML = '<option value="">大項目を追加…</option>' +
-    POS_OPTIONS.map(p=>'<option>'+esc(p)+'</option>').join('');
+  // 枠にまとめる
+  const map = {}; SLOTS = []; let uid = 0;
+  DATA.slots.forEach(x=>{
+    const k = x.pos+'|'+x.role+'|'+x.name+'|'+x.company;
+    if(!map[k]){
+      map[k] = { id:'s'+(uid++), pos:x.pos, role:x.role||'ST',
+                 name:x.name||'', company:x.company||'自社',
+                 start:x.start||'', end:x.end||'', days:[] };
+      SLOTS.push(map[k]);
+    }
+    if(x.date && map[k].days.indexOf(x.date)<0) map[k].days.push(x.date);
+  });
 
-  // ② アサイン（slotsを大項目ごとにまとめる）
-  buildGroups();
+  // 大項目の選択肢
+  document.getElementById('newGrp').innerHTML =
+    '<option value="">大項目を追加…</option>' + POS_OPTIONS.map(p=>'<option>'+esc(p)+'</option>').join('');
 
-  // ③ LINE原文
+  // 原文
   document.getElementById('rawText').textContent = DATA.rawText || '（原文なし）';
   document.getElementById('rawNotes').innerHTML = '';
+
+  renderBoard();
 }
 
-// slots（1枠1日）→ 画面用（1枠にまとめる。稼働日も復元）
-function buildGroups(){
-  const wrap = document.getElementById('groups');
-  wrap.innerHTML = '';
+/* ════ 盤面を描く（スプシと同じ）════ */
+function renderBoard(){
+  const t = document.getElementById('board');
+  const nCol = 1 + DATES.length;
 
-  // 日付リスト
-  const dates = [];
-  DATA.slots.forEach(s=>{ if(s.date && dates.indexOf(s.date)<0) dates.push(s.date); });
-  DATA._dates = dates;
-
-  // 「大項目 → 枠」にまとめる（同じ role|name|company を1枠）
-  const byPos = {};
-  DATA.slots.forEach(s=>{
-    if(!byPos[s.pos]) byPos[s.pos] = {};
-    const key = s.role+'|'+s.name+'|'+s.company;
-    if(!byPos[s.pos][key]){
-      byPos[s.pos][key] = { role:s.role, name:s.name, company:s.company, dates:[] };
-    }
-    // その枠が稼働している日を集める
-    if(s.date && byPos[s.pos][key].dates.indexOf(s.date)<0){
-      byPos[s.pos][key].dates.push(s.date);
-    }
+  const byPos = {}, posOrder = [];
+  SLOTS.forEach(s=>{
+    if(!byPos[s.pos]){ byPos[s.pos]=[]; posOrder.push(s.pos); }
+    byPos[s.pos].push(s);
   });
-
-  Object.keys(byPos).forEach(pos=>{
-    const grp = makeGroup(pos);
-    wrap.appendChild(grp);
-    const gbody = grp.querySelector('.gbody');
-    const addbar = gbody.querySelector('.addbar');
-    Object.keys(byPos[pos]).forEach(k=>{
-      const sl = byPos[pos][k];
-      gbody.insertBefore(
-        makeSlot(sl.role||'ST', sl.name, sl.company||'自社', sl.dates),
-        addbar
-      );
+  const rank = r => r==='D'?0 : r==='AD'?1 : 2;
+  posOrder.forEach(p=>{
+    byPos[p].sort((a,b)=> rank(a.role)-rank(b.role));
+    let st = 0;
+    byPos[p].forEach(s=>{
+      if(s.role==='ST'){ st++; s.label = p+'ST'+st; }
+      else s.label = p + s.role;
     });
-    reorder(gbody);
   });
+
+  const timeStr = (DATA.settings.time||'').replace('〜','-');
+
+  let html = '<thead>';
+  html += '<tr><th class="cLabel">日程</th>' +
+          DATES.map(d=>'<th>'+esc(d)+'</th>').join('') +
+          '<th class="cCo"></th></tr>';
+  html += '<tr class="trTime"><th class="cLabel">時間</th>' +
+          DATES.map(()=>'<td>'+esc(timeStr)+'</td>').join('') +
+          '<td class="cCo"></td></tr></thead><tbody>';
+
+  posOrder.forEach((pos, pi)=>{
+    if(pi>0) html += '<tr class="sep"><td colspan="'+(nCol+1)+'"></td></tr>';
+
+    byPos[pos].forEach(s=>{
+      html += '<tr>';
+      html += '<th class="cLabel">'+esc(s.label)+'</th>';
+      DATES.forEach(d=>{
+        const on = s.days.indexOf(d)>=0;
+        const txt = on ? (s.name || s.company) : '';
+        let cls = 'cell';
+        if(!on) cls += ' off';
+        else if(!s.name) cls += ' conly';
+        html += '<td class="'+cls+'" onclick="openModal(\''+s.id+'\')">'+
+                  '<span class="cellIn">'+esc(txt)+'</span></td>';
+      });
+      html += '<td class="cCo">'+esc(s.company)+'</td>';
+      html += '</tr>';
+    });
+
+    html += '<tr class="addRow"><td class="addCell" colspan="'+nCol+'">'+
+              '<button class="addBtn" onclick="addSlot(\''+escAttr(pos)+'\')">＋ 枠を追加</button>'+
+            '</td><td class="cCo"></td></tr>';
+  });
+
+  html += '</tbody>';
+  t.innerHTML = html;
 }
 
-function makeGroup(name){
-  const grp = document.createElement('div');
-  grp.className = 'grp';
-  grp.innerHTML =
-    '<div class="gbar" onclick="toggleGrp(this)">'+
-      '<span class="gname">'+esc(name)+'</span>'+
-      '<span class="gright"><span class="gcount">ST 0名</span><span class="garrow">▾</span></span>'+
-    '</div>'+
-    '<div class="gbody">'+
-      '<div class="addbar">'+
-        '<button class="btn" onclick="addSlot(this,\'D\')">＋D</button>'+
-        '<button class="btn" onclick="addSlot(this,\'AD\')">＋AD</button>'+
-        '<button class="btn key" onclick="addSlot(this,\'ST\')">＋ST</button>'+
-      '</div>'+
-    '</div>';
-  return grp;
+/* ════ 枠の追加・削除 ════ */
+function addSlot(pos){
+  const s = { id:'s'+Date.now(), pos:pos, role:'ST', name:'', company:'自社',
+              start:'', end:'', days: DATES.slice() };   // デフォルト全日ON
+  SLOTS.push(s);
+  renderBoard(); markDirty();
+  openModal(s.id);
 }
-
-function makeSlot(role, name, co, dateSet){
-  const div = document.createElement('div');
-  div.className = 'slot';
-
-  const dates = DATA._dates || [];
-  const on = dateSet || dates.slice();   // 未指定なら全日ON
-
-  // 稼働日チェック（1日案件なら非表示。内部的には全ON）
-  const multi = dates.length > 1;
-  const dayHtml = dates.map(d=>
-    multi
-      ? '<label class="day"><input type="checkbox" data-date="'+esc(d)+'"'+
-        (on.indexOf(d)>=0?' checked':'')+' onchange="markDirty()"><span>'+esc(d)+'</span></label>'
-      : '<input type="checkbox" data-date="'+esc(d)+'" checked hidden>'
-  ).join('');
-
-  div.innerHTML =
-    // 上段：役割 / 名前（広く） / 会社
-    '<div class="slotmain">'+
-      '<span class="rtag">'+role+'</span>'+
-      '<select class="role" onchange="onRole(this)">'+
-        ROLES.map(r=>'<option'+(r===role?' selected':'')+'>'+r+'</option>').join('')+
-      '</select>'+
-      '<input class="nm" placeholder="名前（後で可）" value="'+esc(name||'')+'" '+
-        'oninput="markDirty()" onfocus="this.select()">'+
-      '<select class="co" onchange="onCo(this)">'+
-        COMPANIES.map(c=>'<option'+(c===co?' selected':'')+'>'+c+'</option>').join('')+
-      '</select>'+
-    '</div>'+
-    // 下段：稼働日 / 単価 / ×
-    '<div class="slotsub">'+
-      '<button class="del" onclick="delSlot(this)">×</button>'+
-      '<div class="days'+(multi?'':' hide')+'">'+dayHtml+'</div>'+
-      '<span class="paytag">—</span>'+
-    '</div>';
-
-  setTimeout(()=>updatePay(div),0);
-  return div;
-}
-
-/* ══════════════════════════════════════════
- *  アサイン操作
- * ══════════════════════════════════════════ */
-function addSlot(btn, role){
-  const gbody = btn.closest('.gbody');
-  gbody.insertBefore(makeSlot(role,'','自社',null), gbody.querySelector('.addbar'));
-  reorder(gbody); markDirty();
-}
-function delSlot(btn){
-  const gbody = btn.closest('.gbody');
-  btn.closest('.slot').remove();
-  reorder(gbody); markDirty();
-}
-function onRole(sel){
-  const slot = sel.closest('.slot');
-  reorder(sel.closest('.gbody'));
-  updatePay(slot); markDirty();
-}
-function onCo(sel){ updatePay(sel.closest('.slot')); markDirty(); }
-
 function addGroup(){
   const sel = document.getElementById('newGrp');
-  const name = sel.value; if(!name) return;
-  const grp = makeGroup(name);
-  document.getElementById('groups').appendChild(grp);
-  const gbody = grp.querySelector('.gbody');
-  gbody.insertBefore(makeSlot('ST','','自社',null), gbody.querySelector('.addbar'));
-  reorder(gbody); sel.value=''; markDirty();
+  const pos = sel.value; if(!pos) return;
+  sel.value = '';
+  addSlot(pos);
 }
 
-function toggleGrp(bar){ bar.closest('.grp').classList.toggle('closed'); }
+/* ════ ポップアップ ════ */
+function openModal(id){
+  const s = SLOTS.find(x=>x.id===id); if(!s) return;
+  editingId = id;
 
-// D→AD→ST順に並べ替え＆ST採番＆人数カウント
-function reorder(gbody){
-  const slots = Array.from(gbody.querySelectorAll('.slot'));
-  const addbar = gbody.querySelector('.addbar');
-  const rank = r => r==='D'?0 : r==='AD'?1 : 2;
-  slots.sort((a,b)=> rank(a.querySelector('.role').value) - rank(b.querySelector('.role').value));
+  document.getElementById('mTitle').innerHTML =
+    esc(s.label||s.pos) + '<span class="mSub">'+esc(s.pos)+'</span>';
 
-  let st=0;
-  slots.forEach(s=>{
-    gbody.insertBefore(s, addbar);
-    const role = s.querySelector('.role').value;
-    const tag = s.querySelector('.rtag');
-    if(role==='ST'){ st++; tag.textContent='ST'+st; }
-    else tag.textContent = role;
-  });
-  gbody.closest('.grp').querySelector('.gcount').textContent = 'ST '+st+'名';
+  document.getElementById('mRole').innerHTML =
+    ROLES.map(r=>'<option'+(r===s.role?' selected':'')+'>'+r+'</option>').join('');
+  document.getElementById('mName').value = s.name || '';
+  document.getElementById('mCo').innerHTML =
+    COMPANIES.map(c=>'<option'+(c===s.company?' selected':'')+'>'+esc(c)+'</option>').join('');
+
+  document.getElementById('mDays').innerHTML = DATES.map(d=>
+    '<label class="mDay"><input type="checkbox" data-date="'+escAttr(d)+'"'+
+    (s.days.indexOf(d)>=0?' checked':'')+' onchange="onModalChange()"><span>'+esc(d)+'</span></label>'
+  ).join('');
+
+  updateModalPay();
+  document.getElementById('modalBg').classList.add('on');
 }
 
-// 払出単価を表示（会社×役割。ten/nextは「その他」）
-function updatePay(slot){
-  const role = slot.querySelector('.role').value;
-  const co   = slot.querySelector('.co').value;
-  const payCo = (PAY_COMPANIES.indexOf(co) >= 0) ? co : 'その他';
-  const cell = document.querySelector('.paycell[data-co="'+payCo+'"][data-role="'+role+'"]');
-  const v = (cell && cell.value) ? uncomma(cell.value) : null;
-  slot.querySelector('.paytag').textContent = (v!=='' && v!=null) ? '¥'+Number(v).toLocaleString() : '—';
-}
-function onPayInput(){
-  document.querySelectorAll('.slot').forEach(updatePay);
+function onModalChange(){
+  const s = SLOTS.find(x=>x.id===editingId); if(!s) return;
+  s.role    = document.getElementById('mRole').value;
+  s.name    = document.getElementById('mName').value.trim();
+  s.company = document.getElementById('mCo').value;
+  s.days    = Array.from(document.querySelectorAll('#mDays input:checked')).map(cb=>cb.dataset.date);
+  updateModalPay();
+  renderBoard();     // 盤面が即更新（ラグゼロ）
   markDirty();
 }
 
-/* ══════════════════════════════════════════
- *  LINE原文の追記
- * ══════════════════════════════════════════ */
-function addRawNote(){
-  const wrap = document.getElementById('rawNotes');
-  const div = document.createElement('div');
-  div.className='rawnote';
-  div.innerHTML =
-    '<textarea class="rawadd" rows="3" placeholder="追加メモ・補足…" oninput="markDirty()"></textarea>'+
-    '<button class="del" onclick="this.parentElement.remove(); markDirty();">×</button>';
-  wrap.appendChild(div);
+function updateModalPay(){
+  const s = SLOTS.find(x=>x.id===editingId); if(!s) return;
+  const payCo = (PAY_COMPANIES.indexOf(s.company)>=0) ? s.company : 'その他';
+  const cell = document.querySelector('.paycell[data-co="'+payCo+'"][data-role="'+s.role+'"]');
+  const v = (cell && cell.value) ? uncomma(cell.value) : '';
+  document.getElementById('mPay').textContent = (v!=='') ? '¥'+Number(v).toLocaleString() : '—';
 }
 
-/* ══════════════════════════════════════════
- *  保存（ラグゼロ：ローカル即反映→裏で保存）
- * ══════════════════════════════════════════ */
+function delFromModal(){
+  const i = SLOTS.findIndex(x=>x.id===editingId);
+  if(i>=0){ SLOTS.splice(i,1); renderBoard(); markDirty(); }
+  closeModal();
+}
+function closeModal(){
+  document.getElementById('modalBg').classList.remove('on');
+  editingId = null;
+}
+
+/* ════ 原文の追記 ════ */
+function addRawNote(){
+  const w = document.getElementById('rawNotes');
+  const d = document.createElement('div');
+  d.className = 'rawnote';
+  d.innerHTML = '<textarea class="rawadd" rows="3" placeholder="追加メモ…" oninput="markDirty()"></textarea>'+
+                '<button class="del" onclick="this.parentElement.remove(); markDirty();">×</button>';
+  w.appendChild(d);
+}
+
+/* ════ 保存 ════ */
 function collectPayload(){
-  // ① 設定
   const bill = {
     D:  uncomma(document.getElementById('billD').value),
     AD: uncomma(document.getElementById('billAD').value),
@@ -631,36 +573,19 @@ function collectPayload(){
     });
   });
 
-  // ② アサイン（チェックされた日だけ展開）
-  //    ★名前が空でもOK（会社だけ決まっている＝外注に渡した状態）
+  const t = (DATA.settings.time||'').split('〜');
+  const ds = (t[0]||'').trim(), de = (t[1]||'').trim();
+
   const slots = [];
-  const baseTime = (DATA.settings.time || '').split('〜');
-  const defStart = (baseTime[0] || '').trim();
-  const defEnd   = (baseTime[1] || '').trim();
-
-  document.querySelectorAll('.grp').forEach(grp=>{
-    const pos = grp.querySelector('.gname').textContent;
-    grp.querySelectorAll('.slot').forEach(sl=>{
-      const role = sl.querySelector('.role').value;
-      const name = sl.querySelector('.nm').value.trim();
-      const co   = sl.querySelector('.co').value;
-
-      // チェックが入っている日だけ
-      const days = Array.from(sl.querySelectorAll('input[type=checkbox]'))
-        .filter(cb => cb.checked)
-        .map(cb => cb.dataset.date);
-
-      days.forEach(dt=>{
-        slots.push({ date:dt, pos:pos, role:role, name:name, company:co,
-                     start:defStart, end:defEnd, note:'' });
-      });
+  SLOTS.forEach(s=>{
+    s.days.forEach(d=>{
+      slots.push({ date:d, pos:s.pos, role:s.role, name:s.name, company:s.company,
+                   start:s.start||ds, end:s.end||de, note:'' });
     });
   });
 
-  // ③ 追記
-  const notes = Array.from(document.querySelectorAll('.rawadd'))
-    .map(t=>t.value.trim()).filter(v=>v);
-  const rawAdd = notes.join('\n');
+  const rawAdd = Array.from(document.querySelectorAll('.rawadd'))
+    .map(x=>x.value.trim()).filter(v=>v).join('\n');
 
   return { settings:{ bill, pay }, slots, rawAdd };
 }
@@ -670,87 +595,35 @@ async function save(silent){
   SAVING = true;
   document.getElementById('saveBtn').disabled = true;
   setStatus('保存中…');
-
   try{
-    const payload = collectPayload();
-    await callGas({ action:'saveCase', ssId:CURRENT.ssId, tabName:CURRENT.tabName, payload });
+    await callGas({ action:'saveCase', ssId:CURRENT.ssId, tabName:CURRENT.tabName,
+                    payload: collectPayload() });
     DIRTY = false;
-    setStatus('保存済み', 'saved');
-    // 追記は保存したらクリア（二重投稿を防ぐ）
+    setStatus('保存済み','saved');
     document.getElementById('rawNotes').innerHTML = '';
   }catch(e){
-    setStatus('保存失敗', 'dirty');
+    setStatus('保存失敗','dirty');
     if(!silent) alert('保存に失敗しました\n'+e.message);
   }finally{
     SAVING = false;
     document.getElementById('saveBtn').disabled = false;
   }
 }
-
-function markDirty(){
-  DIRTY = true;
-  setStatus('未保存の変更あり', 'dirty');
-  scheduleAuto();
-}
-
-// 30秒後に自動保存
-function scheduleAuto(){
-  clearAuto();
-  autoTimer = setTimeout(()=>{ if(DIRTY) save(true); }, 30000);
-}
+function markDirty(){ DIRTY=true; setStatus('未保存の変更あり','dirty'); scheduleAuto(); }
+function scheduleAuto(){ clearAuto(); autoTimer = setTimeout(()=>{ if(DIRTY) save(true); }, 30000); }
 function clearAuto(){ if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; } }
+function setStatus(t,c){ const e=document.getElementById('saveStatus'); e.textContent=t; e.className='status'+(c?' '+c:''); }
+window.addEventListener('beforeunload', e=>{ if(DIRTY){ e.preventDefault(); e.returnValue=''; } });
 
-function setStatus(text, cls){
-  const el = document.getElementById('saveStatus');
-  el.textContent = text;
-  el.className = 'status' + (cls ? ' '+cls : '');
-}
-
-// 離脱警告
-window.addEventListener('beforeunload', e=>{
-  if(DIRTY){ e.preventDefault(); e.returnValue = ''; }
-});
-
-/* ══════════════════════════════════════════
- *  共通
- * ══════════════════════════════════════════ */
-/* ══════════════════════════════════════════
- *  金額のカンマ表示
- * ══════════════════════════════════════════ */
-// 数値 → "58,000"
-function comma(v){
-  if(v==='' || v==null) return '';
-  const n = Number(String(v).replace(/,/g,''));
-  return isNaN(n) ? '' : n.toLocaleString();
-}
-// 入力中に自動でカンマを入れる
-function fmtMoney(el){
-  const raw = el.value.replace(/[^\d]/g,'');   // 数字だけ残す
-  el.value = raw ? Number(raw).toLocaleString() : '';
-  markDirty();
-}
-// "58,000" → 58000 （空欄は空のまま）
-function uncomma(v){
-  const s = String(v==null?'':v).replace(/,/g,'').trim();
-  if(s === '') return '';
-  const n = Number(s);
-  return isNaN(n) ? '' : n;
-}
-
+/* ════ 共通 ════ */
+function comma(v){ if(v===''||v==null) return ''; const n=Number(String(v).replace(/,/g,'')); return isNaN(n)?'':n.toLocaleString(); }
+function fmtMoney(el){ const r=el.value.replace(/[^\d]/g,''); el.value = r ? Number(r).toLocaleString() : ''; markDirty(); }
+function uncomma(v){ const s=String(v==null?'':v).replace(/,/g,'').trim(); if(s==='') return ''; const n=Number(s); return isNaN(n)?'':n; }
 function toggle(id){ document.getElementById(id).classList.toggle('open'); }
-function show(id){
-  ['viewList','viewCase'].forEach(v=>{
-    document.getElementById(v).classList.toggle('hide', v!==id);
-  });
-  window.scrollTo(0,0);
-}
-function esc(s){
-  return String(s==null?'':s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;');
-}
+function show(id){ ['viewList','viewCase'].forEach(v=>document.getElementById(v).classList.toggle('hide', v!==id)); window.scrollTo(0,0); }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return esc(s).replace(/'/g,'&#39;'); }
 
-// 起動
 loadCaseList();
 </script>
 </body>
