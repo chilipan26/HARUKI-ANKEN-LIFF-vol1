@@ -20,7 +20,7 @@
   html,body{ background:var(--bg); color:var(--ink);
     font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
     font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
-  body{ padding:14px 12px 90px; max-width:480px; margin:0 auto; }
+  body{ padding:12px 8px 90px; max-width:480px; margin:0 auto; }
 
   .hide{ display:none !important; }
 
@@ -33,25 +33,31 @@
   .head .sub{ font-size:13px; color:var(--sub); margin-top:2px; }
 
   /* ── 案件一覧 ── */
-  .caseItem{ background:var(--card); border-radius:12px; padding:13px 14px; margin-bottom:9px;
-    box-shadow:0 1px 2px rgba(0,0,0,.04); cursor:pointer; }
+  .caseItem{ background:var(--card); border-radius:12px; padding:12px 12px 12px 14px;
+    margin-bottom:8px; box-shadow:0 1px 2px rgba(0,0,0,.04); cursor:pointer;
+    display:flex; align-items:flex-start; gap:8px; }
   .caseItem:active{ background:#f0f0f5; }
+  .caseItem.pinned{ background:#fffdf5; box-shadow:0 1px 2px rgba(0,0,0,.06); }
+  .caseItem .ci-main{ flex:1; min-width:0; }
   .caseItem .cn{ font-weight:650; font-size:15px; }
   .caseItem .cd{ font-size:12px; color:var(--sub); margin-top:3px; }
   .caseItem .cc{ font-size:11px; color:var(--sub); margin-top:5px;
     display:inline-block; background:var(--field); border-radius:5px; padding:2px 7px; }
+  .caseItem .pin{ flex:0 0 30px; border:none; background:none; cursor:pointer;
+    font-size:16px; opacity:.25; padding:2px; line-height:1; }
+  .caseItem .pin.on{ opacity:1; }
 
   /* ── アコーディオン ── */
   .acc{ background:var(--card); border-radius:12px; margin-bottom:10px;
     box-shadow:0 1px 2px rgba(0,0,0,.04); overflow:hidden; }
   .acc>.bar{ display:flex; align-items:center; justify-content:space-between;
-    padding:14px 15px; cursor:pointer; user-select:none; }
+    padding:13px 12px; cursor:pointer; user-select:none; }
   .acc>.bar .t{ font-size:15px; font-weight:600; }
   .acc>.bar .arrow{ font-size:12px; color:#c7c7cc; transition:transform .22s; }
   .acc.open>.bar .arrow{ transform:rotate(90deg); }
   .acc>.body{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
   .acc.open>.body{ max-height:6000px; }
-  .acc>.body .inner{ padding:0 15px 16px; }
+  .acc>.body .inner{ padding:0 11px 14px; }
 
   .hint{ font-size:12px; color:var(--sub); margin:15px 0 7px; }
 
@@ -76,39 +82,40 @@
   /* ── 大項目 ── */
   .grp{ background:var(--field); border-radius:10px; margin-bottom:9px; overflow:hidden; }
   .grp>.gbar{ display:flex; align-items:center; justify-content:space-between;
-    padding:10px 12px; cursor:pointer; }
+    padding:9px 10px; cursor:pointer; }
   .grp>.gbar .gname{ font-weight:600; }
   .grp>.gbar .gright{ display:flex; align-items:center; gap:8px; }
   .grp>.gbar .gcount{ font-size:12px; color:var(--sub); }
   .grp>.gbar .garrow{ font-size:11px; color:#c7c7cc; transition:transform .2s; }
   .grp.closed .garrow{ transform:rotate(-90deg); }
   .grp.closed .gbody{ display:none; }
-  .grp>.gbody{ padding:4px 9px 11px; }
+  .grp>.gbody{ padding:4px 6px 10px; }
 
   /* ── アサイン枠 ── */
-  .slot{ background:var(--card); border-radius:8px; padding:6px 7px; margin-bottom:7px; }
-  .slotmain{ display:flex; align-items:center; gap:6px; }
-  .slot .rtag{ flex:0 0 30px; font-size:11px; font-weight:700; color:var(--sub); text-align:center; }
-  .slot select.role{ flex:0 0 48px; border:none; background:var(--field);
-    border-radius:6px; height:32px; font-family:inherit; }
-  .slot input.nm{ flex:1; min-width:0; border:none; background:var(--field);
-    border-radius:6px; height:32px; padding:0 7px; font-family:inherit; color:var(--ink); }
-  .slot select.co{ flex:0 0 68px; border:none; background:var(--field);
-    border-radius:6px; height:32px; font-family:inherit; }
-  .slot .paytag{ flex:0 0 58px; text-align:right; font-size:11px; color:var(--sub);
-    font-variant-numeric:tabular-nums; }
-  .slot .del{ flex:0 0 20px; height:32px; border:none; background:none;
-    color:#c7c7cc; font-size:16px; cursor:pointer; }
+  .slot{ background:var(--card); border-radius:8px; padding:7px 8px; margin-bottom:7px; }
+  .slotmain{ display:flex; align-items:center; gap:5px; }
+  .slot .rtag{ flex:0 0 26px; font-size:10px; font-weight:700; color:var(--sub); text-align:left; }
+  .slot select.role{ flex:0 0 44px; border:none; background:var(--field);
+    border-radius:6px; height:32px; font-family:inherit; padding:0 2px; }
+  .slot input.nm{ flex:1 1 auto; min-width:0; border:none; background:var(--field);
+    border-radius:6px; height:32px; padding:0 8px; font-family:inherit; color:var(--ink); }
+  .slot select.co{ flex:0 0 62px; border:none; background:var(--field);
+    border-radius:6px; height:32px; font-family:inherit; padding:0 2px; }
   .slot input:focus,.slot select:focus{ outline:1.5px solid var(--ink); }
 
-  /* 稼働日チェック（デフォルト全日ON。触らなくていい） */
-  .days{ display:flex; flex-wrap:wrap; gap:5px; margin-top:6px; padding-left:36px; }
+  /* 下段：稼働日チェック ＋ 単価 ＋ 削除 */
+  .slotsub{ display:flex; align-items:center; gap:6px; margin-top:6px; padding-left:26px; }
+  .days{ display:flex; flex-wrap:wrap; gap:5px; flex:1; min-width:0; }
   .days.hide{ display:none; }
   .day{ display:inline-flex; align-items:center; gap:3px;
     font-size:11px; color:var(--sub); background:var(--field);
-    border-radius:5px; padding:3px 7px; cursor:pointer; }
+    border-radius:5px; padding:3px 6px; cursor:pointer; }
   .day input{ width:13px; height:13px; margin:0; accent-color:var(--ink); }
   .day input:not(:checked) + span{ opacity:.45; text-decoration:line-through; }
+  .slot .paytag{ flex:0 0 auto; font-size:10px; color:var(--sub);
+    font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .slot .del{ flex:0 0 22px; height:24px; border:none; background:none;
+    color:#c7c7cc; font-size:15px; cursor:pointer; padding:0; }
 
   /* ── ボタン ── */
   .addbar{ display:flex; gap:6px; margin-top:7px; padding:0 2px; }
@@ -177,9 +184,9 @@
     <div class="bar" onclick="toggle('acc1')"><span class="t">① 案件設定</span><span class="arrow">▶</span></div>
     <div class="body"><div class="inner">
       <div class="hint">請求単価（クライアントへ）</div>
-      <div class="row"><span class="lbl">D</span><input id="billD" type="number" inputmode="numeric" oninput="markDirty()"><span class="unit">円</span></div>
-      <div class="row"><span class="lbl">AD</span><input id="billAD" type="number" inputmode="numeric" oninput="markDirty()"><span class="unit">円</span></div>
-      <div class="row"><span class="lbl">ST</span><input id="billST" type="number" inputmode="numeric" oninput="markDirty()"><span class="unit">円</span></div>
+      <div class="row"><span class="lbl">D</span><input id="billD" type="number" inputmode="numeric" oninput="markDirty()" onfocus="this.select()"><span class="unit">円</span></div>
+      <div class="row"><span class="lbl">AD</span><input id="billAD" type="number" inputmode="numeric" oninput="markDirty()" onfocus="this.select()"><span class="unit">円</span></div>
+      <div class="row"><span class="lbl">ST</span><input id="billST" type="number" inputmode="numeric" oninput="markDirty()" onfocus="this.select()"><span class="unit">円</span></div>
 
       <div class="hint">払出単価（会社ごと）</div>
       <div id="payTable"></div>
@@ -264,6 +271,28 @@ async function callGas(payload){
 /* ══════════════════════════════════════════
  *  画面1：案件一覧
  * ══════════════════════════════════════════ */
+const PIN_KEY = 'haruki_pinned_cases';
+
+function getPins(){
+  try{ return JSON.parse(localStorage.getItem(PIN_KEY) || '[]'); }
+  catch(e){ return []; }
+}
+function setPins(arr){
+  try{ localStorage.setItem(PIN_KEY, JSON.stringify(arr)); }catch(e){}
+}
+function caseKey(c){ return c.ssId + '::' + c.tabName; }
+
+function togglePin(i, ev){
+  ev.stopPropagation();   // 案件を開かない
+  const key = caseKey(CASES[i]);
+  const pins = getPins();
+  const at = pins.indexOf(key);
+  if(at >= 0) pins.splice(at, 1);
+  else pins.push(key);
+  setPins(pins);
+  renderCaseList();
+}
+
 async function loadCaseList(){
   try{
     const r = await callGas({ action:'getCaseList' });
@@ -276,19 +305,41 @@ async function loadCaseList(){
   }
 }
 
+// 「6/19(金)・6/20(土)」→ 並べ替え用の数値（最初の日付）
+function dateSortKey(dates){
+  const m = String(dates || '').match(/(\d{1,2})\/(\d{1,2})/);
+  if(!m) return 9999;
+  return Number(m[1]) * 100 + Number(m[2]);   // 6/19 → 619
+}
+
 function renderCaseList(){
   const wrap = document.getElementById('caseList');
+  const pins = getPins();
+
+  // 並べ替え：ピン留めが上 → その中で日程順
+  const sorted = CASES.map((c,i)=>({ c, i, pinned: pins.indexOf(caseKey(c))>=0 }))
+    .sort((a,b)=>{
+      if(a.pinned !== b.pinned) return a.pinned ? -1 : 1;   // ピンが先
+      return dateSortKey(a.c.dates) - dateSortKey(b.c.dates); // 日程順
+    });
+
   document.getElementById('listSub').textContent = CASES.length + '件';
 
   if(CASES.length === 0){
     wrap.innerHTML = '<div class="loading">案件がありません</div>';
     return;
   }
-  wrap.innerHTML = CASES.map((c,i)=>
-    '<div class="caseItem" onclick="openCase('+i+')">'+
-      '<div class="cn">'+esc(c.caseName)+'</div>'+
-      '<div class="cd">'+esc(c.dates)+(c.area?' ／ '+esc(c.area):'')+'</div>'+
-      '<div class="cc">'+esc(c.client)+'</div>'+
+
+  wrap.innerHTML = sorted.map(o=>
+    '<div class="caseItem'+(o.pinned?' pinned':'')+'" onclick="openCase('+o.i+')">'+
+      '<div class="ci-main">'+
+        '<div class="cn">'+esc(o.c.caseName)+'</div>'+
+        '<div class="cd">'+esc(o.c.dates)+(o.c.area?' ／ '+esc(o.c.area):'')+'</div>'+
+        '<div class="cc">'+esc(o.c.client)+'</div>'+
+      '</div>'+
+      '<button class="pin'+(o.pinned?' on':'')+'" onclick="togglePin('+o.i+',event)">'+
+        (o.pinned ? '📌' : '📍') +
+      '</button>'+
     '</div>'
   ).join('');
 }
@@ -344,7 +395,7 @@ function buildUI(){
       const v = (s.pay[co] && s.pay[co][role]) ? s.pay[co][role] : '';
       html += '<input class="paycell" type="number" inputmode="numeric" '+
               'data-co="'+co+'" data-role="'+role+'" value="'+v+'" '+
-              'placeholder="¥" oninput="onPayInput()">';
+              'placeholder="¥" oninput="onPayInput()" onfocus="this.select()">';
     });
     html += '</div>';
   });
@@ -425,37 +476,37 @@ function makeSlot(role, name, co, dateSet){
   const div = document.createElement('div');
   div.className = 'slot';
 
-  // 稼働日：指定がなければ全日ON（デフォルト）
   const dates = DATA._dates || [];
-  const on = dateSet || dates.slice();   // 未指定なら全部
+  const on = dateSet || dates.slice();   // 未指定なら全日ON
 
-  let dayHtml = '';
-  if (dates.length > 1) {   // 1日だけの案件はチェックを出さない（選ぶ意味がない）
-    dayHtml = '<div class="days">' + dates.map(d=>
-      '<label class="day"><input type="checkbox" data-date="'+esc(d)+'"'+
-      (on.indexOf(d)>=0?' checked':'')+' onchange="markDirty()">'+
-      '<span>'+esc(d)+'</span></label>'
-    ).join('') + '</div>';
-  } else {
-    // 1日案件でも、内部的には全日ONとして扱う
-    dayHtml = '<div class="days hide">' + dates.map(d=>
-      '<input type="checkbox" data-date="'+esc(d)+'" checked>'
-    ).join('') + '</div>';
-  }
+  // 稼働日チェック（1日案件なら非表示。内部的には全ON）
+  const multi = dates.length > 1;
+  const dayHtml = dates.map(d=>
+    multi
+      ? '<label class="day"><input type="checkbox" data-date="'+esc(d)+'"'+
+        (on.indexOf(d)>=0?' checked':'')+' onchange="markDirty()"><span>'+esc(d)+'</span></label>'
+      : '<input type="checkbox" data-date="'+esc(d)+'" checked hidden>'
+  ).join('');
 
   div.innerHTML =
+    // 上段：役割 / 名前（広く） / 会社
     '<div class="slotmain">'+
       '<span class="rtag">'+role+'</span>'+
       '<select class="role" onchange="onRole(this)">'+
         ROLES.map(r=>'<option'+(r===role?' selected':'')+'>'+r+'</option>').join('')+
       '</select>'+
-      '<input class="nm" placeholder="名前（後で可）" value="'+esc(name||'')+'" oninput="markDirty()">'+
+      '<input class="nm" placeholder="名前（後で可）" value="'+esc(name||'')+'" '+
+        'oninput="markDirty()" onfocus="this.select()">'+
       '<select class="co" onchange="onCo(this)">'+
         COMPANIES.map(c=>'<option'+(c===co?' selected':'')+'>'+c+'</option>').join('')+
       '</select>'+
+    '</div>'+
+    // 下段：稼働日 / 単価 / ×
+    '<div class="slotsub">'+
+      '<div class="days'+(multi?'':' hide')+'">'+dayHtml+'</div>'+
       '<span class="paytag">—</span>'+
       '<button class="del" onclick="delSlot(this)">×</button>'+
-    '</div>' + dayHtml;
+    '</div>';
 
   setTimeout(()=>updatePay(div),0);
   return div;
