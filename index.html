@@ -293,15 +293,31 @@ function togglePin(i, ev){
   renderCaseList();
 }
 
+const LIST_CACHE_KEY = 'haruki_caselist_cache';
+
 async function loadCaseList(){
+  // ① 前回の一覧をローカルから即表示（待たせない）
+  try{
+    const cached = localStorage.getItem(LIST_CACHE_KEY);
+    if(cached){
+      CASES = JSON.parse(cached);
+      renderCaseList();
+      document.getElementById('listSub').textContent = CASES.length + '件（更新中…）';
+    }
+  }catch(e){}
+
+  // ② 裏で最新を取りに行く
   try{
     const r = await callGas({ action:'getCaseList' });
     CASES = r.cases || [];
+    try{ localStorage.setItem(LIST_CACHE_KEY, JSON.stringify(CASES)); }catch(e){}
     renderCaseList();
   }catch(e){
-    document.getElementById('caseList').innerHTML =
-      '<div class="err">案件の読み込みに失敗しました<br>'+e.message+'</div>';
-    document.getElementById('listSub').textContent = 'エラー';
+    if(CASES.length === 0){
+      document.getElementById('caseList').innerHTML =
+        '<div class="err">案件の読み込みに失敗しました<br>'+e.message+'</div>';
+      document.getElementById('listSub').textContent = 'エラー';
+    }
   }
 }
 
