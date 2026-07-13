@@ -104,7 +104,7 @@
   .slot input:focus,.slot select:focus{ outline:1.5px solid var(--ink); }
 
   /* 下段：稼働日チェック ＋ 単価 ＋ 削除 */
-  .slotsub{ display:flex; align-items:center; gap:6px; margin-top:6px; padding-left:26px; }
+  .slotsub{ display:flex; align-items:center; gap:6px; margin-top:6px; }
   .days{ display:flex; flex-wrap:wrap; gap:5px; flex:1; min-width:0; }
   .days.hide{ display:none; }
   .day{ display:inline-flex; align-items:center; gap:3px;
@@ -179,14 +179,24 @@
 
   <div id="errBox"></div>
 
-  <!-- ① 案件設定 -->
+  <!-- ① LINE原文 -->
+  <div class="acc" id="acc3">
+    <div class="bar" onclick="toggle('acc3')"><span class="t">① LINE原文</span><span class="arrow">▶</span></div>
+    <div class="body"><div class="inner">
+      <div id="rawText">—</div>
+      <div id="rawNotes"></div>
+      <button class="btn key" onclick="addRawNote()" style="margin-top:8px;">＋ 追加文章</button>
+    </div></div>
+  </div>
+
+  <!-- ② 案件設定 -->
   <div class="acc" id="acc1">
-    <div class="bar" onclick="toggle('acc1')"><span class="t">① 案件設定</span><span class="arrow">▶</span></div>
+    <div class="bar" onclick="toggle('acc1')"><span class="t">② 案件設定</span><span class="arrow">▶</span></div>
     <div class="body"><div class="inner">
       <div class="hint">請求単価（クライアントへ）</div>
-      <div class="row"><span class="lbl">D</span><input id="billD" type="number" inputmode="numeric" oninput="markDirty()" onfocus="this.select()"><span class="unit">円</span></div>
-      <div class="row"><span class="lbl">AD</span><input id="billAD" type="number" inputmode="numeric" oninput="markDirty()" onfocus="this.select()"><span class="unit">円</span></div>
-      <div class="row"><span class="lbl">ST</span><input id="billST" type="number" inputmode="numeric" oninput="markDirty()" onfocus="this.select()"><span class="unit">円</span></div>
+      <div class="row"><span class="lbl">D</span><input id="billD" type="text" inputmode="numeric" oninput="fmtMoney(this)" onfocus="this.select()"><span class="unit">円</span></div>
+      <div class="row"><span class="lbl">AD</span><input id="billAD" type="text" inputmode="numeric" oninput="fmtMoney(this)" onfocus="this.select()"><span class="unit">円</span></div>
+      <div class="row"><span class="lbl">ST</span><input id="billST" type="text" inputmode="numeric" oninput="fmtMoney(this)" onfocus="this.select()"><span class="unit">円</span></div>
 
       <div class="hint">払出単価（会社ごと）</div>
       <div id="payTable"></div>
@@ -194,9 +204,9 @@
     </div></div>
   </div>
 
-  <!-- ② アサイン -->
+  <!-- ③ アサイン -->
   <div class="acc" id="acc2">
-    <div class="bar" onclick="toggle('acc2')"><span class="t">② アサイン</span><span class="arrow">▶</span></div>
+    <div class="bar" onclick="toggle('acc2')"><span class="t">③ アサイン</span><span class="arrow">▶</span></div>
     <div class="body"><div class="inner">
       <div id="groups"></div>
       <div class="addgrp">
@@ -205,16 +215,6 @@
         </select>
         <button class="btn key" onclick="addGroup()">追加</button>
       </div>
-    </div></div>
-  </div>
-
-  <!-- ③ LINE原文 -->
-  <div class="acc" id="acc3">
-    <div class="bar" onclick="toggle('acc3')"><span class="t">③ LINE原文</span><span class="arrow">▶</span></div>
-    <div class="body"><div class="inner">
-      <div id="rawText">—</div>
-      <div id="rawNotes"></div>
-      <button class="btn key" onclick="addRawNote()" style="margin-top:8px;">＋ 追加文章</button>
     </div></div>
   </div>
 
@@ -234,14 +234,13 @@
 const GAS_URL = 'https://script.google.com/macros/s/AKfycbzX7Pzhq2TFFOHCr0saeHG7qeWA5PuBptUe4-kAtzj-kYWIkJE7z7F1vkvkAMEUzQpPcA/exec';
 
 // 会社リスト（アサインで選べる6つ）
-const COMPANIES = ['自社','ZERO','ten','next','ハン','その他'];
+let COMPANIES = ['自社','ZERO','ten','next','ハン','その他'];
 // 払出単価表の会社（4つ。ten/next は「その他」に内包）
 const PAY_COMPANIES = ['自社','ZERO','ハン','その他'];
 const ROLES = ['D','AD','ST'];
 
-// 大項目の候補
-const POS_OPTIONS = ['クローク','受付','ドリンク補充','誘導','着替えテント',
-                     'ウォーミングアップ','応援席','環境整理','インフォ','パスコントロール'];
+// 大項目・会社の候補（GASのマスタから読み込む。初期値はフォールバック）
+let POS_OPTIONS = ['クローク','受付','ドリンク補充','誘導'];
 
 /* ══════════════════════════════════════════
  *  状態（ローカルで全部持つ＝ラグゼロ）
@@ -398,9 +397,9 @@ function buildUI(){
   const s = DATA.settings;
 
   // ① 請求単価
-  document.getElementById('billD').value  = s.bill.D  || '';
-  document.getElementById('billAD').value = s.bill.AD || '';
-  document.getElementById('billST').value = s.bill.ST || '';
+  document.getElementById('billD').value  = comma(s.bill.D);
+  document.getElementById('billAD').value = comma(s.bill.AD);
+  document.getElementById('billST').value = comma(s.bill.ST);
 
   // ① 払出単価テーブル
   let html = '<div class="payhead"><span class="pco"></span>'+
@@ -409,18 +408,26 @@ function buildUI(){
     html += '<div class="payrow3"><span class="pco">'+co+'</span>';
     ROLES.forEach(role=>{
       const v = (s.pay[co] && s.pay[co][role]) ? s.pay[co][role] : '';
-      html += '<input class="paycell" type="number" inputmode="numeric" '+
-              'data-co="'+co+'" data-role="'+role+'" value="'+v+'" '+
-              'placeholder="¥" oninput="onPayInput()" onfocus="this.select()">';
+      html += '<input class="paycell" type="text" inputmode="numeric" '+
+              'data-co="'+co+'" data-role="'+role+'" value="'+comma(v)+'" '+
+              'placeholder="¥" oninput="fmtMoney(this); onPayInput();" onfocus="this.select()">';
     });
     html += '</div>';
   });
   document.getElementById('payTable').innerHTML = html;
 
-  // ② 大項目の選択肢
+  // マスタを反映（管理SSの「大項目マスタ」「会社マスタ」から）
+  if(DATA.masters){
+    if(DATA.masters.positions && DATA.masters.positions.length)
+      POS_OPTIONS = DATA.masters.positions;
+    if(DATA.masters.companies && DATA.masters.companies.length)
+      COMPANIES = DATA.masters.companies;
+  }
+
+  // ③ 大項目の選択肢
   const sel = document.getElementById('newGrp');
   sel.innerHTML = '<option value="">大項目を追加…</option>' +
-    POS_OPTIONS.map(p=>'<option>'+p+'</option>').join('');
+    POS_OPTIONS.map(p=>'<option>'+esc(p)+'</option>').join('');
 
   // ② アサイン（slotsを大項目ごとにまとめる）
   buildGroups();
@@ -519,9 +526,9 @@ function makeSlot(role, name, co, dateSet){
     '</div>'+
     // 下段：稼働日 / 単価 / ×
     '<div class="slotsub">'+
+      '<button class="del" onclick="delSlot(this)">×</button>'+
       '<div class="days'+(multi?'':' hide')+'">'+dayHtml+'</div>'+
       '<span class="paytag">—</span>'+
-      '<button class="del" onclick="delSlot(this)">×</button>'+
     '</div>';
 
   setTimeout(()=>updatePay(div),0);
@@ -584,8 +591,8 @@ function updatePay(slot){
   const co   = slot.querySelector('.co').value;
   const payCo = (PAY_COMPANIES.indexOf(co) >= 0) ? co : 'その他';
   const cell = document.querySelector('.paycell[data-co="'+payCo+'"][data-role="'+role+'"]');
-  const v = cell && cell.value ? Number(cell.value) : null;
-  slot.querySelector('.paytag').textContent = (v!=null) ? '¥'+v.toLocaleString() : '—';
+  const v = (cell && cell.value) ? uncomma(cell.value) : null;
+  slot.querySelector('.paytag').textContent = (v!=='' && v!=null) ? '¥'+Number(v).toLocaleString() : '—';
 }
 function onPayInput(){
   document.querySelectorAll('.slot').forEach(updatePay);
@@ -611,16 +618,16 @@ function addRawNote(){
 function collectPayload(){
   // ① 設定
   const bill = {
-    D:  document.getElementById('billD').value,
-    AD: document.getElementById('billAD').value,
-    ST: document.getElementById('billST').value,
+    D:  uncomma(document.getElementById('billD').value),
+    AD: uncomma(document.getElementById('billAD').value),
+    ST: uncomma(document.getElementById('billST').value),
   };
   const pay = {};
   PAY_COMPANIES.forEach(co=>{
     pay[co] = {};
     ROLES.forEach(role=>{
       const c = document.querySelector('.paycell[data-co="'+co+'"][data-role="'+role+'"]');
-      pay[co][role] = c ? c.value : '';
+      pay[co][role] = c ? uncomma(c.value) : '';
     });
   });
 
@@ -707,6 +714,29 @@ window.addEventListener('beforeunload', e=>{
 /* ══════════════════════════════════════════
  *  共通
  * ══════════════════════════════════════════ */
+/* ══════════════════════════════════════════
+ *  金額のカンマ表示
+ * ══════════════════════════════════════════ */
+// 数値 → "58,000"
+function comma(v){
+  if(v==='' || v==null) return '';
+  const n = Number(String(v).replace(/,/g,''));
+  return isNaN(n) ? '' : n.toLocaleString();
+}
+// 入力中に自動でカンマを入れる
+function fmtMoney(el){
+  const raw = el.value.replace(/[^\d]/g,'');   // 数字だけ残す
+  el.value = raw ? Number(raw).toLocaleString() : '';
+  markDirty();
+}
+// "58,000" → 58000 （空欄は空のまま）
+function uncomma(v){
+  const s = String(v==null?'':v).replace(/,/g,'').trim();
+  if(s === '') return '';
+  const n = Number(s);
+  return isNaN(n) ? '' : n;
+}
+
 function toggle(id){ document.getElementById(id).classList.toggle('open'); }
 function show(id){
   ['viewList','viewCase'].forEach(v=>{
