@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="新規案件">
+<title>新規案件</title>
+<style>
+  :root{
+    --ink:#1c1c1e; --sub:#8e8e93; --line:#e5e5ea;
+    --bg:#f2f2f7; --card:#fff; --field:#f2f2f7;
+    --ok:#34c759; --warn:#ff9500;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
+  input,select,textarea{ font-size:16px !important; }
+  html,body{ background:var(--bg); color:var(--ink);
+    font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
+  body{ padding:14px 10px 100px; max-width:520px; margin:0 auto; }
+  .hide{ display:none !important; }
+
+  .head{ padding:4px 4px 14px; }
+  .head .name{ font-size:21px; font-weight:700; }
+  .head .sub{ font-size:12px; color:var(--sub); margin-top:3px; }
+
+  .card{ background:var(--card); border-radius:12px; padding:14px 13px;
+    margin-bottom:10px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
+  .card h3{ font-size:13px; font-weight:600; color:var(--sub); margin-bottom:10px; }
+
+  .row{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .row .lbl{ flex:0 0 52px; color:var(--sub); font-size:13px; }
+  .row input, .row select{ flex:1; min-width:0; border:none; background:var(--field);
+    border-radius:8px; height:40px; padding:0 11px; font-family:inherit; color:var(--ink); }
+  .row input:focus, .row select:focus{ outline:1.5px solid var(--ink); }
+  .row .unit{ color:var(--sub); font-size:13px; }
+  .row .tsel{ flex:0 0 96px; }
+  .row .tilde{ color:var(--sub); }
+
+  /* 複数行入力（服装・仕事内容・条件） */
+  .items{ display:flex; flex-direction:column; gap:6px; }
+  .item{ display:flex; align-items:center; gap:6px; }
+  .item input{ flex:1; min-width:0; border:none; background:var(--field);
+    border-radius:8px; height:38px; padding:0 11px; font-family:inherit; color:var(--ink); }
+  .item input:focus{ outline:1.5px solid var(--ink); }
+  .item .del{ flex:0 0 26px; height:38px; border:none; background:none;
+    color:#c7c7cc; font-size:16px; cursor:pointer; }
+  .addItem{ align-self:flex-start; border:none; background:var(--field); color:#3a3a3c;
+    border-radius:8px; font-size:13px; font-family:inherit; padding:8px 13px;
+    cursor:pointer; margin-top:2px; }
+  .addItem:active{ background:#e5e5ea; }
+
+  /* 日程 */
+  .dates{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
+  .dchip{ display:inline-flex; align-items:center; gap:5px; background:var(--field);
+    border-radius:8px; padding:8px 10px; font-size:13px; }
+  .dchip button{ border:none; background:none; color:#c7c7cc; font-size:15px;
+    cursor:pointer; padding:0; line-height:1; }
+  .dateAdd{ display:flex; gap:7px; }
+  .dateAdd input{ flex:1; border:none; background:var(--field); border-radius:8px;
+    height:40px; padding:0 11px; font-family:inherit; }
+  .dateAdd button{ border:none; background:var(--ink); color:#fff; border-radius:8px;
+    font-size:13px; font-weight:600; font-family:inherit; padding:0 16px; cursor:pointer; }
+
+  /* プレビュー */
+  .preview{ background:#1c1c1e; color:#e8e8ed; border-radius:12px;
+    padding:14px; font-size:13px; line-height:1.8; white-space:pre-wrap;
+    word-break:break-word; margin-bottom:10px; min-height:80px; }
+  .copyBar{ display:flex; gap:8px; }
+  .copyBar button{ flex:1; border:none; border-radius:10px; font-size:15px;
+    font-weight:600; font-family:inherit; padding:13px; cursor:pointer; }
+  .btnCopy{ background:var(--field); color:var(--ink); }
+  .btnCopy.done{ background:var(--ok); color:#fff; }
+
+  /* 下部バー */
+  .bar{ position:fixed; left:0; right:0; bottom:0; padding:10px 12px 20px;
+    background:rgba(242,242,247,.94); backdrop-filter:blur(10px);
+    border-top:1px solid var(--line); z-index:50; }
+  .bar .inner{ max-width:520px; margin:0 auto; display:flex; align-items:center; gap:10px; }
+  .bar .status{ flex:1; font-size:12px; color:var(--sub); }
+  .bar .status.err{ color:#ff3b30; }
+  .bar .status.ok{ color:var(--ok); }
+  .bar .go{ border:none; border-radius:10px; background:var(--ink); color:#fff;
+    font-size:15px; font-weight:600; font-family:inherit; padding:12px 22px; cursor:pointer; }
+  .bar .go:disabled{ opacity:.4; }
+
+  .done{ text-align:center; padding:30px 16px; }
+  .done .ic{ font-size:44px; margin-bottom:12px; }
+  .done h2{ font-size:19px; font-weight:700; margin-bottom:6px; }
+  .done p{ color:var(--sub); font-size:13px; margin-bottom:20px; }
+  .done .btnBack{ border:none; background:var(--field); color:var(--ink);
+    border-radius:10px; font-size:14px; font-weight:600; font-family:inherit;
+    padding:12px 24px; cursor:pointer; }
+
+  .err{ background:#ffe5e5; color:#c00; border-radius:8px; padding:10px;
+    margin-bottom:10px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<!-- ═══ 入力画面 ═══ -->
+<div id="viewForm">
+  <div class="head">
+    <div class="name">新規案件</div>
+    <div class="sub">項目を埋めると、LINE文と案件タブが同時にできます</div>
+  </div>
+
+  <div id="errBox"></div>
+
+  <!-- 基本 -->
+  <div class="card">
+    <h3>基本情報</h3>
+    <div class="row">
+      <span class="lbl">送り先</span>
+      <select id="fMention"><option value="">読み込み中…</option></select>
+    </div>
+    <div class="row">
+      <span class="lbl">案件名</span>
+      <input id="fName" placeholder="NIKE ランイベント" oninput="preview()">
+    </div>
+    <div class="row">
+      <span class="lbl">場所</span>
+      <input id="fArea" placeholder="銀座周辺" oninput="preview()">
+    </div>
+  </div>
+
+  <!-- 日程・時間 -->
+  <div class="card">
+    <h3>日程・時間</h3>
+    <div class="dates" id="dateChips"></div>
+    <div class="dateAdd">
+      <input id="fDate" type="date" onchange="addDate()">
+      <button onclick="addDate()">追加</button>
+    </div>
+    <div class="row" style="margin-top:10px;">
+      <span class="lbl">時間</span>
+      <select class="tsel" id="fStart" onchange="preview()"></select>
+      <span class="tilde">〜</span>
+      <select class="tsel" id="fEnd" onchange="preview()"></select>
+    </div>
+    <div class="row">
+      <span class="lbl">注釈</span>
+      <input id="fTimeNote" placeholder="前後可能性大" oninput="preview()">
+    </div>
+  </div>
+
+  <!-- 金額 -->
+  <div class="card">
+    <h3>金額</h3>
+    <div class="row">
+      <span class="lbl">日当</span>
+      <input id="fPrice" type="text" inputmode="numeric" placeholder="25,000"
+             oninput="fmtMoney(this); preview();" onfocus="this.select()">
+      <span class="unit">円/日</span>
+    </div>
+  </div>
+
+  <!-- 募集条件 -->
+  <div class="card">
+    <h3>募集条件（先頭に出ます）</h3>
+    <div class="items" id="condItems"></div>
+    <button class="addItem" onclick="addItem('condItems','男女OK！')">＋ 条件を追加</button>
+  </div>
+
+  <!-- 服装 -->
+  <div class="card">
+    <h3>服装</h3>
+    <div class="items" id="wearItems"></div>
+    <button class="addItem" onclick="addItem('wearItems','黒パンツ')">＋ 服装を追加</button>
+  </div>
+
+  <!-- 仕事内容 -->
+  <div class="card">
+    <h3>お仕事内容（＝アサインの大項目）</h3>
+    <div class="items" id="jobItems"></div>
+    <button class="addItem" onclick="addItem('jobItems','クローク')">＋ 内容を追加</button>
+  </div>
+
+  <!-- プレビュー -->
+  <div class="card">
+    <h3>LINE文プレビュー</h3>
+    <div class="preview" id="preview">（項目を入力すると、ここに表示されます）</div>
+    <div class="copyBar">
+      <button class="btnCopy" id="btnCopy" onclick="copyText()">📋 コピー</button>
+    </div>
+  </div>
+
+  <div class="bar"><div class="inner">
+    <span class="status" id="status">—</span>
+    <button class="go" id="btnGo" onclick="createCase()">案件を作成</button>
+  </div></div>
+</div>
+
+<!-- ═══ 完了画面 ═══ -->
+<div id="viewDone" class="hide">
+  <div class="done">
+    <div class="ic">✅</div>
+    <h2>案件を作成しました</h2>
+    <p id="doneInfo">—</p>
+    <div class="card">
+      <h3>スタッフに送るLINE文</h3>
+      <div class="preview" id="donePreview">—</div>
+      <div class="copyBar">
+        <button class="btnCopy" id="btnCopy2" onclick="copyText(true)">📋 コピー</button>
+      </div>
+    </div>
+    <button class="btnBack" onclick="reset()">続けて作成</button>
+  </div>
+</div>
+
+<script>
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzX7Pzhq2TFFOHCr0saeHG7qeWA5PuBptUe4-kAtzj-kYWIkJE7z7F1vkvkAMEUzQpPcA/exec';
+
+let DATES = [];      // ['2026-06-19', ...]
+let lastText = '';
+
+/* ════ GAS通信 ════ */
+async function callGas(payload){
+  const res = await fetch(GAS_URL, {
+    method:'POST', headers:{'Content-Type':'text/plain'}, redirect:'follow',
+    body: JSON.stringify(payload),
+  });
+  const json = await res.json();
+  if(!json.ok) throw new Error(json.error || '不明なエラー');
+  return json;
+}
+
+/* ════ 起動 ════ */
+async function init(){
+  // 時間プルダウン（15分刻み）
+  document.getElementById('fStart').innerHTML = timeOpts('09:00');
+  document.getElementById('fEnd').innerHTML   = timeOpts('18:00');
+
+  // 初期項目
+  addItem('condItems','男女OK！');
+  addItem('wearItems','黒パンツ');
+  addItem('jobItems','受付');
+
+  // クライアント一覧
+  try{
+    const r = await callGas({action:'getMasters'});
+    const sel = document.getElementById('fMention');
+    sel.innerHTML = r.masters.clients
+      .map(c=>'<option value="'+esc(c.mention)+'">'+esc(c.name)+'</option>').join('');
+    setStatus('準備完了');
+  }catch(e){
+    document.getElementById('errBox').innerHTML =
+      '<div class="err">クライアント一覧の取得に失敗しました<br>'+e.message+'</div>';
+    setStatus('エラー','err');
+  }
+  preview();
+}
+
+function timeOpts(sel){
+  let h='';
+  for(let i=0;i<24;i++) for(let m=0;m<60;m+=15){
+    const t = ('0'+i).slice(-2)+':'+('0'+m).slice(-2);
+    h += '<option'+(t===sel?' selected':'')+'>'+t+'</option>';
+  }
+  return h;
+}
+
+/* ════ 日程 ════ */
+function addDate(){
+  const el = document.getElementById('fDate');
+  const v = el.value;
+  if(!v) return;
+  if(DATES.indexOf(v)<0) DATES.push(v);
+  DATES.sort();
+  el.value='';
+  renderDates(); preview();
+}
+function delDate(d){
+  DATES = DATES.filter(x=>x!==d);
+  renderDates(); preview();
+}
+function renderDates(){
+  const w = document.getElementById('dateChips');
+  w.innerHTML = DATES.map(d=>
+    '<span class="dchip">'+shortDate(d)+
+    '<button onclick="delDate(\''+d+'\')">×</button></span>'
+  ).join('');
+}
+function shortDate(ymd){
+  const p = ymd.split('-');
+  const wd = ['日','月','火','水','木','金','土'][new Date(+p[0],+p[1]-1,+p[2]).getDay()];
+  return Number(p[1])+'/'+Number(p[2])+'('+wd+')';
+}
+
+/* ════ 複数行の項目 ════ */
+function addItem(wrapId, ph){
+  const w = document.getElementById(wrapId);
+  const d = document.createElement('div');
+  d.className='item';
+  d.innerHTML = '<input placeholder="'+esc(ph)+'" oninput="preview()">'+
+                '<button class="del" onclick="this.parentElement.remove(); preview();">×</button>';
+  w.appendChild(d);
+}
+function getItems(wrapId){
+  return Array.from(document.querySelectorAll('#'+wrapId+' input'))
+    .map(i=>i.value.trim()).filter(v=>v);
+}
+
+/* ════ LINE文プレビュー（テンプレート）════ */
+function buildText(){
+  const L=[];
+  const conds = getItems('condItems');
+  if(conds.length){ L.push('🙋🏽‍♂️💁🏼‍♀️'); conds.forEach(c=>L.push(c)); }
+
+  const name = document.getElementById('fName').value.trim();
+  L.push('✅【'+(name||'（案件名）')+'】');
+
+  L.push('□日程');
+  L.push(datesForLine());
+
+  const st = document.getElementById('fStart').value;
+  const en = document.getElementById('fEnd').value;
+  L.push('□時間');
+  L.push(st+'〜'+en);
+  const tn = document.getElementById('fTimeNote').value.trim();
+  if(tn) L.push('※'+tn);
+
+  const area = document.getElementById('fArea').value.trim();
+  if(area){ L.push('□場所'); L.push(area); }
+
+  const wear = getItems('wearItems');
+  if(wear.length){ L.push('□服装'); wear.forEach(w=>L.push(w)); }
+
+  const price = uncomma(document.getElementById('fPrice').value);
+  if(price){ L.push('□金額'); L.push('D'+Number(price).toLocaleString()+'円/日'); }
+
+  const jobs = getItems('jobItems');
+  if(jobs.length){
+    L.push('□お仕事内容');
+    jobs.forEach((j,i)=> L.push(j + (i===jobs.length-1 ? 'など！' : '')));
+  }
+  return L.join('\n');
+}
+
+function datesForLine(){
+  if(!DATES.length) return '（日程を追加）';
+  const byM={};
+  DATES.forEach(d=>{
+    const p=d.split('-'); const m=Number(p[1]), day=Number(p[2]);
+    if(!byM[m]) byM[m]=[];
+    byM[m].push(day);
+  });
+  return Object.keys(byM).map(m=> m+'/'+byM[m].join('、')).join('　');
+}
+
+function preview(){
+  lastText = buildText();
+  document.getElementById('preview').textContent = lastText;
+  document.getElementById('btnCopy').classList.remove('done');
+  document.getElementById('btnCopy').textContent = '📋 コピー';
+}
+
+/* ════ コピー ════ */
+async function copyText(isDone){
+  const btn = document.getElementById(isDone ? 'btnCopy2' : 'btnCopy');
+  try{
+    await navigator.clipboard.writeText(lastText);
+    btn.classList.add('done');
+    btn.textContent = '✓ コピーしました';
+    setTimeout(()=>{ btn.classList.remove('done'); btn.textContent='📋 コピー'; }, 2000);
+  }catch(e){
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = lastText; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+    btn.textContent = '✓ コピーしました';
+    setTimeout(()=>{ btn.textContent='📋 コピー'; }, 2000);
+  }
+}
+
+/* ════ 案件を作成 ════ */
+async function createCase(){
+  const name = document.getElementById('fName').value.trim();
+  const mention = document.getElementById('fMention').value;
+
+  if(!mention){ setStatus('送り先を選んでください','err'); return; }
+  if(!name){ setStatus('案件名を入れてください','err'); return; }
+  if(!DATES.length){ setStatus('日程を追加してください','err'); return; }
+  if(!getItems('jobItems').length){ setStatus('お仕事内容を1つ以上','err'); return; }
+
+  const btn = document.getElementById('btnGo');
+  btn.disabled = true;
+  setStatus('作成中…');
+
+  const form = {
+    mention: mention,
+    caseName: name,
+    area: document.getElementById('fArea').value.trim(),
+    dates: DATES.map(d=>{ const p=d.split('-'); return Number(p[1])+'/'+Number(p[2]); }),
+    timeStart: document.getElementById('fStart').value,
+    timeEnd:   document.getElementById('fEnd').value,
+    timeNote:  document.getElementById('fTimeNote').value.trim(),
+    wear:  getItems('wearItems'),
+    jobs:  getItems('jobItems'),
+    price: uncomma(document.getElementById('fPrice').value),
+    conditions: getItems('condItems'),
+    notes: '',
+  };
+
+  try{
+    const r = await callGas({ action:'createCase', form });
+    lastText = r.result.lineText;
+    document.getElementById('doneInfo').textContent =
+      'タブ名：' + r.result.tabName + '　／　' + r.result.rowCount + '行を生成';
+    document.getElementById('donePreview').textContent = lastText;
+    show('viewDone');
+    setStatus('作成しました','ok');
+  }catch(e){
+    setStatus('作成に失敗しました','err');
+    alert('作成に失敗しました\n'+e.message);
+  }finally{
+    btn.disabled = false;
+  }
+}
+
+function reset(){
+  document.getElementById('fName').value='';
+  document.getElementById('fArea').value='';
+  document.getElementById('fTimeNote').value='';
+  document.getElementById('fPrice').value='';
+  DATES=[]; renderDates();
+  ['condItems','wearItems','jobItems'].forEach(id=>{
+    document.getElementById(id).innerHTML='';
+  });
+  addItem('condItems','男女OK！');
+  addItem('wearItems','黒パンツ');
+  addItem('jobItems','受付');
+  preview();
+  show('viewForm');
+  setStatus('—');
+  window.scrollTo(0,0);
+}
+
+/* ════ 共通 ════ */
+function setStatus(t,c){ const e=document.getElementById('status'); e.textContent=t; e.className='status'+(c?' '+c:''); }
+function show(id){ ['viewForm','viewDone'].forEach(v=>document.getElementById(v).classList.toggle('hide', v!==id)); window.scrollTo(0,0); }
+function fmtMoney(el){ const r=el.value.replace(/[^\d]/g,''); el.value = r? Number(r).toLocaleString():''; }
+function uncomma(v){ const s=String(v==null?'':v).replace(/,/g,'').trim(); if(s==='') return ''; const n=Number(s); return isNaN(n)?'':n; }
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+init();
+</script>
+</body>
+</html>
