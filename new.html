@@ -15,7 +15,6 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 input,textarea,select,button{font-family:inherit;font-size:16px;text-align:left;}
 button{cursor:pointer;border:none;background:none;color:inherit;}
 .hide{display:none!important;}
-
 /* ===== 案件一覧 ===== */
 #viewList{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
 .listHead{height:var(--head-h);display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);}
@@ -29,10 +28,9 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .caseCard .cName{font-weight:600;font-size:14px;margin-bottom:2px;}
 .caseCard .cMeta{font-size:11px;color:var(--sub);}
 .caseCard.pinned{border-left:3px solid var(--warn);}
-
+.listLoading{text-align:center;color:var(--sub);padding:40px;font-size:13px;}
 /* ===== 案件詳細 ===== */
 #viewCase{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
-
 /* ヘッダー（折りたたみ可能） */
 .caseHead{
   height:var(--head-h);
@@ -53,7 +51,6 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .caseHead .st.saved{color:var(--ok);}
 .caseHead .saveBtn{padding:6px 12px;background:var(--ok);color:#fff;border-radius:8px;font-size:13px;font-weight:600;}
 .caseHead .saveBtn.dirty{background:var(--warn);}
-
 /* ナビバー */
 .navbar{
   height:var(--nav-h);
@@ -75,16 +72,13 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 }
 .headShowBtn{display:none;}
 .caseHead.collapsed ~ .caseWrap .headShowBtn{display:block;}
-
 /* 本体スクロール領域 */
 .caseWrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
 .scrollArea{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 8px;}
-
 /* 各ブロック共通 */
 .block{background:var(--card);border-bottom:1px solid var(--line);}
 .blockBody{padding:10px 12px;}
 .block:not(.open) .blockBody{display:none;}
-
 /* ⓪原文（開いている時 1/4 固定・上部スティッキー） */
 #paneRaw{position:relative;}
 #paneRaw.open{
@@ -96,13 +90,19 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 }
 #paneRaw.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;
 }
+#rawHistory{
+  font-size:12px;line-height:1.5;color:var(--sub);white-space:pre-wrap;
+  max-height:45%;overflow-y:auto;padding:6px 8px;background:var(--off);
+  border-radius:6px;margin-bottom:6px;
+}
+#rawAddLabel{font-size:11px;color:var(--sub);margin-bottom:4px;}
 #rawText{
-  width:100%;height:100%;border:0;background:transparent;
+  flex:1;width:100%;border:0;background:var(--field);border-radius:6px;
   font-size:13px;line-height:1.5;color:var(--ink);
-  resize:none;padding:0;
+  resize:none;padding:8px;min-height:60px;
 }
-
 /* ③LINE文（開いている時 下部固定、⓪状態で高さ変化） */
 #paneGen{position:relative;}
 #paneGen.open{
@@ -125,10 +125,8 @@ body:not(.rawOpen) #paneGen.open{
 #paneGen.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
-
 /* 中央ブロック（①②④）*/
 #block1,#block2,#block4{}
-
 /* フィールド */
 .lineRow{display:flex;align-items:center;gap:8px;padding:6px 0;}
 .lineRow .lbl{width:56px;font-size:12px;color:var(--sub);flex-shrink:0;}
@@ -137,7 +135,9 @@ body:not(.rawOpen) #paneGen.open{
   width:100%;padding:8px 10px;background:var(--field);border:0;border-radius:8px;
   font-size:15px;
 }
+select.field{-webkit-appearance:none;appearance:none;}
 textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1.5;}
+.fieldHint{font-size:10px;color:var(--sub);margin-top:2px;}
 .dateDisplay{
   flex:1;padding:8px 10px;background:var(--field);border-radius:8px;
   font-size:14px;min-height:36px;cursor:pointer;
@@ -157,13 +157,11 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 .irrList{padding:4px 0 0 56px;}
 .irrItem{display:flex;align-items:center;gap:4px;padding:4px 0;font-size:12px;color:var(--sub);}
 .irrItem .del{padding:2px 6px;color:var(--warn);}
-
 /* ②単価 */
 .priceGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .priceCell{background:var(--field);border-radius:8px;padding:8px;}
 .priceCell .plbl{font-size:11px;color:var(--sub);margin-bottom:4px;}
 .priceCell input{width:100%;padding:6px 8px;background:var(--card);border:0;border-radius:6px;font-size:14px;}
-
 /* ③向け先＋追加費用 */
 .targetRow{display:flex;align-items:center;gap:6px;padding:4px 0;}
 .targetRow .lbl{width:52px;font-size:11px;color:var(--sub);flex-shrink:0;}
@@ -186,10 +184,9 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
   font-size:12px;line-height:1.5;white-space:pre-wrap;color:var(--ink);
   font-family:inherit;
 }
-
+.genNote{font-size:10px;color:var(--sub);margin-top:4px;}
 /* ④アサイン */
 .assignHint{font-size:12px;color:var(--sub);padding:8px 0;}
-
 /* カレンダーモーダル */
 .modal{
   position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;
@@ -218,7 +215,6 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 </style>
 </head>
 <body>
-
 <!-- ===== 案件一覧 ===== -->
 <div id="viewList">
   <div class="listHead">
@@ -228,7 +224,6 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
   <div class="filterBar" id="filterBar"></div>
   <div class="caseList" id="caseList"></div>
 </div>
-
 <!-- ===== 案件詳細 ===== -->
 <div id="viewCase" class="hide">
   <div class="caseHead" id="caseHead">
@@ -239,7 +234,6 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
     </div>
     <button class="saveBtn" id="saveBtn" onclick="save()">保存</button>
   </div>
-
   <div class="caseWrap">
     <div class="navbar">
       <div class="navtabs" id="navtabs">
@@ -255,19 +249,22 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
         <button class="navAllBtn" onclick="hideHead()" title="ヘッダー折りたたみ">▽</button>
       </div>
     </div>
-
     <div class="scrollArea" id="scrollArea">
-
-      <!-- ⓪原文 -->
+      <!-- ⓪原文（既存案件を開いた時だけ使う。新規作成時は使わない） -->
       <div class="block" id="paneRaw">
         <div class="blockBody">
-          <textarea id="rawText" placeholder="LINE原文（貼り付け可）" oninput="onRawChange()"></textarea>
+          <div id="rawHistory"></div>
+          <div id="rawAddLabel">↓追記する内容があれば貼り付け（保存すると下に追記されます）</div>
+          <textarea id="rawText" placeholder="追記するLINE原文など" oninput="onRawChange()"></textarea>
         </div>
       </div>
-
       <!-- ①案件詳細 -->
       <div class="block open" id="block1">
         <div class="blockBody">
+          <div class="lineRow" id="rowClient">
+            <span class="lbl">送り先</span>
+            <div class="val"><select class="field" id="dClient"></select></div>
+          </div>
           <div class="lineRow">
             <span class="lbl">案件名</span>
             <div class="val"><input class="field" id="dName" oninput="onDetailChange()"></div>
@@ -288,22 +285,21 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
             <button class="irrAdd" onclick="addIrregular()">＋</button>
           </div>
           <div class="irrList" id="irrList"></div>
-          <div class="lineRow">
+          <div class="lineRow" id="rowPeople">
             <span class="lbl">人数</span>
             <div class="val"><input class="field" id="dPeople" placeholder="女性ST2名（〇）" oninput="onDetailChange()"></div>
           </div>
-          <div class="lineRow">
+          <div class="lineRow" id="rowWear">
             <span class="lbl">衣装</span>
             <div class="val"><input class="field" id="dWear" oninput="onDetailChange()"></div>
           </div>
-          <div class="lineRow" style="align-items:flex-start;">
+          <div class="lineRow" id="rowJob" style="align-items:flex-start;">
             <span class="lbl" style="padding-top:8px;">仕事内容</span>
-            <div class="val"><textarea class="field" id="dJob" oninput="onDetailChange()"></textarea></div>
+            <div class="val"><textarea class="field" id="dJob" placeholder="1行に1項目" oninput="onDetailChange()"></textarea></div>
           </div>
         </div>
       </div>
-
-      <!-- ②単価 -->
+      <!-- ②単価（新規作成時のみ。既存案件の単価編集は今回未対応） -->
       <div class="block" id="block2">
         <div class="blockBody">
           <div class="priceGrid">
@@ -326,7 +322,6 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
           </div>
         </div>
       </div>
-
       <!-- ③LINE文 -->
       <div class="block" id="paneGen">
         <div class="blockBody">
@@ -351,20 +346,18 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
             </label>
           </div>
           <pre class="genPreview" id="genPreview">—</pre>
+          <div class="genNote" id="genNote">※これはプレビューです。新規作成時は保存後に確定した文章に差し替わります。</div>
         </div>
       </div>
-
       <!-- ④アサイン -->
       <div class="block" id="block4">
         <div class="blockBody">
           <div class="assignHint">アサイン編集は今回スルー（後日実装）</div>
         </div>
       </div>
-
     </div>
   </div>
 </div>
-
 <!-- カレンダーモーダル -->
 <div class="modal" id="calModal">
   <div class="modalBox">
@@ -383,21 +376,36 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
     </div>
   </div>
 </div>
-
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbzX7Pzhq2TFFOHCr0saeHG7qeWA5PuBptUe4-kAtzj-kYWIkJE7z7F1vkvkAMEUzQpPcA/exec';
 
 // ===== 状態 =====
 let CASES=[];
-let CUR=null;         // 現在の案件データ
-let CUR_ID=null;      // 現在の案件タブID
+let MODE='create';    // 'create'(新規作成) | 'edit'(既存編集)
+let CUR=null;          // 既存編集モード時：{settings,slots,rawText,masters}
+let CUR_SSID=null;     // 既存編集モード時：対象SS_ID
+let CUR_TAB=null;      // 既存編集モード時：対象タブ名
+let CUR_ID=null;       // 一覧・キャッシュ用のキー = ssId + '::' + tabName
 let DIRTY=false;
-let SEL_DATES=[];     // ['6/19','6/20'...] 内部は YYYY-MM-DD
-let IRR=[];           // イレギュラー [{date:'YYYY-MM-DD',start:'HH:MM',end:'HH:MM'}]
+let SEL_DATES=[];      // ['2026-06-19','2026-06-20'...] 内部はISO
+let IRR=[];            // イレギュラー [{date:'YYYY-MM-DD',start:'HH:MM',end:'HH:MM'}]
 let TARGET='self';
 let FILTER_CLIENT='ALL';
-let CAL_TMP=[];       // カレンダー編集中の一時
-let CAL_YM={y:0,m:0}; // カレンダー表示中の年月
+let CAL_TMP=[];        // カレンダー編集中の一時
+let CAL_YM={y:0,m:0};  // カレンダー表示中の年月
+let MASTERS=null;      // getMastersのキャッシュ（クライアント一覧など）
+
+// ===== GAS通信共通ヘルパー =====
+// ★必ずPOST＋Content-Type:text/plainで送る（CORSプリフライト回避のため）。
+//   GETはdoGet側でアクション振り分けをしていないため使わないこと。
+function postGAS(obj){
+  return fetch(GAS_URL,{
+    method:'POST',
+    headers:{'Content-Type':'text/plain'},
+    body:JSON.stringify(obj),
+    redirect:'follow'
+  }).then(r=>r.json());
+}
 
 // ===== 一覧 =====
 function loadCaseList(){
@@ -405,11 +413,18 @@ function loadCaseList(){
     const c=localStorage.getItem('caseList');
     if(c){CASES=JSON.parse(c);renderList();}
   }catch(e){}
-  fetch(GAS_URL+'?action=getCaseList').then(r=>r.json()).then(d=>{
-    if(d.ok){CASES=d.list||[];localStorage.setItem('caseList',JSON.stringify(CASES));renderList();}
-  }).catch(()=>{});
+  postGAS({action:'getCaseList'}).then(d=>{
+    if(d.ok){
+      CASES=(d.cases||[]).map(c=>Object.assign({id:c.ssId+'::'+c.tabName},c));
+      localStorage.setItem('caseList',JSON.stringify(CASES));
+      renderList();
+    }
+  }).catch(()=>{
+    if(!CASES.length){
+      document.getElementById('caseList').innerHTML='<div class="listLoading">読み込みに失敗しました。電波の良い所で開き直してください。</div>';
+    }
+  });
 }
-
 function renderList(){
   const clients=[...new Set(CASES.map(c=>c.client||'—'))];
   const fb=document.getElementById('filterBar');
@@ -417,20 +432,25 @@ function renderList(){
     clients.map(cl=>`<button class="chip ${FILTER_CLIENT===cl?'on':''}" onclick="setFilter('${cl}')">${cl}</button>`).join('');
   const list=CASES.filter(c=>FILTER_CLIENT==='ALL'||c.client===FILTER_CLIENT)
     .sort((a,b)=>{
-      if(a.pinned!==b.pinned)return b.pinned?1:-1;
-      return (b.firstDate||'').localeCompare(a.firstDate||'');
+      if(!!a.pinned!==!!b.pinned)return b.pinned?1:-1;
+      // ※日付は表示文字列("6/19(金)・6/20(土)"等)での比較のため、月をまたぐ案件が
+      //   混在すると厳密な時系列にならない場合があります(既知の制限)。
+      return (b.dates||'').localeCompare(a.dates||'');
     });
   document.getElementById('caseList').innerHTML=list.map(c=>
     `<div class="caseCard ${c.pinned?'pinned':''}" onclick="openCase('${c.id}')">
-      <div class="cName">${c.name||'(無題)'}</div>
-      <div class="cMeta">${c.client||''} ・ ${c.firstDate||''}</div>
-    </div>`).join('')||'<div style="text-align:center;color:var(--sub);padding:40px;">案件がありません</div>';
+      <div class="cName">${c.caseName||'(無題)'}</div>
+      <div class="cMeta">${c.client||''} ・ ${c.dates||''}</div>
+    </div>`).join('')||'<div class="listLoading">案件がありません</div>';
 }
-
 function setFilter(c){FILTER_CLIENT=c;renderList();}
 
-// ===== 詳細を開く =====
+// ===== 既存案件を開く =====
 function openCase(id){
+  MODE='edit';
+  const idx=id.indexOf('::');
+  CUR_SSID=id.substring(0,idx);
+  CUR_TAB=id.substring(idx+2);
   CUR_ID=id;
   // キャッシュから即表示
   try{
@@ -440,62 +460,130 @@ function openCase(id){
   document.getElementById('viewList').classList.add('hide');
   document.getElementById('viewCase').classList.remove('hide');
   // 裏で最新取得
-  fetch(GAS_URL+'?action=getCase&id='+encodeURIComponent(id)).then(r=>r.json()).then(d=>{
+  postGAS({action:'getCase',ssId:CUR_SSID,tabName:CUR_TAB}).then(d=>{
     if(d.ok&&d.data){
-      CUR=d.data;localStorage.setItem('case_'+id,JSON.stringify(CUR));
+      CUR=d.data;
+      localStorage.setItem('case_'+id,JSON.stringify(CUR));
       buildAll();
     }
   }).catch(()=>{});
 }
-
 function backToList(){
   document.getElementById('viewCase').classList.add('hide');
   document.getElementById('viewList').classList.remove('hide');
   loadCaseList();
 }
-
 function newCase(){
-  CUR_ID=null;
-  CUR={name:'',client:'',place:'',dates:[],timeStart:'',timeEnd:'',irregulars:[],people:'',wear:'',job:'',prices:{},raw:''};
+  MODE='create';
+  CUR_SSID=null;CUR_TAB=null;CUR_ID=null;CUR=null;
   SEL_DATES=[];IRR=[];TARGET='self';DIRTY=false;
   buildAll();
   document.getElementById('viewList').classList.add('hide');
   document.getElementById('viewCase').classList.remove('hide');
 }
 
+// ===== クライアント選択（新規作成モード用） =====
+function populateClientPicker(){
+  const sel=document.getElementById('dClient');
+  if(MASTERS){ fillClientSelect(sel); return; }
+  sel.innerHTML='<option value="">読み込み中…</option>';
+  postGAS({action:'getMasters'}).then(d=>{
+    if(d.ok){ MASTERS=d.masters; fillClientSelect(sel); }
+    else{ sel.innerHTML='<option value="">取得失敗</option>'; }
+  }).catch(()=>{ sel.innerHTML='<option value="">通信エラー</option>'; });
+}
+function fillClientSelect(sel){
+  const clients=(MASTERS&&MASTERS.clients)||[];
+  sel.innerHTML=clients.length
+    ? clients.map(c=>`<option value="${c.mention}">${c.name}</option>`).join('')
+    : '<option value="">クライアント未登録</option>';
+}
+
+// ===== モードに応じた表示切替 =====
+function applyModeVisibility(){
+  const isEdit = MODE==='edit';
+  document.getElementById('rowClient').style.display = isEdit?'none':'flex';
+  document.getElementById('rowPeople').style.display = isEdit?'none':'flex';
+  document.getElementById('rowWear').style.display = isEdit?'none':'flex';
+  document.getElementById('rowJob').style.display = isEdit?'none':'flex';
+
+  const tab2=document.querySelector('.navtab[data-target="block2"]');
+  const tab0=document.querySelector('.navtab[data-target="paneRaw"]');
+  if(isEdit){
+    tab2.classList.add('hide');
+    document.getElementById('block2').classList.remove('open');
+    tab0.classList.remove('hide');
+  }else{
+    tab2.classList.remove('hide');
+    tab0.classList.add('hide');
+    document.getElementById('paneRaw').classList.remove('open');
+  }
+  document.body.classList.toggle('rawOpen',document.getElementById('paneRaw').classList.contains('open'));
+  updateNavActive();
+}
+
 // ===== データ描画 =====
 function buildAll(){
-  if(!CUR)return;
-  document.getElementById('hName').textContent=CUR.name||'(無題)';
-  document.getElementById('rawText').value=CUR.raw||'';
-  document.getElementById('dName').value=CUR.name||'';
-  document.getElementById('dPlace').value=CUR.place||'';
-  SEL_DATES=(CUR.dates||[]).slice();
-  updateDatesDisplay();
-  document.getElementById('dTimeStart').value=CUR.timeStart||'';
-  document.getElementById('dTimeEnd').value=CUR.timeEnd||'';
-  IRR=(CUR.irregulars||[]).slice();
-  renderIrr();
-  document.getElementById('dPeople').value=CUR.people||'';
-  document.getElementById('dWear').value=CUR.wear||'';
-  document.getElementById('dJob').value=CUR.job||'';
-  const p=CUR.prices||{};
-  document.getElementById('p_self_bill').value=p.self_bill||'';
-  document.getElementById('p_zero_bill').value=p.zero_bill||'';
-  document.getElementById('p_han_bill').value=p.han_bill||'';
-  document.getElementById('p_other_bill').value=p.other_bill||'';
+  const isEdit = MODE==='edit';
+
+  if(isEdit && CUR){
+    document.getElementById('hName').textContent=CUR.settings.caseName||'(無題)';
+    document.getElementById('dName').value=CUR.settings.caseName||'';
+    document.getElementById('dPlace').value=CUR.settings.area||'';
+
+    // 時間は "09:00〜21:00" 形式なら分解して初期値に。それ以外は空のまま。
+    const tm=(CUR.settings.time||'').match(/^(\d{2}:\d{2})[〜~-](\d{2}:\d{2})$/);
+    document.getElementById('dTimeStart').value=tm?tm[1]:'';
+    document.getElementById('dTimeEnd').value=tm?tm[2]:'';
+
+    // 日程は文字列でしか持っていないため、そのままでは再選択できない。
+    // 変更したい時だけカレンダーで選び直す運用にする。
+    SEL_DATES=[];
+    updateDatesDisplay(CUR.settings.dates||'');
+
+    IRR=[];renderIrr();
+
+    document.getElementById('rawHistory').textContent=CUR.rawText||'(原文の記録はまだありません)';
+    document.getElementById('rawText').value='';
+  }else{
+    document.getElementById('hName').textContent=document.getElementById('dName').value||'(無題)';
+    document.getElementById('dName').value='';
+    document.getElementById('dPlace').value='';
+    SEL_DATES=[];updateDatesDisplay();
+    document.getElementById('dTimeStart').value='';
+    document.getElementById('dTimeEnd').value='';
+    IRR=[];renderIrr();
+    document.getElementById('dPeople').value='';
+    document.getElementById('dWear').value='';
+    document.getElementById('dJob').value='';
+    populateClientPicker();
+  }
+
+  // 単価（新規作成モードのみ使用）
+  document.getElementById('p_self_bill').value='';
+  document.getElementById('p_zero_bill').value='';
+  document.getElementById('p_han_bill').value='';
+  document.getElementById('p_other_bill').value='';
+
+  document.getElementById('genNote').style.display = isEdit ? 'none' : 'block';
+
   DIRTY=false;updateSaveState();
+  applyModeVisibility();
   renderGen();
 }
 
 // ===== 日程表示 =====
-function updateDatesDisplay(){
+function updateDatesDisplay(existingStr){
   const el=document.getElementById('dDatesDisplay');
-  if(!SEL_DATES.length){
-    el.textContent='タップして選択';el.classList.add('empty');
-  }else{
+  if(SEL_DATES.length){
     el.textContent=SEL_DATES.map(fmtDateJP).join('、');
     el.classList.remove('empty');
+  }else if(existingStr){
+    el.textContent=existingStr+'（変更する場合はタップして選び直し）';
+    el.classList.add('empty');
+  }else{
+    el.textContent='タップして選択';
+    el.classList.add('empty');
   }
 }
 function fmtDateJP(iso){
@@ -570,8 +658,8 @@ function delIrr(i){IRR.splice(i,1);renderIrr();onDetailChange();}
 // ===== ナビ・ブロック開閉 =====
 function toggleBlock(id){
   const el=document.getElementById(id);
+  if(el.classList.contains('hide'))return;
   el.classList.toggle('open');
-  // ⓪状態を body に反映（③高さ制御用）
   document.body.classList.toggle('rawOpen',document.getElementById('paneRaw').classList.contains('open'));
   updateNavActive();
 }
@@ -580,11 +668,18 @@ function updateNavActive(){
     const tgt=t.dataset.target;
     t.classList.toggle('active',document.getElementById(tgt).classList.contains('open'));
   });
-  const anyClosed=['paneRaw','block1','block2','paneGen','block4'].some(id=>!document.getElementById(id).classList.contains('open'));
+  const ids=['paneRaw','block1','block2','paneGen','block4'].filter(id=>{
+    const tab=document.querySelector('.navtab[data-target="'+id+'"]');
+    return !tab || !tab.classList.contains('hide');
+  });
+  const anyClosed=ids.some(id=>!document.getElementById(id).classList.contains('open'));
   document.getElementById('navAllBtn').textContent=anyClosed?'全開':'全閉';
 }
 function toggleAll(){
-  const ids=['paneRaw','block1','block2','paneGen','block4'];
+  const ids=['paneRaw','block1','block2','paneGen','block4'].filter(id=>{
+    const tab=document.querySelector('.navtab[data-target="'+id+'"]');
+    return !tab || !tab.classList.contains('hide');
+  });
   const anyClosed=ids.some(id=>!document.getElementById(id).classList.contains('open'));
   ids.forEach(id=>document.getElementById(id).classList.toggle('open',anyClosed));
   document.body.classList.toggle('rawOpen',document.getElementById('paneRaw').classList.contains('open'));
@@ -622,7 +717,7 @@ function updateSaveState(){
   else{st.textContent='保存済み';st.className='st saved';btn.classList.remove('dirty');}
 }
 
-// ===== ③LINE文生成 =====
+// ===== ③LINE文プレビュー（ローカル簡易生成。保存後は本番テンプレの結果に差し替わる） =====
 function renderGen(){
   const name=document.getElementById('dName').value||'';
   const place=document.getElementById('dPlace').value||'';
@@ -650,8 +745,7 @@ function renderGen(){
   }
   const txt=
 `✅【${name}】
-
-□日程：${dates}
+□日程：${dates||'—'}
 □時間：${ts&&te?ts+'〜'+te:'—'}${irrStr}
 □場所：${place}
 □ご依頼人数：${people}
@@ -663,41 +757,91 @@ function renderGen(){
 
 // ===== 保存 =====
 function save(){
-  if(!CUR)return;
   const btn=document.getElementById('saveBtn');
-  btn.disabled=true;btn.textContent='保存中...';
-  const data={
-    id:CUR_ID,
-    name:document.getElementById('dName').value,
-    place:document.getElementById('dPlace').value,
-    dates:SEL_DATES,
-    timeStart:document.getElementById('dTimeStart').value,
-    timeEnd:document.getElementById('dTimeEnd').value,
-    irregulars:IRR,
-    people:document.getElementById('dPeople').value,
-    wear:document.getElementById('dWear').value,
-    job:document.getElementById('dJob').value,
-    prices:{
-      self_bill:document.getElementById('p_self_bill').value,
-      zero_bill:document.getElementById('p_zero_bill').value,
-      han_bill:document.getElementById('p_han_bill').value,
-      other_bill:document.getElementById('p_other_bill').value,
-    },
-    raw:document.getElementById('rawText').value
-  };
-  fetch(GAS_URL,{method:'POST',body:JSON.stringify({action:'saveCase',data:data})})
-    .then(r=>r.json()).then(d=>{
+
+  if(MODE==='create'){
+    const mention=document.getElementById('dClient').value;
+    const caseName=document.getElementById('dName').value.trim();
+    if(!mention){alert('送り先クライアントを選んでください');return;}
+    if(!caseName){alert('案件名を入力してください');return;}
+    if(!SEL_DATES.length){alert('日程を選択してください');return;}
+
+    const priceMap={self:'p_self_bill',zero:'p_zero_bill',han:'p_han_bill',other:'p_other_bill'};
+    const price=document.getElementById(priceMap[TARGET])?.value||'';
+    const people=document.getElementById('dPeople').value.trim();
+
+    const form={
+      mention:mention,
+      caseName:caseName,
+      area:document.getElementById('dPlace').value,
+      dates:SEL_DATES,
+      timeStart:document.getElementById('dTimeStart').value,
+      timeEnd:document.getElementById('dTimeEnd').value,
+      wear:(document.getElementById('dWear').value||'').split(/[\n、,]/).map(s=>s.trim()).filter(Boolean),
+      jobs:(document.getElementById('dJob').value||'').split(/\n/).map(s=>s.trim()).filter(Boolean),
+      price:price,
+      conditions:people?[people]:[],
+      notes:'',
+    };
+
+    btn.disabled=true;btn.textContent='保存中...';
+    postGAS({action:'createCase',form:form}).then(d=>{
       btn.disabled=false;btn.textContent='保存';
       if(d.ok){
-        CUR_ID=d.id||CUR_ID;
-        CUR=Object.assign(CUR,data);
-        localStorage.setItem('case_'+CUR_ID,JSON.stringify(CUR));
+        MODE='edit';
+        CUR_SSID=d.result.ssId;
+        CUR_TAB=d.result.tabName;
+        CUR_ID=CUR_SSID+'::'+CUR_TAB;
+        document.getElementById('genPreview').textContent=d.result.lineText||'';
+        document.getElementById('genNote').textContent='※この文章が確定版です。コピーしてスタッフに送ってください。';
+        document.getElementById('genNote').style.display='block';
         DIRTY=false;updateSaveState();
-      }else{alert('保存失敗: '+(d.error||''));}
+        applyModeVisibility();
+        alert('案件タブを作成しました。③LINE文タブの文章をコピーして送ってください。');
+      }else{
+        alert('作成に失敗しました: '+(d.error||'不明なエラー'));
+      }
     }).catch(e=>{
       btn.disabled=false;btn.textContent='保存';
       alert('通信エラー: '+e);
     });
+    return;
+  }
+
+  // ===== 編集モード（既存案件） =====
+  const meta={
+    caseName:document.getElementById('dName').value.trim(),
+    area:document.getElementById('dPlace').value.trim(),
+    dates:SEL_DATES.slice(),               // 変更した時だけ中身が入る
+    timeStart:document.getElementById('dTimeStart').value,
+    timeEnd:document.getElementById('dTimeEnd').value,
+  };
+  const rawAdd=(document.getElementById('rawText').value||'').trim();
+
+  // ★slotsキーは意図的に含めない＝GAS側でアサインデータには一切触らせない
+  const payload={settings:{meta:meta}};
+  if(rawAdd) payload.rawAdd=rawAdd;
+
+  btn.disabled=true;btn.textContent='保存中...';
+  postGAS({action:'saveCase',ssId:CUR_SSID,tabName:CUR_TAB,payload:payload}).then(d=>{
+    btn.disabled=false;btn.textContent='保存';
+    if(d.ok){
+      if(meta.caseName){CUR.settings.caseName=meta.caseName;document.getElementById('hName').textContent=meta.caseName;}
+      if(meta.area)CUR.settings.area=meta.area;
+      if(rawAdd){
+        CUR.rawText=(CUR.rawText?CUR.rawText+'\n\n':'')+rawAdd;
+        document.getElementById('rawHistory').textContent=CUR.rawText;
+        document.getElementById('rawText').value='';
+      }
+      localStorage.setItem('case_'+CUR_ID,JSON.stringify(CUR));
+      DIRTY=false;updateSaveState();
+    }else{
+      alert('保存に失敗しました: '+(d.error||'不明なエラー'));
+    }
+  }).catch(e=>{
+    btn.disabled=false;btn.textContent='保存';
+    alert('通信エラー: '+e);
+  });
 }
 
 // ===== 初期化 =====
