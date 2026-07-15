@@ -11,26 +11,30 @@
     --ink:#1c1c1e; --sub:#8e8e93; --line:#e5e5ea; --line2:#d1d1d6;
     --bg:#f2f2f7; --card:#fff; --field:#f2f2f7;
     --ok:#34c759; --warn:#ff9500; --off:#f7f7f9;
-    --nav-h:44px;    /* 常駐ミニナビバーの高さ */
-    --head-h:56px;   /* 案件詳細のヘッダー高さ */
+    --nav-h:40px;   /* ミニナビバーの高さ */
+    --sav-h:52px;   /* 下部保存バーの高さ（詰めた） */
   }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
   input,select,textarea{ font-size:16px !important; }
   html,body{ background:var(--bg); color:var(--ink);
     font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
-    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased; }
-  body{ padding:12px 8px 90px; max-width:520px; margin:0 auto; }
+    font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
+    text-align:left; }
+  body{ padding:12px 8px 68px; max-width:520px; margin:0 auto; }
   .hide{ display:none !important; }
 
+  /* すべて左寄せ */
+  input, textarea, select { text-align:left; }
+
   /* ── ヘッダー ── */
-  .head{ padding:6px 4px 12px; display:flex; align-items:flex-start; gap:8px; }
+  .head{ padding:6px 4px 10px; display:flex; align-items:flex-start; gap:8px; }
   .head .back{ font-size:20px; color:var(--sub); background:none; border:none; cursor:pointer; padding:0 4px 0 0; }
   .head .ttl{ flex:1; min-width:0; }
   .head .name{ font-size:19px; font-weight:700; letter-spacing:-.01em; }
   .head .sub{ font-size:12px; color:var(--sub); margin-top:2px; }
   .head .newBtn{ flex:0 0 auto; font-size:13px; font-weight:600; font-family:inherit;
     border:none; border-radius:8px; background:var(--ink); color:#fff;
-    padding:8px 14px; cursor:pointer; }
+    padding:7px 12px; cursor:pointer; }
 
   /* ── 案件一覧 ── */
   .caseItem{ background:var(--card); border-radius:12px; padding:12px 12px 12px 14px; margin-bottom:8px;
@@ -49,211 +53,240 @@
   .clientChips .chip{ font-size:12px; padding:6px 10px; background:var(--card);
     border-radius:14px; cursor:pointer; border:1px solid var(--line); }
   .clientChips .chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
-  .clientHeading{ font-size:11px; color:var(--sub); padding:12px 4px 4px; }
 
-  /* ── 常駐ミニナビバー（②詳細画面の上に固定） ── */
+  /* ══════ 案件詳細のレイアウト ══════
+     ⓪原文（上1/3固定）・中央スクロール領域（①②④）・③LINE文（下1/3固定）
+  ══════════════════════════════════════ */
+  .caseWrap{
+    position:relative;
+    /* 画面の残り高さを使う（ヘッダー分ざっくり60、下保存バー分52を差し引き） */
+    height: calc(100vh - 60px - var(--sav-h));
+    display:flex; flex-direction:column;
+  }
+
+  /* 常駐ミニナビバー */
   .navbar{ position:sticky; top:0; z-index:40; background:rgba(242,242,247,.95);
     backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
-    padding:6px 4px; margin:0 -8px 8px; }
-  .navtabs{ display:flex; gap:4px; overflow-x:auto; -webkit-overflow-scrolling:touch;
-    padding:0 4px; scrollbar-width:none; }
+    padding:4px 4px; height:var(--nav-h); flex:0 0 auto; }
+  .navtabs{ display:flex; gap:2px; overflow-x:auto; -webkit-overflow-scrolling:touch;
+    padding:0 2px; scrollbar-width:none; }
   .navtabs::-webkit-scrollbar{ display:none; }
-  .navtab{ flex:0 0 auto; font-family:inherit; border:none; background:transparent;
-    color:var(--sub); font-size:12px; padding:8px 10px; border-radius:8px;
+  .navtab{ flex:1 1 auto; font-family:inherit; border:none; background:transparent;
+    color:var(--sub); font-size:12px; padding:6px 4px; border-radius:8px;
     cursor:pointer; white-space:nowrap; }
   .navtab.active{ background:var(--ink); color:#fff; font-weight:600; }
   .navtab:not(.active):active{ background:var(--field); }
 
-  /* ── アコーディオン ── */
-  .acc{ background:var(--card); border-radius:12px; margin-bottom:9px;
+  /* ⓪原文パネル（上1/3固定・展開時のみ） */
+  .paneRaw{
+    background:var(--card); border-radius:12px; margin:6px 0 0;
     box-shadow:0 1px 2px rgba(0,0,0,.04); overflow:hidden;
-    scroll-margin-top:calc(var(--nav-h) + 8px); }
-  .acc>.bar{ display:flex; align-items:center; justify-content:space-between;
-    padding:13px 12px; cursor:pointer; user-select:none; }
-  .acc>.bar .t{ font-size:15px; font-weight:600; }
-  .acc>.bar .arrow{ font-size:12px; color:#c7c7cc; transition:transform .22s; }
-  .acc.open>.bar .arrow{ transform:rotate(90deg); }
-  .acc>.body{ max-height:0; overflow:hidden; transition:max-height .3s ease; }
-  .acc.open>.body{ max-height:12000px; }
-  .acc>.body .inner{ padding:0 11px 14px; }
-  .hint{ font-size:12px; color:var(--sub); margin:14px 0 7px; }
+    max-height:0; transition:max-height .25s ease;
+    flex:0 0 auto;
+  }
+  .paneRaw.open{ max-height:33vh; }
+  .paneRaw .inner{
+    padding:10px 11px; height:33vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
 
-  /* ── 入力行 ── */
-  .row{ display:flex; align-items:center; gap:8px; margin-bottom:7px; }
-  .row .lbl{ width:48px; flex-shrink:0; color:var(--sub); }
-  .row input{ flex:1; min-width:0; font-family:inherit; border:none; background:var(--field);
-    border-radius:8px; padding:8px 10px; height:36px; color:var(--ink); text-align:right; }
-  .row input:focus{ outline:1.5px solid var(--ink); }
-  .row .unit{ color:var(--sub); }
+  /* 中央スクロール領域（①②④が縦に並ぶ） */
+  .scrollMain{
+    flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:6px 0 6px;
+  }
+
+  /* ③LINE文パネル（下1/3固定・展開時のみ） */
+  .paneGen{
+    background:var(--card); border-radius:12px; margin:0 0 6px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04); overflow:hidden;
+    max-height:0; transition:max-height .25s ease;
+    flex:0 0 auto;
+  }
+  .paneGen.open{ max-height:34vh; }
+  .paneGen .inner{
+    padding:10px 11px; height:34vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+  }
+
+  /* ①②④の中身カード */
+  .block{
+    background:var(--card); border-radius:12px; margin-bottom:9px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    max-height:0; overflow:hidden; transition:max-height .25s ease;
+  }
+  .block.open{ max-height:12000px; }
+  .block .inner{ padding:12px 11px; }
+
+  .hint{ font-size:12px; color:var(--sub); margin:10px 0 5px; }
+  .hint:first-child{ margin-top:0; }
+
+  /* ── 入力行：ラベル1行＋入力1行の2行構造 ── */
+  .field{ margin-bottom:10px; }
+  .field .lbl{ display:block; font-size:11px; color:var(--sub); margin-bottom:4px; }
+  .field input, .field textarea, .field select{
+    display:block; width:100%; border:none; background:var(--field);
+    border-radius:8px; padding:9px 11px; font-family:inherit; color:var(--ink);
+    text-align:left;
+  }
+  .field textarea{ min-height:70px; resize:vertical; line-height:1.5; }
+  .field input:focus, .field textarea:focus, .field select:focus{ outline:1.5px solid var(--ink); }
+  .field .unit{ color:var(--sub); font-size:12px; margin-left:6px; }
+  .field .row2{ display:flex; align-items:center; gap:8px; }
+  .field .row2 input{ flex:1; }
+
+  /* ── 単価行（コンパクト2行構造） ── */
+  .priceRow{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .priceRow .lbl{ flex:0 0 32px; font-size:12px; color:var(--sub); }
+  .priceRow input{ flex:1; border:none; background:var(--field); border-radius:8px;
+    height:36px; padding:0 11px; font-family:inherit; color:var(--ink); text-align:left; }
+  .priceRow input:focus{ outline:1.5px solid var(--ink); }
+  .priceRow .unit{ color:var(--sub); font-size:12px; }
 
   /* ── 払出単価表 ── */
-  .payhead,.payrow3{ display:flex; gap:6px; align-items:center; margin-bottom:6px; }
+  .payhead,.payrow3{ display:flex; gap:6px; align-items:center; margin-bottom:5px; }
   .payhead .pco,.payrow3 .pco{ flex:0 0 44px; color:var(--sub); font-size:12px; }
-  .payhead .pcol{ flex:1; text-align:center; font-size:12px; color:var(--sub); }
+  .payhead .pcol{ flex:1; text-align:left; font-size:11px; color:var(--sub); padding-left:6px; }
   .payrow3 .paycell{ flex:1; min-width:0; border:none; background:var(--field); border-radius:8px;
-    height:36px; padding:0 8px; font-family:inherit; text-align:right; color:var(--ink); }
+    height:34px; padding:0 8px; font-family:inherit; text-align:left; color:var(--ink); }
   .payrow3 .paycell:focus{ outline:1.5px solid var(--ink); }
 
   /* ── 生成LINE文 ── */
-  .targetPick{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+  .targetPick{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
   .targetPick .tp{ font-family:inherit; border:none; background:var(--field);
-    color:var(--sub); font-size:13px; padding:8px 12px; border-radius:8px; cursor:pointer; }
+    color:var(--sub); font-size:12px; padding:6px 10px; border-radius:8px; cursor:pointer; }
   .targetPick .tp.on{ background:var(--ink); color:#fff; font-weight:600; }
 
-  .genOut{ font-family:inherit; font-size:13px; line-height:1.75; white-space:pre-wrap;
-    color:#1c1c1e; background:var(--field); border-radius:8px; padding:11px; min-height:60px; }
+  .genOut{ font-family:inherit; font-size:13px; line-height:1.7; white-space:pre-wrap;
+    color:#1c1c1e; background:var(--field); border-radius:8px; padding:10px; text-align:left; }
 
-  .priceEdit{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
-  .priceEdit .lbl{ flex:0 0 auto; color:var(--sub); font-size:12px; }
-  .priceEdit input{ flex:1; min-width:0; border:none; background:var(--field);
-    border-radius:8px; height:34px; padding:0 10px; font-family:inherit; text-align:right; color:var(--ink); }
-  .priceEdit input:focus{ outline:1.5px solid var(--ink); }
-  .priceEdit .unit{ color:var(--sub); font-size:12px; }
-
-  .extras{ display:flex; flex-wrap:wrap; gap:6px; margin:8px 0 4px; }
-  .extra{ display:inline-flex; align-items:center; gap:6px; background:var(--field);
-    border-radius:8px; padding:6px 10px; cursor:pointer; font-size:12px; }
+  .extras{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
+  .extra{ display:inline-flex; align-items:center; gap:5px; background:var(--field);
+    border-radius:8px; padding:5px 9px; cursor:pointer; font-size:12px; }
   .extra input[type=checkbox]{ width:14px; height:14px; margin:0; accent-color:var(--ink); }
-  .extra input[type=number]{ width:60px; text-align:right; border:none;
-    background:var(--card); border-radius:5px; padding:2px 6px; height:24px; }
-  .extra input:not(:checked) ~ .extraFields{ opacity:.35; }
-  .extraFields{ display:inline-flex; align-items:center; gap:4px; }
+  .extra input[type=number]{ width:52px; text-align:left; border:none;
+    background:var(--card); border-radius:5px; padding:2px 6px; height:22px; }
 
-  .copyBar{ display:flex; gap:8px; margin-top:10px; }
-  .copyBar button{ flex:1; border:none; border-radius:10px; font-size:14px;
-    font-weight:600; font-family:inherit; padding:11px; cursor:pointer; }
-  .btnCopy{ background:var(--field); color:var(--ink); }
+  .copyBar{ display:flex; gap:8px; margin-top:8px; }
+  .copyBar button{ flex:1; border:none; border-radius:10px; font-size:13px;
+    font-weight:600; font-family:inherit; padding:9px; cursor:pointer; }
+  .btnCopy{ background:var(--ink); color:#fff; }
   .btnCopy.done{ background:var(--ok); color:#fff; }
 
-  /* ══════ 盤面（スプシと同じビジュアル）══════ */
+  /* ══════ 盤面 ══════ */
   .boardWrap{ overflow-x:auto; -webkit-overflow-scrolling:touch;
     background:var(--card); border-radius:8px; }
   .board{ border-collapse:collapse; font-size:13px; }
   .board th, .board td{ border:1px solid var(--line2); padding:0;
-    text-align:center; white-space:nowrap; }
-
+    text-align:left; white-space:nowrap; }
   .board .cLabel{ position:sticky; left:0; z-index:2; background:var(--card);
     text-align:left; font-weight:600; padding:9px 9px; min-width:110px;
     border-right:1.5px solid var(--line2); font-size:12px; }
   .board thead .cLabel{ background:#efeff2; }
-
-  .board thead th{ background:#efeff2; font-weight:600; padding:8px 12px; font-size:12px; min-width:88px; }
+  .board thead th{ background:#efeff2; font-weight:600; padding:8px 12px; font-size:12px; min-width:88px; text-align:left; }
   .board .trTime td, .board .trTime th{ background:#f7f7f9; font-size:11px;
-    color:var(--sub); font-weight:600; padding:5px 8px; }
-
+    color:var(--sub); font-weight:600; padding:5px 8px; text-align:left; }
   .board td.cell{ padding:0; min-width:88px; }
   .board td.cell .cellIn{ display:block; width:100%; min-height:38px;
-    padding:9px 8px; cursor:pointer; font-size:13px; }
+    padding:9px 8px; cursor:pointer; font-size:13px; text-align:left; }
   .board td.cell:active .cellIn{ background:#e8e8ed; }
   .board td.cell.off .cellIn{ background:var(--off); }
   .board td.cell.conly .cellIn{ color:var(--sub); font-size:12px; }
-
   .board .cCo{ border:none !important; text-align:left; padding:8px 8px;
     color:var(--ink); font-size:11px; background:var(--bg); }
-
   .board tr.sep td{ border:none; height:10px; background:var(--bg); }
-
   .board tr.addRow td.addCell{ border:1px dashed var(--line2); background:#fbfbfc; }
   .board tr.addRow .addBtn{ display:block; width:100%; padding:9px;
     background:none; border:none; color:var(--sub); font-size:12px;
     font-family:inherit; cursor:pointer; text-align:left; padding-left:10px; }
   .board tr.addRow .addBtn:active{ background:var(--field); }
 
-  .addgrp{ display:flex; gap:7px; align-items:center; margin-top:12px; }
+  .addgrp{ display:flex; gap:7px; align-items:center; margin-top:10px; }
   .addgrp select{ flex:1; border:none; background:var(--field); border-radius:8px;
-    height:38px; font-family:inherit; padding:0 10px; }
+    height:36px; font-family:inherit; padding:0 10px; text-align:left; }
   .addgrp .btnAdd{ border:none; border-radius:8px; background:var(--ink); color:#fff;
-    font-size:13px; font-weight:600; font-family:inherit; padding:10px 16px; cursor:pointer; }
+    font-size:13px; font-weight:600; font-family:inherit; padding:9px 14px; cursor:pointer; }
 
-  /* ══════ ポップアップ ══════ */
+  /* ═══ ポップアップ ═══ */
   .modalBg{ position:fixed; inset:0; background:rgba(0,0,0,.35);
     display:flex; align-items:flex-end; justify-content:center; z-index:100;
     opacity:0; pointer-events:none; transition:opacity .18s; }
   .modalBg.on{ opacity:1; pointer-events:auto; }
   .modal{ background:var(--card); width:100%; max-width:520px;
-    border-radius:16px 16px 0 0; padding:18px 16px 26px;
-    transform:translateY(24px); transition:transform .2s; }
+    border-radius:16px 16px 0 0; padding:16px 14px 22px;
+    transform:translateY(24px); transition:transform .2s; text-align:left; }
   .modalBg.on .modal{ transform:translateY(0); }
-  .modal h3{ font-size:16px; font-weight:700; margin-bottom:15px; }
-  .modal h3 .mSub{ color:var(--sub); font-weight:400; font-size:12px; margin-left:7px; }
-
-  .mRow{ display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-  .mRow .mLbl{ flex:0 0 42px; color:var(--sub); font-size:13px; }
-  .mRow select, .mRow input{ flex:1; min-width:0; border:none; background:var(--field);
-    border-radius:8px; height:42px; padding:0 11px; font-family:inherit; color:var(--ink); }
-  .mRow select:focus, .mRow input:focus{ outline:1.5px solid var(--ink); }
-
-  .mDaysLbl{ font-size:12px; color:var(--sub); margin:14px 0 7px; }
-  .mDays{ display:flex; flex-wrap:wrap; gap:6px; }
+  .modal h3{ font-size:15px; font-weight:700; margin-bottom:12px; text-align:left; }
+  .modal h3 .mSub{ color:var(--sub); font-weight:400; font-size:12px; margin-left:6px; }
+  .mField{ margin-bottom:8px; }
+  .mField .mLbl{ display:block; font-size:11px; color:var(--sub); margin-bottom:3px; }
+  .mField input, .mField select{ display:block; width:100%; border:none; background:var(--field);
+    border-radius:8px; height:40px; padding:0 11px; font-family:inherit; color:var(--ink); text-align:left; }
+  .mField input:focus, .mField select:focus{ outline:1.5px solid var(--ink); }
+  .mDaysLbl{ font-size:11px; color:var(--sub); margin:10px 0 5px; }
+  .mDays{ display:flex; flex-wrap:wrap; gap:5px; }
   .mDay{ display:inline-flex; align-items:center; gap:5px; font-size:12px;
-    color:var(--ink); background:var(--field); border-radius:8px; padding:8px 11px; cursor:pointer; }
-  .mDay input{ width:16px; height:16px; margin:0; accent-color:var(--ink); }
+    color:var(--ink); background:var(--field); border-radius:8px; padding:7px 10px; cursor:pointer; }
+  .mDay input{ width:15px; height:15px; margin:0; accent-color:var(--ink); }
   .mDay input:not(:checked) + span{ opacity:.35; text-decoration:line-through; }
-
-  .mPay{ font-size:12px; color:var(--sub); margin:15px 0 16px;
-    background:var(--field); border-radius:8px; padding:10px 12px; }
+  .mPay{ font-size:12px; color:var(--sub); margin:10px 0 12px;
+    background:var(--field); border-radius:8px; padding:8px 11px; }
   .mPay b{ color:var(--ink); font-variant-numeric:tabular-nums; font-size:14px; }
-
-  .mBtns{ display:flex; gap:9px; }
-  .mBtns button{ border:none; border-radius:10px; font-size:15px; font-weight:600;
-    font-family:inherit; padding:13px; cursor:pointer; }
-  .mBtns .mDel{ flex:0 0 auto; background:var(--field); color:#ff3b30; padding:13px 20px; }
+  .mBtns{ display:flex; gap:8px; }
+  .mBtns button{ border:none; border-radius:10px; font-size:14px; font-weight:600;
+    font-family:inherit; padding:11px; cursor:pointer; }
+  .mBtns .mDel{ flex:0 0 auto; background:var(--field); color:#ff3b30; padding:11px 18px; }
   .mBtns .mOk{ flex:1; background:var(--ink); color:#fff; }
 
-  /* ── LINE原文 ── */
-  #rawText{ font-family:inherit; font-size:13px; line-height:1.75; white-space:pre-wrap;
-    color:#3a3a3c; background:var(--field); border-radius:8px; padding:11px; }
+  /* ── 原文 ── */
+  #rawText{ font-family:inherit; font-size:13px; line-height:1.7; white-space:pre-wrap;
+    color:#3a3a3c; text-align:left; }
   .rawnote{ display:flex; gap:6px; align-items:flex-start; margin-top:8px; }
   .rawadd{ flex:1; font-family:inherit; border:none; background:var(--field);
-    border-radius:8px; padding:9px; resize:vertical; color:var(--ink); }
+    border-radius:8px; padding:9px; resize:vertical; color:var(--ink); text-align:left; }
   .rawnote .del{ flex:0 0 20px; border:none; background:none; color:#c7c7cc;
     font-size:16px; cursor:pointer; padding-top:8px; }
-  .btn{ font-size:13px; font-family:inherit; border:none; border-radius:8px;
-    background:var(--field); color:#3a3a3c; cursor:pointer; padding:8px 13px; }
-  .btn.key{ font-weight:600; }
+  .btn{ font-size:12px; font-family:inherit; border:none; border-radius:8px;
+    background:var(--field); color:#3a3a3c; cursor:pointer; padding:6px 11px; }
 
-  /* ── 保存バー ── */
-  .savebar{ position:fixed; left:0; right:0; bottom:0; padding:10px 12px 20px;
+  /* ── 保存バー（幅・高さを詰めた） ── */
+  .savebar{ position:fixed; left:0; right:0; bottom:0; padding:6px 10px 10px;
     background:rgba(242,242,247,.94); backdrop-filter:blur(10px);
-    border-top:1px solid var(--line); z-index:50; }
-  .savebar .inner{ max-width:520px; margin:0 auto; display:flex; align-items:center; gap:10px; }
-  .savebar .status{ flex:1; font-size:12px; color:var(--sub); }
+    border-top:1px solid var(--line); z-index:50; height:var(--sav-h); }
+  .savebar .inner{ max-width:520px; margin:0 auto; display:flex; align-items:center; gap:8px; height:100%; }
+  .savebar .status{ flex:1; font-size:11px; color:var(--sub); text-align:left; }
   .savebar .status.dirty{ color:var(--warn); font-weight:600; }
   .savebar .status.saved{ color:var(--ok); }
-  .savebar .save{ border:none; border-radius:10px; background:var(--ink); color:#fff;
-    font-size:15px; font-weight:600; font-family:inherit; padding:11px 26px; cursor:pointer; }
+  .savebar .save{ border:none; border-radius:8px; background:var(--ink); color:#fff;
+    font-size:13px; font-weight:600; font-family:inherit; padding:7px 18px; cursor:pointer; }
   .savebar .save:disabled{ opacity:.4; }
 
   /* ── 新規作成モード ── */
-  .card{ background:var(--card); border-radius:12px; padding:14px 13px;
-    margin-bottom:10px; box-shadow:0 1px 2px rgba(0,0,0,.04); }
-  .card h3{ font-size:13px; font-weight:600; color:var(--sub); margin-bottom:10px; }
+  .card{ background:var(--card); border-radius:12px; padding:12px 12px;
+    margin-bottom:9px; box-shadow:0 1px 2px rgba(0,0,0,.04); text-align:left; }
+  .card h3{ font-size:12px; font-weight:600; color:var(--sub); margin-bottom:8px; }
   .items{ display:flex; flex-direction:column; gap:6px; }
   .item{ display:flex; align-items:center; gap:6px; }
   .item input{ flex:1; min-width:0; border:none; background:var(--field);
-    border-radius:8px; height:38px; padding:0 11px; font-family:inherit; color:var(--ink); }
+    border-radius:8px; height:36px; padding:0 11px; font-family:inherit; color:var(--ink); text-align:left; }
   .item input:focus{ outline:1.5px solid var(--ink); }
-  .item .del{ flex:0 0 26px; height:38px; border:none; background:none;
-    color:#c7c7cc; font-size:16px; cursor:pointer; }
+  .item .del{ flex:0 0 24px; height:36px; border:none; background:none;
+    color:#c7c7cc; font-size:15px; cursor:pointer; }
   .addItem{ align-self:flex-start; border:none; background:var(--field); color:#3a3a3c;
-    border-radius:8px; font-size:13px; font-family:inherit; padding:8px 13px; cursor:pointer; margin-top:2px; }
+    border-radius:8px; font-size:12px; font-family:inherit; padding:6px 11px; cursor:pointer; margin-top:2px; }
   .dates{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
   .dchip{ display:inline-flex; align-items:center; gap:5px; background:var(--field);
-    border-radius:8px; padding:8px 10px; font-size:13px; }
-  .dchip button{ border:none; background:none; color:#c7c7cc; font-size:15px; cursor:pointer; padding:0; }
+    border-radius:8px; padding:6px 9px; font-size:12px; }
+  .dchip button{ border:none; background:none; color:#c7c7cc; font-size:14px; cursor:pointer; padding:0; }
   .dateAdd{ display:flex; gap:7px; }
   .dateAdd input{ flex:1; border:none; background:var(--field); border-radius:8px;
-    height:40px; padding:0 11px; font-family:inherit; }
+    height:38px; padding:0 11px; font-family:inherit; text-align:left; }
   .dateAdd button{ border:none; background:var(--ink); color:#fff; border-radius:8px;
-    font-size:13px; font-weight:600; font-family:inherit; padding:0 16px; cursor:pointer; }
-  .preview{ background:#1c1c1e; color:#e8e8ed; border-radius:12px;
-    padding:14px; font-size:13px; line-height:1.8; white-space:pre-wrap;
-    word-break:break-word; margin-bottom:10px; min-height:80px; }
-  .doneCard{ text-align:center; padding:20px 12px; }
-  .doneCard .ic{ font-size:36px; margin-bottom:10px; }
+    font-size:12px; font-weight:600; font-family:inherit; padding:0 14px; cursor:pointer; }
+  .preview{ background:#1c1c1e; color:#e8e8ed; border-radius:10px;
+    padding:11px; font-size:12px; line-height:1.7; white-space:pre-wrap;
+    word-break:break-word; margin-bottom:8px; min-height:60px; text-align:left; }
 
-  .loading{ text-align:center; color:var(--sub); padding:40px 0; }
-  .err{ background:#ffe5e5; color:#c00; border-radius:8px; padding:10px; margin-bottom:10px; font-size:13px; }
+  .loading{ text-align:left; padding:32px 8px; color:var(--sub); }
+  .err{ background:#ffe5e5; color:#c00; border-radius:8px; padding:9px 10px; margin-bottom:9px; font-size:12px; text-align:left; }
 </style>
 </head>
 <body>
@@ -281,114 +314,115 @@
     </div>
   </div>
 
-  <!-- 常駐ミニナビバー -->
-  <div class="navbar">
-    <div class="navtabs" id="navtabs">
-      <button class="navtab" data-target="acc0">⓪ 原文</button>
-      <button class="navtab active" data-target="acc1">① 詳細</button>
-      <button class="navtab" data-target="acc2">② 単価</button>
-      <button class="navtab" data-target="acc3">③ LINE文</button>
-      <button class="navtab" data-target="acc4">④ アサイン</button>
+  <div class="caseWrap">
+
+    <!-- 常駐ミニナビバー -->
+    <div class="navbar">
+      <div class="navtabs" id="navtabs">
+        <button class="navtab" data-target="paneRaw">⓪ 原文</button>
+        <button class="navtab active" data-target="block1">① 詳細</button>
+        <button class="navtab" data-target="block2">② 単価</button>
+        <button class="navtab" data-target="paneGen">③ LINE文</button>
+        <button class="navtab" data-target="block4">④ アサイン</button>
+      </div>
     </div>
-  </div>
 
-  <div id="errBox"></div>
-
-  <!-- ⓪ LINE原文 -->
-  <div class="acc" id="acc0">
-    <div class="bar" onclick="toggle('acc0')"><span class="t">⓪ LINE原文</span><span class="arrow">▶</span></div>
-    <div class="body"><div class="inner">
-      <div id="rawText">—</div>
-      <div id="rawNotes"></div>
-      <button class="btn key" onclick="addRawNote()" style="margin-top:8px;">＋ 追加文章</button>
-    </div></div>
-  </div>
-
-  <!-- ① 案件詳細 -->
-  <div class="acc open" id="acc1">
-    <div class="bar" onclick="toggle('acc1')"><span class="t">① 案件詳細</span><span class="arrow">▶</span></div>
-    <div class="body"><div class="inner" id="detailInner">
-      <div class="row"><span class="lbl">案件名</span><input id="dName" oninput="onDetailChange()"></div>
-      <div class="row"><span class="lbl">場所</span><input id="dArea" oninput="onDetailChange()"></div>
-      <div class="row"><span class="lbl">日程</span><input id="dDates" readonly style="text-align:left;"></div>
-      <div class="row"><span class="lbl">時間</span><input id="dTime" readonly style="text-align:left;"></div>
-      <div class="hint">お仕事内容（改行区切り）</div>
-      <textarea id="dJobs" oninput="onDetailChange()" style="width:100%;min-height:70px;border:none;background:var(--field);border-radius:8px;padding:10px;font-family:inherit;color:var(--ink);"></textarea>
-    </div></div>
-  </div>
-
-  <!-- ② 単価設定 -->
-  <div class="acc" id="acc2">
-    <div class="bar" onclick="toggle('acc2')"><span class="t">② 単価設定</span><span class="arrow">▶</span></div>
-    <div class="body"><div class="inner">
-      <div class="hint">請求単価（クライアントへ）</div>
-      <div class="row"><span class="lbl">D</span><input id="billD" type="text" inputmode="numeric" oninput="fmtMoney(this); refreshGen();" onfocus="this.select()"><span class="unit">円</span></div>
-      <div class="row"><span class="lbl">AD</span><input id="billAD" type="text" inputmode="numeric" oninput="fmtMoney(this); refreshGen();" onfocus="this.select()"><span class="unit">円</span></div>
-      <div class="row"><span class="lbl">ST</span><input id="billST" type="text" inputmode="numeric" oninput="fmtMoney(this); refreshGen();" onfocus="this.select()"><span class="unit">円</span></div>
-      <div class="hint">払出単価（会社ごと）</div>
-      <div id="payTable"></div>
-      <div class="hint">※ ten / next は「その他」の単価が適用されます</div>
-    </div></div>
-  </div>
-
-  <!-- ③ 自動生成LINE文 -->
-  <div class="acc" id="acc3">
-    <div class="bar" onclick="toggle('acc3')"><span class="t">③ 自動生成LINE文</span><span class="arrow">▶</span></div>
-    <div class="body"><div class="inner">
-      <div class="hint">向け先を選ぶ</div>
-      <div class="targetPick" id="targetPick"></div>
-
-      <div class="hint">金額（自動抽出。タップで手修正可）</div>
-      <div class="priceEdit">
-        <span class="lbl">D</span>
-        <input id="genPriceD" type="text" inputmode="numeric" oninput="fmtMoney(this); renderGen();" onfocus="this.select()">
-        <span class="unit">円/日</span>
+    <!-- ⓪原文（開いてる時は上1/3固定） -->
+    <div class="paneRaw" id="paneRaw">
+      <div class="inner">
+        <div id="rawText">—</div>
+        <div id="rawNotes"></div>
+        <button class="btn" onclick="addRawNote()" style="margin-top:8px;">＋ 追加文章</button>
       </div>
-      <div class="priceEdit">
-        <span class="lbl">ST</span>
-        <input id="genPriceST" type="text" inputmode="numeric" oninput="fmtMoney(this); renderGen();" onfocus="this.select()">
-        <span class="unit">円/日</span>
+    </div>
+
+    <!-- 中央スクロール領域：①②④ -->
+    <div class="scrollMain" id="scrollMain">
+
+      <div id="errBox"></div>
+
+      <!-- ① 案件詳細 -->
+      <div class="block open" id="block1">
+        <div class="inner">
+          <div class="field">
+            <span class="lbl">案件名</span>
+            <input id="dName" oninput="onDetailChange()">
+          </div>
+          <div class="field">
+            <span class="lbl">場所</span>
+            <input id="dArea" oninput="onDetailChange()">
+          </div>
+          <div class="field">
+            <span class="lbl">日程</span>
+            <input id="dDates" readonly>
+          </div>
+          <div class="field">
+            <span class="lbl">時間</span>
+            <input id="dTime" readonly>
+          </div>
+          <div class="field">
+            <span class="lbl">お仕事内容（改行区切り）</span>
+            <textarea id="dJobs" oninput="onDetailChange()"></textarea>
+          </div>
+        </div>
       </div>
 
-      <div class="hint">追加費用</div>
-      <div class="extras">
-        <label class="extra">
-          <input type="checkbox" id="exFood" onchange="renderGen()">
-          <span>＋食費</span>
-          <span class="extraFields">
+      <!-- ② 単価設定 -->
+      <div class="block" id="block2">
+        <div class="inner">
+          <div class="hint">請求単価（クライアントへ）</div>
+          <div class="priceRow"><span class="lbl">D</span><input id="billD" type="text" inputmode="numeric" oninput="fmtMoney(this); refreshGen();" onfocus="this.select()"><span class="unit">円</span></div>
+          <div class="priceRow"><span class="lbl">AD</span><input id="billAD" type="text" inputmode="numeric" oninput="fmtMoney(this); refreshGen();" onfocus="this.select()"><span class="unit">円</span></div>
+          <div class="priceRow"><span class="lbl">ST</span><input id="billST" type="text" inputmode="numeric" oninput="fmtMoney(this); refreshGen();" onfocus="this.select()"><span class="unit">円</span></div>
+          <div class="hint">払出単価（会社ごと）</div>
+          <div id="payTable"></div>
+          <div class="hint" style="margin-top:8px;">※ ten / next は「その他」の単価が適用されます</div>
+        </div>
+      </div>
+
+      <!-- ④ アサイン編集 -->
+      <div class="block" id="block4">
+        <div class="inner">
+          <div class="boardWrap"><table class="board" id="board"></table></div>
+          <div class="addgrp">
+            <select id="newGrp"><option value="">大項目を追加…</option></select>
+            <button class="btnAdd" onclick="addGroup()">追加</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /scrollMain -->
+
+    <!-- ③LINE文（開いてる時は下1/3固定） -->
+    <div class="paneGen" id="paneGen">
+      <div class="inner">
+        <div class="hint">向け先</div>
+        <div class="targetPick" id="targetPick"></div>
+
+        <div class="hint">追加費用</div>
+        <div class="extras">
+          <label class="extra">
+            <input type="checkbox" id="exFood" onchange="renderGen()">
+            <span>＋食費</span>
             <input type="number" id="exFoodAmt" value="1000" onchange="renderGen()" oninput="renderGen()">
             <span>円/日</span>
-          </span>
-        </label>
-        <label class="extra">
-          <input type="checkbox" id="exTrans" onchange="renderGen()">
-          <span>＋交通費</span>
-          <span class="extraFields">
+          </label>
+          <label class="extra">
+            <input type="checkbox" id="exTrans" onchange="renderGen()">
+            <span>＋交通費</span>
             <input type="number" id="exTransAmt" value="1000" onchange="renderGen()" oninput="renderGen()">
             <span>円/日</span>
-          </span>
-        </label>
-      </div>
+          </label>
+        </div>
 
-      <div class="hint">プレビュー</div>
-      <div class="genOut" id="genOut">—</div>
-      <div class="copyBar">
-        <button class="btnCopy" id="btnCopy" onclick="copyGen()">📋 コピー</button>
+        <div class="genOut" id="genOut">—</div>
+        <div class="copyBar">
+          <button class="btnCopy" id="btnCopy" onclick="copyGen()">📋 コピー</button>
+        </div>
       </div>
-    </div></div>
-  </div>
+    </div>
 
-  <!-- ④ アサイン編集 -->
-  <div class="acc" id="acc4">
-    <div class="bar" onclick="toggle('acc4')"><span class="t">④ アサイン</span><span class="arrow">▶</span></div>
-    <div class="body"><div class="inner">
-      <div class="boardWrap"><table class="board" id="board"></table></div>
-      <div class="addgrp">
-        <select id="newGrp"><option value="">大項目を追加…</option></select>
-        <button class="btnAdd" onclick="addGroup()">追加</button>
-      </div>
-    </div></div>
-  </div>
+  </div><!-- /caseWrap -->
 
   <div class="savebar"><div class="inner">
     <span class="status" id="saveStatus">—</span>
@@ -402,7 +436,7 @@
     <button class="back" onclick="backFromNew()">‹</button>
     <div class="ttl">
       <div class="name">新規案件</div>
-      <div class="sub">項目を埋めると、LINE文と案件タブが同時にできます</div>
+      <div class="sub">項目を埋めるとLINE文と案件タブが同時作成</div>
     </div>
   </div>
 
@@ -410,9 +444,9 @@
 
   <div class="card">
     <h3>基本情報</h3>
-    <div class="row"><span class="lbl">送り先</span><select id="fMention" style="text-align:left;"><option value="">読み込み中…</option></select></div>
-    <div class="row"><span class="lbl">案件名</span><input id="fName" placeholder="NIKE ランイベント" oninput="previewNew()" style="text-align:left;"></div>
-    <div class="row"><span class="lbl">場所</span><input id="fArea" placeholder="銀座周辺" oninput="previewNew()" style="text-align:left;"></div>
+    <div class="field"><span class="lbl">送り先</span><select id="fMention"><option value="">読み込み中…</option></select></div>
+    <div class="field"><span class="lbl">案件名</span><input id="fName" placeholder="NIKE ランイベント" oninput="previewNew()"></div>
+    <div class="field"><span class="lbl">場所</span><input id="fArea" placeholder="銀座周辺" oninput="previewNew()"></div>
   </div>
 
   <div class="card">
@@ -422,18 +456,24 @@
       <input id="fDate" type="date" onchange="addDateNew()">
       <button onclick="addDateNew()">追加</button>
     </div>
-    <div class="row" style="margin-top:10px;">
-      <span class="lbl">時間</span>
-      <select id="fStart" onchange="previewNew()" style="text-align:left;"></select>
-      <span style="color:var(--sub);">〜</span>
-      <select id="fEnd" onchange="previewNew()" style="text-align:left;"></select>
+    <div class="field" style="margin-top:10px;"><span class="lbl">時間</span>
+      <div class="row2">
+        <select id="fStart" onchange="previewNew()"></select>
+        <span style="color:var(--sub);">〜</span>
+        <select id="fEnd" onchange="previewNew()"></select>
+      </div>
     </div>
-    <div class="row"><span class="lbl">注釈</span><input id="fTimeNote" placeholder="前後可能性大" oninput="previewNew()" style="text-align:left;"></div>
+    <div class="field"><span class="lbl">注釈</span><input id="fTimeNote" placeholder="前後可能性大" oninput="previewNew()"></div>
   </div>
 
   <div class="card">
     <h3>金額</h3>
-    <div class="row"><span class="lbl">日当</span><input id="fPrice" type="text" inputmode="numeric" placeholder="25,000" oninput="fmtMoney(this); previewNew();" onfocus="this.select()"><span class="unit">円/日</span></div>
+    <div class="field"><span class="lbl">日当</span>
+      <div class="row2">
+        <input id="fPrice" type="text" inputmode="numeric" placeholder="25,000" oninput="fmtMoney(this); previewNew();" onfocus="this.select()">
+        <span class="unit">円/日</span>
+      </div>
+    </div>
   </div>
 
   <div class="card">
@@ -472,18 +512,9 @@
 <div class="modalBg" id="modalBg" onclick="if(event.target===this) closeModal()">
   <div class="modal">
     <h3 id="mTitle">—</h3>
-    <div class="mRow">
-      <span class="mLbl">役割</span>
-      <select id="mRole" onchange="onModalChange()"></select>
-    </div>
-    <div class="mRow">
-      <span class="mLbl">名前</span>
-      <input id="mName" placeholder="名前(後で可)" onfocus="this.select()" oninput="onModalChange()">
-    </div>
-    <div class="mRow">
-      <span class="mLbl">会社</span>
-      <select id="mCo" onchange="onModalChange()"></select>
-    </div>
+    <div class="mField"><span class="mLbl">役割</span><select id="mRole" onchange="onModalChange()"></select></div>
+    <div class="mField"><span class="mLbl">名前</span><input id="mName" placeholder="名前(後で可)" onfocus="this.select()" oninput="onModalChange()"></div>
+    <div class="mField"><span class="mLbl">会社</span><select id="mCo" onchange="onModalChange()"></select></div>
     <div class="mDaysLbl">稼働日</div>
     <div class="mDays" id="mDays"></div>
     <div class="mPay">払出単価　<b id="mPay">—</b></div>
@@ -501,17 +532,17 @@ let COMPANIES = ['自社','ZERO','ten','next','ハン','その他'];
 const PAY_COMPANIES = ['自社','ZERO','ハン','その他'];
 const ROLES = ['D','AD','ST'];
 let POS_OPTIONS = ['クローク','受付','ドリンク補充','誘導'];
-let CLIENTS = []; // [{mention,name}]
+let CLIENTS = [];
 
 /* ════ 状態 ════ */
 let CASES = [], CURRENT = null, DATA = null;
-let CLIENT_FILTER = new Set(); // 空なら全表示
+let CLIENT_FILTER = new Set();
 let DIRTY = false, SAVING = false, autoTimer = null;
-let DATES = [];   // 詳細用 (盤面の日付)
-let SLOTS = [];   // 枠
+let DATES = [];
+let SLOTS = [];
 let editingId = null;
-let currentTarget = '自社'; // 生成LINE文の向け先
-let genPriceEditedByUser = { D:false, ST:false }; // 手修正フラグ
+let currentTarget = '自社';
+let currentBlock = 'block1';   // 中央スクロール領域で今アクティブなブロック
 
 /* ════ GAS通信 ════ */
 async function callGas(payload){
@@ -524,7 +555,7 @@ async function callGas(payload){
   return json;
 }
 
-/* ════ 案件一覧 ════ */
+/* ════ 一覧 ════ */
 const PIN_KEY='haruki_pins', LIST_CACHE='haruki_list', FILTER_KEY='haruki_filter';
 function getPins(){ try{ return JSON.parse(localStorage.getItem(PIN_KEY)||'[]'); }catch(e){ return []; } }
 function setPins(a){ try{ localStorage.setItem(PIN_KEY, JSON.stringify(a)); }catch(e){} }
@@ -536,11 +567,9 @@ function togglePin(i,ev){
   setPins(p); renderCaseList();
 }
 function dsort(d){
-  // 初日を数値化。降順にしたいので大きいほど上に来る値にする
   const m=String(d||'').match(/(\d{1,2})\/(\d{1,2})/);
   return m ? Number(m[1])*100+Number(m[2]) : 0;
 }
-
 function loadFilter(){
   try{ const a = JSON.parse(localStorage.getItem(FILTER_KEY)||'[]'); CLIENT_FILTER = new Set(a); }catch(e){}
 }
@@ -581,16 +610,12 @@ function toggleClientFilter(c){
 function renderCaseList(){
   const wrap = document.getElementById('caseList');
   const pins = getPins();
-
   let items = CASES.map((c,i)=>({ c, i, p: pins.indexOf(ckey(c))>=0 }));
   if(CLIENT_FILTER.size>0) items = items.filter(o=>CLIENT_FILTER.has(o.c.client));
-
-  // 初日が遅い順にソート（降順）。ピン留めが常に上
   items.sort((a,b)=> a.p!==b.p ? (a.p?-1:1) : dsort(b.c.dates)-dsort(a.c.dates));
 
   document.getElementById('listSub').textContent = items.length+'件'+(CLIENT_FILTER.size>0?'（絞込中）':'');
   if(items.length===0){ wrap.innerHTML='<div class="loading">案件がありません</div>'; return; }
-
   wrap.innerHTML = items.map(o=>
     '<div class="caseItem'+(o.p?' pinned':'')+'" onclick="openCase('+o.i+')">'+
       '<div class="ci-main">'+
@@ -609,11 +634,14 @@ async function openCase(i){
   document.getElementById('hName').textContent = CURRENT.caseName;
   document.getElementById('hSub').textContent  = CURRENT.dates+' ／ '+CURRENT.time;
   document.getElementById('errBox').innerHTML = '';
-  // 初期表示：①だけ開く
-  ['acc0','acc1','acc2','acc3','acc4'].forEach(id=>{
-    document.getElementById(id).classList.toggle('open', id==='acc1');
-  });
-  setActiveNav('acc1');
+  // 初期：⓪閉じ、①開き、②閉じ、③閉じ、④閉じ
+  document.getElementById('paneRaw').classList.remove('open');
+  document.getElementById('paneGen').classList.remove('open');
+  document.getElementById('block1').classList.add('open');
+  document.getElementById('block2').classList.remove('open');
+  document.getElementById('block4').classList.remove('open');
+  currentBlock = 'block1';
+  setActiveNav('block1');
   setStatus('読み込み中…');
   try{
     const r = await callGas({ action:'getCase', ssId:CURRENT.ssId, tabName:CURRENT.tabName });
@@ -630,7 +658,45 @@ function backToList(){
   clearAuto(); DIRTY=false; show('viewList');
 }
 
-/* ════ データ → 内部状態 ════ */
+/* ════ ミニナビ切替 ════ */
+document.getElementById('navtabs').addEventListener('click', ev=>{
+  const btn = ev.target.closest('.navtab');
+  if(!btn) return;
+  const id = btn.dataset.target;
+  navigateTo(id);
+});
+
+function navigateTo(id){
+  if(id==='paneRaw'){
+    // 上パネル：トグル
+    const el = document.getElementById('paneRaw');
+    el.classList.toggle('open');
+  } else if(id==='paneGen'){
+    // 下パネル：トグル
+    const el = document.getElementById('paneGen');
+    el.classList.toggle('open');
+  } else {
+    // 中央（①②④）：他を閉じ、対象を開いてスクロール
+    ['block1','block2','block4'].forEach(b=>{
+      document.getElementById(b).classList.toggle('open', b===id);
+    });
+    currentBlock = id;
+    setTimeout(()=>{
+      const sm = document.getElementById('scrollMain');
+      const el = document.getElementById(id);
+      sm.scrollTo({ top: el.offsetTop - 4, behavior:'smooth' });
+    }, 30);
+  }
+  setActiveNav(id);
+}
+
+function setActiveNav(id){
+  document.querySelectorAll('.navtab').forEach(b=>{
+    b.classList.toggle('active', b.dataset.target===id);
+  });
+}
+
+/* ════ 詳細 → 状態 ════ */
 function buildAll(){
   const s = DATA.settings;
 
@@ -639,18 +705,15 @@ function buildAll(){
     if(DATA.masters.companies && DATA.masters.companies.length) COMPANIES  = DATA.masters.companies;
   }
 
-  // ① 案件詳細
   document.getElementById('dName').value  = s.caseName || '';
   document.getElementById('dArea').value  = s.area || '';
   document.getElementById('dDates').value = s.dates || '';
   document.getElementById('dTime').value  = s.time || '';
 
-  // 仕事内容はデータリストの「ポジ」の一意集合から拾う（初期値）
   const jobs = [];
   (DATA.slots||[]).forEach(x=>{ if(x.pos && jobs.indexOf(x.pos)<0) jobs.push(x.pos); });
   document.getElementById('dJobs').value = jobs.join('\n');
 
-  // ② 単価
   document.getElementById('billD').value  = comma(s.bill.D);
   document.getElementById('billAD').value = comma(s.bill.AD);
   document.getElementById('billST').value = comma(s.bill.ST);
@@ -668,22 +731,16 @@ function buildAll(){
   });
   document.getElementById('payTable').innerHTML = h;
 
-  // ③ 向け先ボタン
   const tp = document.getElementById('targetPick');
   tp.innerHTML = PAY_COMPANIES.map(co=>
     '<button class="tp'+(co===currentTarget?' on':'')+'" onclick="pickTarget(\''+escAttr(co)+'\')">'+esc(co)+'</button>'
   ).join('');
 
-  // 追加費用は毎回リセット
   document.getElementById('exFood').checked = false;
   document.getElementById('exTrans').checked = false;
 
-  // 手修正フラグリセット
-  genPriceEditedByUser = { D:false, ST:false };
-
   refreshGen();
 
-  // ④ アサイン
   DATES = [];
   (DATA.slots||[]).forEach(x=>{ if(x.date && DATES.indexOf(x.date)<0) DATES.push(x.date); });
 
@@ -702,27 +759,20 @@ function buildAll(){
   document.getElementById('newGrp').innerHTML =
     '<option value="">大項目を追加…</option>' + POS_OPTIONS.map(p=>'<option>'+esc(p)+'</option>').join('');
 
-  // ⓪ 原文
   document.getElementById('rawText').textContent = DATA.rawText || '（原文なし）';
   document.getElementById('rawNotes').innerHTML = '';
 
   renderBoard();
 }
 
-/* ════ 詳細の変更ハンドラ ════ */
-function onDetailChange(){
-  refreshGen();
-  markDirty();
-}
+function onDetailChange(){ refreshGen(); markDirty(); }
 
-/* ════ ③自動生成LINE文 ════ */
+/* ════ ③LINE文（金額は自動抽出のみ・手修正なし） ════ */
 function pickTarget(co){
   currentTarget = co;
   document.querySelectorAll('#targetPick .tp').forEach(b=>{
     b.classList.toggle('on', b.textContent===co);
   });
-  // 向け先変更時は手修正フラグをリセットして単価表から取り直す
-  genPriceEditedByUser = { D:false, ST:false };
   refreshGen();
 }
 
@@ -731,36 +781,17 @@ function getPayFromTable(co, role){
   return cell ? uncomma(cell.value) : '';
 }
 
-// 単価表と請求単価を参照して、③の金額欄を自動セット（手修正済みなら維持）
-function refreshGen(){
-  // 「自社」だけは請求単価(=クライアントへ)を採用する
-  // それ以外(ZERO/ハン/その他)は払出単価を採用する
-  ['D','ST'].forEach(role=>{
-    if(genPriceEditedByUser[role]) return;
-    let v = '';
-    if(currentTarget==='自社'){
-      const el = document.getElementById('bill'+role);
-      v = el ? uncomma(el.value) : '';
-    }else{
-      v = getPayFromTable(currentTarget, role);
-    }
-    const gel = document.getElementById('genPrice'+role);
-    gel.value = (v==='' || v==null) ? '' : Number(v).toLocaleString();
-  });
-  renderGen();
-}
-
-// ③金額入力欄への手修正を検知
-['genPriceD','genPriceST'].forEach(id=>{
-  document.addEventListener('input', ev=>{
-    if(ev.target && ev.target.id===id){
-      const role = id.replace('genPrice','');
-      genPriceEditedByUser[role] = true;
-    }
-  }, true);
-});
+function refreshGen(){ renderGen(); }
 
 function renderGen(){
+  // 単価の自動決定：自社=請求単価、他=払出単価
+  const priceD  = (currentTarget==='自社')
+      ? uncomma(document.getElementById('billD').value)
+      : getPayFromTable(currentTarget, 'D');
+  const priceST = (currentTarget==='自社')
+      ? uncomma(document.getElementById('billST').value)
+      : getPayFromTable(currentTarget, 'ST');
+
   const L = [];
   const name = document.getElementById('dName').value.trim();
   L.push('✅【' + (name||'（案件名）') + '】');
@@ -776,15 +807,10 @@ function renderGen(){
   const area = document.getElementById('dArea').value.trim();
   if(area){ L.push(''); L.push('□場所'); L.push(area); }
 
-  // 金額
-  const priceD  = uncomma(document.getElementById('genPriceD').value);
-  const priceST = uncomma(document.getElementById('genPriceST').value);
   if(priceD || priceST){
     L.push(''); L.push('□金額');
     if(priceD)  L.push('D' + Number(priceD).toLocaleString() + '円/日');
     if(priceST) L.push('ST' + Number(priceST).toLocaleString() + '円/日');
-
-    // 追加費用
     if(document.getElementById('exFood').checked){
       const a = Number(document.getElementById('exFoodAmt').value)||0;
       L.push('＋食費' + a.toLocaleString() + '円/日');
@@ -795,7 +821,6 @@ function renderGen(){
     }
   }
 
-  // お仕事内容
   const jobs = document.getElementById('dJobs').value.split(/\n+/).map(x=>x.trim()).filter(x=>x);
   if(jobs.length){
     L.push(''); L.push('□お仕事内容');
@@ -810,15 +835,13 @@ async function copyGen(){
   const txt = document.getElementById('genOut').textContent;
   try{
     await navigator.clipboard.writeText(txt);
-    btn.classList.add('done');
-    btn.textContent = '✓ コピーしました';
+    btn.classList.add('done'); btn.textContent='✓ コピーしました';
     setTimeout(()=>{ btn.classList.remove('done'); btn.textContent='📋 コピー'; }, 2000);
   }catch(e){
-    const ta = document.createElement('textarea');
-    ta.value = txt; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); ta.remove();
-    btn.textContent = '✓ コピーしました';
-    setTimeout(()=>{ btn.textContent='📋 コピー'; }, 2000);
+    const ta=document.createElement('textarea'); ta.value=txt; document.body.appendChild(ta);
+    ta.select(); document.execCommand('copy'); ta.remove();
+    btn.textContent='✓ コピーしました';
+    setTimeout(()=>{ btn.textContent='📋 コピー'; },2000);
   }
 }
 
@@ -897,21 +920,17 @@ function addGroup(){
 function openModal(id){
   const s = SLOTS.find(x=>x.id===id); if(!s) return;
   editingId = id;
-
   document.getElementById('mTitle').innerHTML =
     esc(s.label||s.pos) + '<span class="mSub">'+esc(s.pos)+'</span>';
-
   document.getElementById('mRole').innerHTML =
     ROLES.map(r=>'<option'+(r===s.role?' selected':'')+'>'+r+'</option>').join('');
   document.getElementById('mName').value = s.name || '';
   document.getElementById('mCo').innerHTML =
     COMPANIES.map(c=>'<option'+(c===s.company?' selected':'')+'>'+esc(c)+'</option>').join('');
-
   document.getElementById('mDays').innerHTML = DATES.map(d=>
     '<label class="mDay"><input type="checkbox" data-date="'+escAttr(d)+'"'+
     (s.days.indexOf(d)>=0?' checked':'')+' onchange="onModalChange()"><span>'+esc(d)+'</span></label>'
   ).join('');
-
   updateModalPay();
   document.getElementById('modalBg').classList.add('on');
 }
@@ -941,7 +960,7 @@ function closeModal(){
   editingId = null;
 }
 
-/* ════ ⓪原文の追記 ════ */
+/* ════ ⓪原文追記 ════ */
 function addRawNote(){
   const w = document.getElementById('rawNotes');
   const d = document.createElement('div');
@@ -1008,32 +1027,6 @@ function scheduleAuto(){ clearAuto(); autoTimer = setTimeout(()=>{ if(DIRTY) sav
 function clearAuto(){ if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; } }
 function setStatus(t,c){ const e=document.getElementById('saveStatus'); e.textContent=t; e.className='status'+(c?' '+c:''); }
 window.addEventListener('beforeunload', e=>{ if(DIRTY){ e.preventDefault(); e.returnValue=''; } });
-
-/* ════ 常駐ミニナビバー ════ */
-document.getElementById('navtabs').addEventListener('click', ev=>{
-  const btn = ev.target.closest('.navtab');
-  if(!btn) return;
-  const id = btn.dataset.target;
-  const el = document.getElementById(id);
-  if(!el.classList.contains('open')) el.classList.add('open');
-  setActiveNav(id);
-  // アニメが始まる前に少し待ってスクロール
-  setTimeout(()=>{
-    const y = el.getBoundingClientRect().top + window.pageYOffset - 56;
-    window.scrollTo({top:y, behavior:'smooth'});
-  }, 30);
-});
-function setActiveNav(id){
-  document.querySelectorAll('.navtab').forEach(b=>{
-    b.classList.toggle('active', b.dataset.target===id);
-  });
-}
-// アコーディオン開閉時にナビのアクティブ状態も同期
-function toggle(id){
-  const el = document.getElementById(id);
-  el.classList.toggle('open');
-  if(el.classList.contains('open')) setActiveNav(id);
-}
 
 /* ════ 新規作成モード ════ */
 function openNew(){
@@ -1182,7 +1175,6 @@ async function createCase(){
   try{
     const r = await callGas({ action:'createCase', form });
     setNewStatus('作成しました','ok');
-    // 一覧を強制更新して、そのまま新規作成した案件を開く
     try{ localStorage.removeItem(LIST_CACHE); }catch(e){}
     await loadCaseList();
     const idx = CASES.findIndex(c=>c.ssId===r.result.ssId && c.tabName===r.result.tabName);
