@@ -61,19 +61,20 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .caseHead .saveBtn{padding:6px 12px;background:var(--ok);color:#fff;border-radius:8px;font-size:13px;font-weight:600;}
 .caseHead .saveBtn.dirty{background:var(--warn);}
 
-/* ナビバー：余白を削り、各コマンドの横幅を広く使う */
+/* ナビバー：余白は最小限に、各コマンドの横幅を広く使う。角丸＋小さな隙間で見た目を柔らかく */
 .navbar{
   height:var(--nav-h);
-  display:flex;align-items:stretch;
+  display:flex;align-items:center;
   background:var(--card);border-bottom:1px solid var(--line);
   position:relative;z-index:5;
+  padding:3px 4px;gap:3px;
 }
-.navAllBtn{flex:0 0 auto;padding:0 12px;font-size:11px;color:var(--sub);background:var(--off);display:flex;align-items:center;justify-content:center;}
-.navtabs{display:flex;flex:1;overflow-x:auto;}
-.navtab{flex:1 0 auto;min-width:46px;padding:0 8px;font-size:11px;color:var(--sub);display:flex;align-items:center;justify-content:center;white-space:nowrap;}
+.navAllBtn{flex:0 0 auto;height:100%;padding:0 12px;font-size:11px;color:var(--sub);background:var(--off);border-radius:7px;display:flex;align-items:center;justify-content:center;}
+.navtabs{display:flex;flex:1;gap:3px;overflow-x:auto;height:100%;}
+.navtab{flex:1 0 auto;min-width:44px;height:100%;padding:0 8px;font-size:11px;color:var(--sub);border-radius:7px;display:flex;align-items:center;justify-content:center;white-space:nowrap;}
 .navtab.active{background:var(--ink);color:#fff;}
-.headShowBtn{display:none;flex:0 0 auto;padding:0 16px;margin-right:2px;font-size:13px;color:var(--sub);background:var(--off);align-items:center;justify-content:center;}
-.navCollapseBtn{flex:0 0 auto;padding:0 16px;margin-right:2px;font-size:13px;color:var(--sub);background:var(--off);display:flex;align-items:center;justify-content:center;}
+.headShowBtn{display:none;flex:0 0 auto;height:100%;padding:0 16px;font-size:13px;color:var(--sub);background:var(--off);border-radius:7px;align-items:center;justify-content:center;}
+.navCollapseBtn{flex:0 0 auto;height:100%;padding:0 16px;font-size:13px;color:var(--sub);background:var(--off);border-radius:7px;display:flex;align-items:center;justify-content:center;}
 .caseHead.collapsed ~ .caseWrap .headShowBtn{display:flex;}
 .caseHead.collapsed ~ .caseWrap .navCollapseBtn{display:none;}
 
@@ -159,6 +160,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 }
 .irrList{padding:4px 0 0 56px;}
 .irrItem{display:flex;align-items:center;gap:4px;padding:4px 0;font-size:12px;color:var(--sub);}
+.irrItem .irrPriceInput{width:64px;padding:3px 6px;background:var(--field);border:0;border-radius:4px;font-size:11px;text-align:right;color:var(--ink);}
 .irrItem .del{padding:2px 6px;color:var(--warn);}
 
 /* ②単価：本物の請求(D/AD/ST)＋払出(会社×D/AD/ST) */
@@ -359,9 +361,9 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
             <span class="lbl">人数</span>
             <div class="val"><input class="field" id="dPeople" placeholder="女性ST2名（〇）" oninput="onDetailChange()"></div>
           </div>
-          <div class="lineRow">
-            <span class="lbl">衣装</span>
-            <div class="val"><input class="field" id="dWear" oninput="onDetailChange()"></div>
+          <div class="lineRow" style="align-items:flex-start;">
+            <span class="lbl" style="padding-top:8px;">衣装</span>
+            <div class="val"><textarea class="field" id="dWear" oninput="onDetailChange()"></textarea></div>
           </div>
           <div class="lineRow" style="align-items:flex-start;">
             <span class="lbl" style="padding-top:8px;">仕事内容</span>
@@ -622,6 +624,10 @@ function openCase(id){
   CUR_SSID=id.substring(0,idx);
   CUR_TAB=id.substring(idx+2);
   CUR_ID=id;
+  // ★パネルの開閉状態はここで1回だけ全閉にリセットする。
+  //   buildAll()自体はこの後、キャッシュ表示時と裏の最新取得完了時の2回呼ばれるが、
+  //   2回目（読み込み完了後）でユーザーが開いたタブを勝手に閉じ直さないようにするため。
+  document.querySelectorAll('.block').forEach(b=>b.classList.remove('open'));
   // キャッシュから即表示
   try{
     const c=localStorage.getItem('case_'+id);
@@ -647,6 +653,7 @@ function newCase(){
   MODE='create';
   CUR_SSID=null;CUR_TAB=null;CUR_ID=null;CUR=null;
   SEL_DATES=[];DATES_TOUCHED=false;IRR=[];TARGET='self';DIRTY=false;
+  document.querySelectorAll('.block').forEach(b=>b.classList.remove('open'));   // ★こちらも1回だけ
   buildAll();
   document.getElementById('viewList').classList.add('hide');
   document.getElementById('viewCase').classList.remove('hide');
@@ -936,8 +943,8 @@ function buildAll(){
   }
 
   DIRTY=false;updateSaveState();
-  // ★全閉：どちらのモードでも最初は何も開かない
-  document.querySelectorAll('.block').forEach(b=>b.classList.remove('open'));
+  // ★パネルの開閉状態はここでは触らない（openCase/newCaseで最初の1回だけリセット済み）。
+  //   裏の読み込みが完了してbuildAll()が再度呼ばれても、開いたタブが勝手に閉じないようにするため。
   applyModeVisibility();
   renderGen();
 }
@@ -1012,12 +1019,18 @@ function renderIrr(){
   document.getElementById('irrList').innerHTML=IRR.map((r,i)=>
     `<div class="irrItem">
       <span>※ ${fmtDateJP(r.date)} ${r.start}〜${r.end}</span>
+      <input type="number" class="irrPriceInput" placeholder="単価" value="${r.price||''}" oninput="updateIrrPrice(${i},this.value)">
       <button class="del" onclick="delIrr(${i})">×</button>
     </div>`).join('');
 }
+function updateIrrPrice(i,v){
+  if(!IRR[i])return;
+  IRR[i].price=v;
+  onDetailChange();
+}
 function addIrregular(){
   if(!SEL_DATES.length){alert('先に日程を選択してください');return;}
-  IRR.push({date:SEL_DATES[0],start:'10:00',end:'21:30'});
+  IRR.push({date:SEL_DATES[0],start:'10:00',end:'21:30',price:''});
   renderIrr();onDetailChange();
 }
 function delIrr(i){IRR.splice(i,1);renderIrr();onDetailChange();}
@@ -1108,13 +1121,37 @@ function updateSaveState(){
   else{st.textContent='保存済み';st.className='st saved';btn.classList.remove('dirty');}
 }
 
+// 日程をLINE文の形式に。GAS側formatDatesForLine_と同じロジック（連続日はまとめて1行、飛び日は行を分ける）
+function formatDatesForLineJS(dates){
+  if(!dates.length) return '';
+  const sorted=dates.slice().sort();
+  const clusters=[];
+  let cur=[sorted[0]];
+  for(let i=1;i<sorted.length;i++){
+    const prev=new Date(sorted[i-1]+'T00:00');
+    const next=new Date(sorted[i]+'T00:00');
+    const diffDays=Math.round((next-prev)/86400000);
+    if(diffDays===1) cur.push(sorted[i]); else { clusters.push(cur); cur=[sorted[i]]; }
+  }
+  clusters.push(cur);
+  return clusters.map(cluster=>{
+    const byMonth={};const order=[];
+    cluster.forEach(d=>{
+      const p=d.split('-');const m=Number(p[1]),day=Number(p[2]);
+      if(!byMonth[m]){byMonth[m]=[];order.push(m);}
+      byMonth[m].push(day);
+    });
+    return order.map(m=>m+'/'+byMonth[m].join('、')).join('　');
+  }).join('\n');
+}
+
 // ===== ③LINE文プレビュー =====
 //   向け先(自社/ZERO/ハン/その他)のD/AD/ST払出単価を「全部」出す。空欄は「－」。
 //   不要な行を消すのは春木さんの仕事、という運用（GAS側のbuildRateLines_と同じロジック）。
 function renderGen(){
   const name=document.getElementById('dName').value||'';
   const place=document.getElementById('dPlace').value||'';
-  const dates=SEL_DATES.map(fmtDateJP).join('、');
+  const datesStr=formatDatesForLineJS(SEL_DATES);
   const ts=document.getElementById('dTimeStart').value||'';
   const te=document.getElementById('dTimeEnd').value||'';
   const people=document.getElementById('dPeople').value||'〇名';
@@ -1126,31 +1163,32 @@ function renderGen(){
     const v=uncomma(document.getElementById(`pay_${idc}_${r}`).value);
     const vs=v!==''?`${Number(v).toLocaleString()}円/日`:'－';
     return `${r}：${vs}`;
-  }).join('\n');
+  });
 
-  let irrStr='';
-  if(IRR.length){
-    irrStr='\n'+IRR.map(r=>`※${fmtDateJP(r.date)}のみ ${r.start}〜${r.end}`).join('\n');
-  }
-  let extraStr='';
+  const irrTimeLines=IRR.filter(r=>r.start||r.end).map(r=>`※${fmtDateJP(r.date)}のみ ${r.start}〜${r.end}`);
+  const irrPriceLines=IRR.filter(r=>r.price!==undefined&&r.price!=='').map(r=>`※${fmtDateJP(r.date)}は${Number(r.price).toLocaleString()}円`);
+
+  let extraLines=[];
   if(document.getElementById('exFood').checked){
     const a=document.getElementById('exFoodAmt').value||'0';
-    extraStr+=`\n＋食費${Number(a).toLocaleString()}円/日`;
+    extraLines.push(`＋食費${Number(a).toLocaleString()}円/日`);
   }
   if(document.getElementById('exTrans').checked){
     const a=document.getElementById('exTransAmt').value||'0';
-    extraStr+=`\n＋交通費${Number(a).toLocaleString()}円/日`;
+    extraLines.push(`＋交通費${Number(a).toLocaleString()}円/日`);
   }
-  const txt=
-`✅【${name}】
-□日程：${dates||'—'}
-□時間：${ts&&te?ts+'〜'+te:'—'}${irrStr}
-□場所：${place}
-□ご依頼人数：${people}
-□衣装：${wear}
-□内容：${job}
-□金額：
-${rateLines}${extraStr}`;
+
+  // ★各□セクションを「ラベル単独行→値」のブロックにして、ブロック間を空行で区切る（実物の書き方に合わせる）
+  const sections=[];
+  sections.push('□日程\n'+(datesStr||'—'));
+  sections.push('□時間\n'+[(ts&&te)?`${ts}〜${te}`:'—',...irrTimeLines].join('\n'));
+  sections.push('□場所\n'+place);
+  sections.push('□ご依頼人数\n'+people);
+  sections.push('□衣装\n'+wear);
+  sections.push('□内容\n'+job);
+  sections.push('□金額\n'+rateLines.concat(irrPriceLines).concat(extraLines).join('\n'));
+
+  const txt=`✅【${name}】\n\n`+sections.join('\n\n');
   document.getElementById('genPreview').textContent=txt;
 }
 
@@ -1183,6 +1221,7 @@ function save(){
       bill:bill,
       pay:pay,
       targetCompany:TARGET_NAME[TARGET],
+      irregulars:IRR,
     };
 
     btn.disabled=true;btn.textContent='保存中...';
