@@ -8,7 +8,7 @@
 :root{
   --ink:#1c1c1e;--sub:#8e8e93;--line:#e5e5ea;--bg:#f2f2f7;--card:#fff;
   --field:#f2f2f7;--ok:#34c759;--warn:#ff9500;--off:#f7f7f9;
-  --nav-h:36px;--head-h:44px;--fix-h:25vh;
+  --nav-h:38px;--head-h:44px;--fix-h:25vh;
 }
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
 html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Segoe UI",sans-serif;background:var(--bg);color:var(--ink);font-size:14px;text-align:left;}
@@ -21,14 +21,21 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .listHead{height:var(--head-h);display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);}
 .listHead .title{font-weight:600;font-size:16px;}
 .listHead .newBtn{padding:6px 12px;background:var(--ok);color:#fff;border-radius:8px;font-size:13px;font-weight:600;}
-.filterBar{padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);display:flex;gap:6px;overflow-x:auto;}
-.filterBar .chip{padding:4px 10px;font-size:12px;background:var(--off);border-radius:14px;white-space:nowrap;}
+
+.filterRow{display:flex;align-items:center;background:var(--card);border-bottom:1px solid var(--line);}
+.filterBar{flex:1;min-width:0;padding:8px 6px 8px 12px;display:flex;gap:6px;overflow-x:auto;}
+.filterBar .chip{padding:4px 10px;font-size:12px;background:var(--off);border-radius:14px;white-space:nowrap;flex-shrink:0;}
 .filterBar .chip.on{background:var(--ink);color:#fff;}
+.pinChip{flex-shrink:0;padding:5px 12px;margin:8px 12px 8px 4px;font-size:13px;background:var(--off);border-radius:14px;}
+.pinChip.on{background:var(--warn);color:#fff;}
+
 .caseList{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 12px;}
-.caseCard{background:var(--card);border-radius:10px;padding:10px 12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);}
+.caseCard{background:var(--card);border-radius:10px;padding:10px 8px 10px 12px;margin-bottom:8px;box-shadow:0 1px 2px rgba(0,0,0,.04);display:flex;align-items:center;gap:4px;}
+.caseCard .cMain{flex:1;min-width:0;}
 .caseCard .cName{font-weight:600;font-size:14px;margin-bottom:2px;}
 .caseCard .cMeta{font-size:11px;color:var(--sub);}
-.caseCard.pinned{border-left:3px solid var(--warn);}
+.caseCard .pinBtn{flex:0 0 32px;font-size:16px;opacity:.3;padding:6px;line-height:1;}
+.caseCard .pinBtn.on{opacity:1;}
 
 /* ===== 案件詳細 ===== */
 #viewCase{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
@@ -54,27 +61,21 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .caseHead .saveBtn{padding:6px 12px;background:var(--ok);color:#fff;border-radius:8px;font-size:13px;font-weight:600;}
 .caseHead .saveBtn.dirty{background:var(--warn);}
 
-/* ナビバー */
+/* ナビバー：余白を削り、各コマンドの横幅を広く使う */
 .navbar{
   height:var(--nav-h);
-  display:flex;align-items:center;
+  display:flex;align-items:stretch;
   background:var(--card);border-bottom:1px solid var(--line);
-  padding:0 4px;gap:2px;
   position:relative;z-index:5;
 }
-.navtabs{display:flex;flex:1;gap:2px;overflow-x:auto;}
-.navtab{
-  padding:4px 8px;font-size:11px;color:var(--sub);
-  border-radius:6px;white-space:nowrap;
-}
+.navAllBtn{flex:0 0 auto;padding:0 12px;font-size:11px;color:var(--sub);background:var(--off);display:flex;align-items:center;justify-content:center;}
+.navtabs{display:flex;flex:1;overflow-x:auto;}
+.navtab{flex:1 0 auto;min-width:46px;padding:0 8px;font-size:11px;color:var(--sub);display:flex;align-items:center;justify-content:center;white-space:nowrap;}
 .navtab.active{background:var(--ink);color:#fff;}
-.navRight{display:flex;gap:2px;flex-shrink:0;}
-.navAllBtn,.headShowBtn{
-  padding:4px 8px;font-size:11px;color:var(--sub);
-  border-radius:6px;background:var(--off);
-}
-.headShowBtn{display:none;}
-.caseHead.collapsed ~ .caseWrap .headShowBtn{display:block;}
+.headShowBtn{display:none;flex:0 0 auto;padding:0 16px;margin-right:2px;font-size:13px;color:var(--sub);background:var(--off);align-items:center;justify-content:center;}
+.navCollapseBtn{flex:0 0 auto;padding:0 16px;margin-right:2px;font-size:13px;color:var(--sub);background:var(--off);display:flex;align-items:center;justify-content:center;}
+.caseHead.collapsed ~ .caseWrap .headShowBtn{display:flex;}
+.caseHead.collapsed ~ .caseWrap .navCollapseBtn{display:none;}
 
 /* 本体スクロール領域 */
 .caseWrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
@@ -96,12 +97,17 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 }
 #paneRaw.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  display:flex;flex-direction:column;
 }
-#rawText{
-  width:100%;height:100%;border:0;background:transparent;
-  font-size:13px;line-height:1.5;color:var(--ink);
-  resize:none;padding:0;
-}
+.rawHistory{font-size:12px;line-height:1.5;color:var(--sub);white-space:pre-wrap;flex:0 0 auto;}
+.rawAddBtn{margin-top:8px;padding:6px 12px;background:var(--off);border-radius:8px;font-size:12px;color:var(--ink);align-self:flex-start;}
+.rawAddBox{margin-top:8px;}
+.rawAddInput{width:100%;min-height:56px;padding:8px;background:var(--field);border:0;border-radius:8px;font-size:13px;line-height:1.5;resize:vertical;}
+.rawAddActions{display:flex;justify-content:flex-end;gap:8px;margin-top:6px;}
+.rawAddActions button{padding:6px 12px;border-radius:8px;font-size:12px;}
+.rawAddCancel{background:var(--off);color:var(--sub);}
+.rawAddConfirm{background:var(--ok);color:#fff;font-weight:600;}
+.rawPending{margin-top:8px;padding:8px;background:#fff8e6;border-radius:8px;font-size:11px;color:#9a6b00;white-space:pre-wrap;}
 
 /* ③LINE文（開いている時 下部固定、⓪状態で高さ変化） */
 #paneGen{position:relative;}
@@ -110,7 +116,6 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
   background:var(--card);
   border-top:1px solid var(--line);
   display:flex;flex-direction:column;
-  /* ⓪が開いている時：1/4、⓪が閉じている時：拡張。ただし最低1/4は確保 */
   min-height:var(--fix-h);
   max-height:50vh;
 }
@@ -125,9 +130,6 @@ body:not(.rawOpen) #paneGen.open{
 #paneGen.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
-
-/* 中央ブロック（①②④）*/
-#block1,#block2,#block4{}
 
 /* フィールド */
 .lineRow{display:flex;align-items:center;gap:8px;padding:6px 0;}
@@ -159,11 +161,17 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 .irrItem{display:flex;align-items:center;gap:4px;padding:4px 0;font-size:12px;color:var(--sub);}
 .irrItem .del{padding:2px 6px;color:var(--warn);}
 
-/* ②単価 */
-.priceGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
-.priceCell{background:var(--field);border-radius:8px;padding:8px;}
-.priceCell .plbl{font-size:11px;color:var(--sub);margin-bottom:4px;}
-.priceCell input{width:100%;padding:6px 8px;background:var(--card);border:0;border-radius:6px;font-size:14px;}
+/* ②単価：本物の請求(D/AD/ST)＋払出(会社×D/AD/ST) */
+.priceLabel{font-size:11px;color:var(--sub);margin-bottom:6px;font-weight:600;}
+.billGrid{display:flex;gap:8px;}
+.billCell{flex:1;background:var(--field);border-radius:8px;padding:8px;text-align:center;}
+.billCell .plbl{font-size:11px;color:var(--sub);margin-bottom:4px;}
+.billCell input{width:100%;padding:6px;background:var(--card);border:0;border-radius:6px;font-size:14px;text-align:center;}
+.payTable{width:100%;border-collapse:collapse;font-size:12px;margin-top:2px;}
+.payTable th{padding:4px 2px;color:var(--sub);font-weight:600;text-align:center;}
+.payTable th:first-child{text-align:left;width:44px;}
+.payTable td{padding:3px 2px;}
+.payTable input{width:100%;padding:6px 3px;background:var(--field);border:0;border-radius:6px;font-size:13px;text-align:center;}
 
 /* ③向け先＋追加費用 */
 .targetRow{display:flex;align-items:center;gap:6px;padding:4px 0;}
@@ -191,6 +199,48 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 
 /* ④アサイン */
 .assignHint{font-size:12px;color:var(--sub);padding:8px 0;}
+
+/* ══════ ④アサイン盤面（index.htmlのビジュアルをそのまま移植）══════ */
+.boardWrap{overflow-x:auto;-webkit-overflow-scrolling:touch;background:var(--card);border-radius:8px;}
+.board{border-collapse:collapse;font-size:13px;}
+.board th,.board td{border:1px solid #d1d1d6;padding:0;text-align:center;white-space:nowrap;}
+.board .cLabel{position:sticky;left:0;z-index:2;background:var(--card);text-align:left;font-weight:600;padding:9px;min-width:100px;border-right:1.5px solid #d1d1d6;font-size:12px;}
+.board thead .cLabel{background:#efeff2;}
+.board thead th{background:#efeff2;font-weight:600;padding:8px 10px;font-size:12px;min-width:78px;}
+.board .trTime td,.board .trTime th{background:#f7f7f9;font-size:11px;color:var(--sub);font-weight:600;padding:5px 8px;}
+.board td.cell{padding:0;min-width:78px;}
+.board td.cell .cellIn{display:block;width:100%;min-height:36px;padding:8px;cursor:pointer;font-size:13px;}
+.board td.cell.off .cellIn{background:var(--off);}
+.board td.cell.conly .cellIn{color:var(--sub);font-size:12px;}
+.board .cCo{border:none!important;text-align:left;padding:8px;color:var(--ink);font-size:11px;background:var(--bg);}
+.board tr.sep td{border:none;height:8px;background:var(--bg);}
+.board tr.addRow td.addCell{border:1px dashed #d1d1d6;background:#fbfbfc;}
+.board tr.addRow .addBtn{display:block;width:100%;padding:8px;background:none;border:none;color:var(--sub);font-size:12px;font-family:inherit;text-align:left;padding-left:8px;}
+.addgrp{display:flex;gap:7px;align-items:center;margin-top:12px;}
+.addgrp select{flex:1;border:none;background:var(--field);border-radius:8px;height:36px;font-family:inherit;padding:0 10px;}
+.addgrp .btnAdd{border:none;border-radius:8px;background:var(--ink);color:#fff;font-size:13px;font-weight:600;font-family:inherit;padding:9px 14px;}
+
+/* ④アサイン編集ポップアップ（⓪日程のカレンダーモーダルとはクラス名を分けて衝突回避） */
+.assignModalBg{position:fixed;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .18s;}
+.assignModalBg.on{opacity:1;pointer-events:auto;}
+.assignModal{background:var(--card);width:100%;max-width:520px;border-radius:16px 16px 0 0;padding:18px 16px 26px;transform:translateY(24px);transition:transform .2s;}
+.assignModalBg.on .assignModal{transform:translateY(0);}
+.assignModal h3{font-size:16px;font-weight:700;margin-bottom:15px;}
+.assignModal h3 .mSub{color:var(--sub);font-weight:400;font-size:12px;margin-left:7px;}
+.mRow{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.mRow .mLbl{flex:0 0 42px;color:var(--sub);font-size:13px;}
+.mRow select,.mRow input{flex:1;min-width:0;border:none;background:var(--field);border-radius:8px;height:42px;padding:0 11px;font-family:inherit;color:var(--ink);}
+.mDaysLbl{font-size:12px;color:var(--sub);margin:14px 0 7px;}
+.mDays{display:flex;flex-wrap:wrap;gap:6px;}
+.mDay{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--ink);background:var(--field);border-radius:8px;padding:8px 11px;}
+.mDay input{width:16px;height:16px;margin:0;accent-color:var(--ink);}
+.mDay input:not(:checked)+span{opacity:.35;text-decoration:line-through;}
+.mPayBox{font-size:12px;color:var(--sub);margin:15px 0 16px;background:var(--field);border-radius:8px;padding:10px 12px;}
+.mPayBox b{color:var(--ink);font-variant-numeric:tabular-nums;font-size:14px;}
+.mBtns{display:flex;gap:9px;}
+.mBtns button{border:none;border-radius:10px;font-size:15px;font-weight:600;font-family:inherit;padding:13px;}
+.mBtns .mDel{flex:0 0 auto;background:var(--field);color:#ff3b30;padding:13px 20px;}
+.mBtns .mOk{flex:1;background:var(--ink);color:#fff;}
 
 /* カレンダーモーダル */
 .modal{
@@ -227,7 +277,10 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
     <div class="title">案件</div>
     <button class="newBtn" onclick="newCase()">＋新規</button>
   </div>
-  <div class="filterBar" id="filterBar"></div>
+  <div class="filterRow">
+    <div class="filterBar" id="filterBar"></div>
+    <button class="pinChip" id="pinChip" onclick="togglePinFilter()">📍</button>
+  </div>
   <div class="caseList" id="caseList"></div>
 </div>
 
@@ -244,33 +297,40 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 
   <div class="caseWrap">
     <div class="navbar">
+      <button class="navAllBtn" id="navAllBtn" onclick="toggleAll()">全開</button>
       <div class="navtabs" id="navtabs">
         <button class="navtab" data-target="paneRaw" onclick="toggleBlock('paneRaw')">⓪原文</button>
-        <button class="navtab active" data-target="block1" onclick="toggleBlock('block1')">①詳細</button>
+        <button class="navtab" data-target="block1" onclick="toggleBlock('block1')">①詳細</button>
         <button class="navtab" data-target="block2" onclick="toggleBlock('block2')">②単価</button>
         <button class="navtab" data-target="paneGen" onclick="toggleBlock('paneGen')">③LINE文</button>
         <button class="navtab" data-target="block4" onclick="toggleBlock('block4')">④アサイン</button>
       </div>
-      <div class="navRight">
-        <button class="headShowBtn" onclick="showHead()">△</button>
-        <button class="navAllBtn" id="navAllBtn" onclick="toggleAll()">全開</button>
-        <button class="navAllBtn" onclick="hideHead()" title="ヘッダー折りたたみ">▽</button>
-      </div>
+      <button class="headShowBtn" onclick="showHead()">△</button>
+      <button class="navCollapseBtn" onclick="hideHead()" title="ヘッダー折りたたみ">▽</button>
     </div>
 
     <div class="scrollArea" id="scrollArea">
 
-      <!-- ⓪原文（既存案件のみ。自由に読み書きできる1つのテキストエリア） -->
+      <!-- ⓪原文（既存案件のみ。履歴は読み取り専用＋「＋」でコンパクトに追記） -->
       <div class="block" id="paneRaw">
         <div class="blockBody">
-          <textarea id="rawText" placeholder="LINE原文（貼り付け可）" oninput="onRawChange()"></textarea>
+          <div id="rawHistory" class="rawHistory"></div>
+          <button class="rawAddBtn" id="rawAddBtn" onclick="toggleRawAdd()">＋ 追記する</button>
+          <div class="rawAddBox hide" id="rawAddBox">
+            <textarea id="rawAddInput" class="rawAddInput" placeholder="追記するLINE原文など"></textarea>
+            <div class="rawAddActions">
+              <button class="rawAddCancel" onclick="cancelRawAdd()">キャンセル</button>
+              <button class="rawAddConfirm" onclick="confirmRawAdd()">追加</button>
+            </div>
+          </div>
+          <div class="rawPending hide" id="rawPending"></div>
         </div>
       </div>
 
       <!-- ①案件詳細 -->
-      <div class="block open" id="block1">
+      <div class="block" id="block1">
         <div class="blockBody">
-          <!-- 送り先：新規作成の時だけ表示（既存案件はSS/タブが既に決まっているため選び直せない） -->
+          <!-- 送り先：新規作成の時だけ表示 -->
           <div class="lineRow" id="rowClient">
             <span class="lbl">送り先</span>
             <div class="val"><select class="field" id="dClient"></select></div>
@@ -310,27 +370,20 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
         </div>
       </div>
 
-      <!-- ②単価（常時編集可能。自社/ZERO/ハン/その他の目安値。実際の請求計算には使わない参考値） -->
+      <!-- ②単価：請求(D/AD/ST) と 払出(会社×D/AD/ST)。常時編集可能。実際のアサイン計算に使う本物の値。 -->
       <div class="block" id="block2">
         <div class="blockBody">
-          <div class="priceGrid">
-            <div class="priceCell">
-              <div class="plbl">自社 請求</div>
-              <input type="number" id="p_self_bill" oninput="onDetailChange()">
-            </div>
-            <div class="priceCell">
-              <div class="plbl">ZERO 請求</div>
-              <input type="number" id="p_zero_bill" oninput="onDetailChange()">
-            </div>
-            <div class="priceCell">
-              <div class="plbl">ハン 請求</div>
-              <input type="number" id="p_han_bill" oninput="onDetailChange()">
-            </div>
-            <div class="priceCell">
-              <div class="plbl">その他 請求</div>
-              <input type="number" id="p_other_bill" oninput="onDetailChange()">
-            </div>
+          <div class="priceLabel">請求（クライアントへの請求単価）</div>
+          <div class="billGrid">
+            <div class="billCell"><div class="plbl">D</div><input type="text" inputmode="numeric" id="bill_D" oninput="fmtMoney(this)" onfocus="this.select()"></div>
+            <div class="billCell"><div class="plbl">AD</div><input type="text" inputmode="numeric" id="bill_AD" oninput="fmtMoney(this)" onfocus="this.select()"></div>
+            <div class="billCell"><div class="plbl">ST</div><input type="text" inputmode="numeric" id="bill_ST" oninput="fmtMoney(this)" onfocus="this.select()"></div>
           </div>
+          <div class="priceLabel" style="margin-top:12px;">払出（会社ごとの支払い単価）</div>
+          <table class="payTable">
+            <thead><tr><th></th><th>D</th><th>AD</th><th>ST</th></tr></thead>
+            <tbody id="payTableBody"></tbody>
+          </table>
         </div>
       </div>
 
@@ -362,10 +415,14 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
         </div>
       </div>
 
-      <!-- ④アサイン -->
+      <!-- ④アサイン：index.htmlの盤面編集を移植 -->
       <div class="block" id="block4">
         <div class="blockBody">
-          <div class="assignHint">アサイン編集は今回スルー（後日実装）</div>
+          <div class="boardWrap"><table class="board" id="board"></table></div>
+          <div class="addgrp">
+            <select id="newGrp"><option value="">大項目を追加…</option></select>
+            <button class="btnAdd" onclick="addGroup()">追加</button>
+          </div>
         </div>
       </div>
 
@@ -392,8 +449,41 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
   </div>
 </div>
 
+<!-- ④アサイン編集ポップアップ -->
+<div class="assignModalBg" id="assignModalBg" onclick="if(event.target===this) closeAssignModal()">
+  <div class="assignModal">
+    <h3 id="mTitle">—</h3>
+    <div class="mRow">
+      <span class="mLbl">役割</span>
+      <select id="mRole" onchange="onAssignModalChange()"></select>
+    </div>
+    <div class="mRow">
+      <span class="mLbl">名前</span>
+      <input id="mName" placeholder="名前（後で可）" oninput="onAssignModalChange()">
+    </div>
+    <div class="mRow">
+      <span class="mLbl">会社</span>
+      <select id="mCo" onchange="onAssignModalChange()"></select>
+    </div>
+    <div class="mDaysLbl">稼働日</div>
+    <div class="mDays" id="mDays"></div>
+    <div class="mPayBox">払出単価　<b id="mPay">—</b></div>
+    <div class="mBtns">
+      <button class="mDel" onclick="deleteAssignSlot()">削除</button>
+      <button class="mOk" onclick="closeAssignModal()">完了</button>
+    </div>
+  </div>
+</div>
+
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbzX7Pzhq2TFFOHCr0saeHG7qeWA5PuBptUe4-kAtzj-kYWIkJE7z7F1vkvkAMEUzQpPcA/exec';
+
+// 会社名 → id用の安全な英字キー
+const PAY_ID = {'自社':'self','ZERO':'zero','ハン':'han','その他':'other'};
+const PAY_COMPANIES_JS = ['自社','ZERO','ハン','その他'];
+const ROLE_LIST = ['D','AD','ST'];
+// ③向け先ボタンの内部キー('self'等)→実際の会社名。PAY_IDの逆引き。
+const TARGET_NAME = {self:'自社', zero:'ZERO', han:'ハン', other:'その他'};
 
 // ===== 状態 =====
 let CASES=[];
@@ -404,17 +494,31 @@ let CUR_TAB=null;      // 既存編集モード時：対象タブ名
 let CUR_ID=null;       // 一覧・キャッシュ用のキー = ssId + '::' + tabName
 let DIRTY=false;
 let SEL_DATES=[];      // ['2026-06-19','2026-06-20'...] 内部はISO
+let DATES_TOUCHED=false; // ★カレンダーで明示的に選び直した時だけtrue（既存日程を保存で壊さないためのガード）
 let IRR=[];            // イレギュラー [{date:'YYYY-MM-DD',start:'HH:MM',end:'HH:MM'}]
 let TARGET='self';
-let FILTER_CLIENT='ALL';
+let FILTER_CLIENT=null;   // null = 絞り込みなし（全部表示）
+let FILTER_PINNED=false;  // true = ピン留めだけ表示
 let CAL_TMP=[];        // カレンダー編集中の一時
 let CAL_YM={y:0,m:0};  // カレンダー表示中の年月
 let MASTERS=null;      // getMastersのキャッシュ（クライアント一覧など）
-let RAW_BASELINE='';   // ⓪原文：読み込んだ時点の内容（差分計算の基準）
+let PENDING_RAW_ADD=''; // ⓪原文：まだ保存していない追記分
+
+// ===== ④アサイン盤面の状態 =====
+let DATES=[];              // 案件の稼働日（案件データのslotsから拾う）
+let SLOTS=[];              // 枠 [{id,pos,role,name,company,start,end,days:[]}]
+let COMPANIES=['自社','ZERO','ten','next','ハン','その他'];   // アサインの会社プルダウン（masters.companiesで上書き）
+let POS_OPTIONS=['クローク','受付','ドリンク補充','誘導'];    // 大項目プルダウン（masters.positionsで上書き）
+let editingSlotId=null;
+
+// ===== 表示・数値まわりの共通ヘルパー =====
+function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s){ return esc(s).replace(/'/g,'&#39;'); }
+function comma(v){ if(v===''||v==null) return ''; const n=Number(String(v).replace(/,/g,'')); return isNaN(n)?'':n.toLocaleString(); }
+function uncomma(v){ const s=String(v==null?'':v).replace(/,/g,'').trim(); if(s==='') return ''; const n=Number(s); return isNaN(n)?'':n; }
+function fmtMoney(el){ const r=el.value.replace(/[^\d]/g,''); el.value=r?Number(r).toLocaleString():''; onDetailChange(); }
 
 // ===== GAS通信共通ヘルパー =====
-// ★必ずPOST＋Content-Type:text/plainで送る（CORSプリフライト回避のため）。
-//   GETはdoGet側でアクション振り分けをしていないため使わないこと。
 function postGAS(obj){
   return fetch(GAS_URL,{
     method:'POST',
@@ -422,6 +526,27 @@ function postGAS(obj){
     body:JSON.stringify(obj),
     redirect:'follow'
   }).then(r=>r.json());
+}
+
+// ===== ピン留め（端末内のみ・localStorage） =====
+function getPins(){
+  try{ return JSON.parse(localStorage.getItem('pinnedCases')||'[]'); }catch(e){ return []; }
+}
+function setPins(arr){
+  try{ localStorage.setItem('pinnedCases', JSON.stringify(arr)); }catch(e){}
+}
+function togglePin(id, ev){
+  if(ev) ev.stopPropagation();
+  const pins=getPins();
+  const i=pins.indexOf(id);
+  if(i>=0) pins.splice(i,1); else pins.push(id);
+  setPins(pins);
+  renderList();
+}
+function togglePinFilter(){
+  FILTER_CLIENT=null;
+  FILTER_PINNED=!FILTER_PINNED;
+  renderList();
 }
 
 // ===== 一覧 =====
@@ -442,25 +567,53 @@ function loadCaseList(){
     }
   });
 }
+// 「6/19(金)・6/20(土)」→ 並べ替え用の数値（最初の日付、M*100+D）
+function dateSortKey(dates){
+  const m=String(dates||'').match(/(\d{1,2})\/(\d{1,2})/);
+  if(!m) return 9999;
+  return Number(m[1])*100+Number(m[2]);
+}
 function renderList(){
-  const clients=[...new Set(CASES.map(c=>c.client||'—'))];
+  // クライアントごとの略称（設定タブの表示略称。未設定ならクライアント名そのまま）
+  const abbrMap={};
+  CASES.forEach(c=>{ if(c.client) abbrMap[c.client]=c.clientAbbr||c.client; });
+  const clients=Object.keys(abbrMap);
+
   const fb=document.getElementById('filterBar');
-  fb.innerHTML='<button class="chip '+(FILTER_CLIENT==='ALL'?'on':'')+'" onclick="setFilter(\'ALL\')">全部</button>'+
-    clients.map(cl=>`<button class="chip ${FILTER_CLIENT===cl?'on':''}" onclick="setFilter('${cl}')">${cl}</button>`).join('');
-  const list=CASES.filter(c=>FILTER_CLIENT==='ALL'||c.client===FILTER_CLIENT)
-    .sort((a,b)=>{
-      if(!!a.pinned!==!!b.pinned)return b.pinned?1:-1;
-      // ※日付は表示文字列("6/19(金)・6/20(土)"等)での比較のため、月をまたぐ案件が
-      //   混在すると厳密な時系列にならない場合があります(既知の制限)。
-      return (b.dates||'').localeCompare(a.dates||'');
-    });
+  fb.innerHTML=clients.map(cl=>
+    `<button class="chip ${FILTER_CLIENT===cl?'on':''}" onclick="setFilter('${cl}')">${abbrMap[cl]}</button>`
+  ).join('');
+  document.getElementById('pinChip').classList.toggle('on',FILTER_PINNED);
+
+  const pins=getPins();
+  let list=CASES.map(c=>Object.assign({pinned:pins.indexOf(c.id)>=0},c));
+
+  if(FILTER_PINNED){
+    list=list.filter(c=>c.pinned);
+  }else if(FILTER_CLIENT){
+    list=list.filter(c=>c.client===FILTER_CLIENT);
+  }
+  // 何も選ばれていなければ絞り込みなし＝全部表示
+
+  list.sort((a,b)=>{
+    if(a.pinned!==b.pinned) return a.pinned?-1:1;
+    return dateSortKey(a.dates)-dateSortKey(b.dates);
+  });
+
   document.getElementById('caseList').innerHTML=list.map(c=>
-    `<div class="caseCard ${c.pinned?'pinned':''}" onclick="openCase('${c.id}')">
-      <div class="cName">${c.caseName||'(無題)'}</div>
-      <div class="cMeta">${c.client||''} ・ ${c.dates||''}</div>
+    `<div class="caseCard" onclick="openCase('${c.id}')">
+      <div class="cMain">
+        <div class="cName">${c.caseName||'(無題)'}</div>
+        <div class="cMeta">${c.client||''} ・ ${c.dates||''}</div>
+      </div>
+      <button class="pinBtn ${c.pinned?'on':''}" onclick="togglePin('${c.id}',event)">${c.pinned?'📌':'📍'}</button>
     </div>`).join('')||'<div style="text-align:center;color:var(--sub);padding:40px;">案件がありません</div>';
 }
-function setFilter(c){FILTER_CLIENT=c;renderList();}
+function setFilter(cl){
+  FILTER_PINNED=false;
+  FILTER_CLIENT=(FILTER_CLIENT===cl)?null:cl;   // もう一度タップで解除→全部表示
+  renderList();
+}
 
 // ===== 既存案件を開く =====
 function openCase(id){
@@ -493,7 +646,7 @@ function backToList(){
 function newCase(){
   MODE='create';
   CUR_SSID=null;CUR_TAB=null;CUR_ID=null;CUR=null;
-  SEL_DATES=[];IRR=[];TARGET='self';DIRTY=false;
+  SEL_DATES=[];DATES_TOUCHED=false;IRR=[];TARGET='self';DIRTY=false;
   buildAll();
   document.getElementById('viewList').classList.add('hide');
   document.getElementById('viewCase').classList.remove('hide');
@@ -516,45 +669,222 @@ function fillClientSelect(sel){
     : '<option value="">クライアント未登録</option>';
 }
 
+// ===== ②単価：払出テーブルの行を組み立て =====
+function buildPayTableBody(){
+  document.getElementById('payTableBody').innerHTML=PAY_COMPANIES_JS.map(co=>{
+    const idc=PAY_ID[co];
+    return `<tr><th>${co}</th>`+ROLE_LIST.map(r=>
+      `<td><input type="text" inputmode="numeric" id="pay_${idc}_${r}" oninput="fmtMoney(this)" onfocus="this.select()"></td>`
+    ).join('')+`</tr>`;
+  }).join('');
+}
+function setBillPayToForm(bill,pay){
+  bill=bill||{};pay=pay||{};
+  document.getElementById('bill_D').value=comma(bill.D);
+  document.getElementById('bill_AD').value=comma(bill.AD);
+  document.getElementById('bill_ST').value=comma(bill.ST);
+  PAY_COMPANIES_JS.forEach(co=>{
+    const idc=PAY_ID[co];
+    const p=pay[co]||{};
+    document.getElementById(`pay_${idc}_D`).value=comma(p.D);
+    document.getElementById(`pay_${idc}_AD`).value=comma(p.AD);
+    document.getElementById(`pay_${idc}_ST`).value=comma(p.ST);
+  });
+}
+function clearBillPayForm(){ setBillPayToForm({},{}); }
+function getBillPayFromForm(){
+  const bill={
+    D:uncomma(document.getElementById('bill_D').value),
+    AD:uncomma(document.getElementById('bill_AD').value),
+    ST:uncomma(document.getElementById('bill_ST').value),
+  };
+  const pay={};
+  PAY_COMPANIES_JS.forEach(co=>{
+    const idc=PAY_ID[co];
+    pay[co]={
+      D:uncomma(document.getElementById(`pay_${idc}_D`).value),
+      AD:uncomma(document.getElementById(`pay_${idc}_AD`).value),
+      ST:uncomma(document.getElementById(`pay_${idc}_ST`).value),
+    };
+  });
+  return {bill,pay};
+}
+
+// ===== ④アサイン盤面（index.htmlの盤面編集をそのまま移植） =====
+function renderBoard(){
+  const t=document.getElementById('board');
+  const nCol=1+DATES.length;
+
+  const byPos={},posOrder=[];
+  SLOTS.forEach(s=>{ if(!byPos[s.pos]){byPos[s.pos]=[];posOrder.push(s.pos);} byPos[s.pos].push(s); });
+  const rank=r=>r==='D'?0:r==='AD'?1:2;
+  posOrder.forEach(p=>{
+    byPos[p].sort((a,b)=>rank(a.role)-rank(b.role));
+    let st=0;
+    byPos[p].forEach(s=>{
+      if(s.role==='ST'){ st++; s.label=p+'ST'+st; } else s.label=p+s.role;
+    });
+  });
+
+  const ts=document.getElementById('dTimeStart').value;
+  const te=document.getElementById('dTimeEnd').value;
+  const timeStr=(ts&&te)?ts+'-'+te:'';
+
+  let html='<thead>';
+  html+='<tr><th class="cLabel">日程</th>'+DATES.map(d=>'<th>'+esc(d)+'</th>').join('')+'<th class="cCo"></th></tr>';
+  html+='<tr class="trTime"><th class="cLabel">時間</th>'+DATES.map(()=>'<td>'+esc(timeStr)+'</td>').join('')+'<td class="cCo"></td></tr></thead><tbody>';
+
+  posOrder.forEach((pos,pi)=>{
+    if(pi>0) html+='<tr class="sep"><td colspan="'+(nCol+1)+'"></td></tr>';
+    byPos[pos].forEach(s=>{
+      html+='<tr><th class="cLabel">'+esc(s.label)+'</th>';
+      DATES.forEach(d=>{
+        const on=s.days.indexOf(d)>=0;
+        const txt=on?(s.name||s.company):'';
+        let cls='cell';
+        if(!on) cls+=' off'; else if(!s.name) cls+=' conly';
+        html+='<td class="'+cls+'" onclick="openAssignModal(\''+s.id+'\')"><span class="cellIn">'+esc(txt)+'</span></td>';
+      });
+      html+='<td class="cCo">'+esc(s.company)+'</td></tr>';
+    });
+    html+='<tr class="addRow"><td class="addCell" colspan="'+nCol+'"><button class="addBtn" onclick="addSlot(\''+escAttr(pos)+'\')">＋ 枠を追加</button></td><td class="cCo"></td></tr>';
+  });
+  html+='</tbody>';
+  t.innerHTML=html;
+}
+
+function addSlot(pos){
+  const s={id:'s'+Date.now(),pos:pos,role:'ST',name:'',company:'自社',start:'',end:'',days:DATES.slice()};
+  SLOTS.push(s);
+  renderBoard();onDetailChange();
+  openAssignModal(s.id);
+}
+function addGroup(){
+  const sel=document.getElementById('newGrp');
+  const pos=sel.value; if(!pos) return;
+  sel.value='';
+  addSlot(pos);
+}
+
+function openAssignModal(id){
+  const s=SLOTS.find(x=>x.id===id); if(!s) return;
+  editingSlotId=id;
+  document.getElementById('mTitle').innerHTML=esc(s.label||s.pos)+'<span class="mSub">'+esc(s.pos)+'</span>';
+  document.getElementById('mRole').innerHTML=ROLE_LIST.map(r=>'<option'+(r===s.role?' selected':'')+'>'+r+'</option>').join('');
+  document.getElementById('mName').value=s.name||'';
+  document.getElementById('mCo').innerHTML=COMPANIES.map(c=>'<option'+(c===s.company?' selected':'')+'>'+esc(c)+'</option>').join('');
+  document.getElementById('mDays').innerHTML=DATES.map(d=>
+    '<label class="mDay"><input type="checkbox" data-date="'+escAttr(d)+'"'+(s.days.indexOf(d)>=0?' checked':'')+' onchange="onAssignModalChange()"><span>'+esc(d)+'</span></label>'
+  ).join('');
+  updateAssignModalPay();
+  document.getElementById('assignModalBg').classList.add('on');
+}
+function onAssignModalChange(){
+  const s=SLOTS.find(x=>x.id===editingSlotId); if(!s) return;
+  s.role=document.getElementById('mRole').value;
+  s.name=document.getElementById('mName').value.trim();
+  s.company=document.getElementById('mCo').value;
+  s.days=Array.from(document.querySelectorAll('#mDays input:checked')).map(cb=>cb.dataset.date);
+  updateAssignModalPay();
+  renderBoard();
+  onDetailChange();
+}
+// 払出単価はモーダル内の役割・会社に応じて②単価の現在値からそのまま引く（ten/next→その他扱い）
+function updateAssignModalPay(){
+  const s=SLOTS.find(x=>x.id===editingSlotId); if(!s) return;
+  const payCo=(PAY_COMPANIES_JS.indexOf(s.company)>=0)?s.company:'その他';
+  const idc=PAY_ID[payCo];
+  const el=document.getElementById(`pay_${idc}_${s.role}`);
+  const v=el?uncomma(el.value):'';
+  document.getElementById('mPay').textContent=(v!=='')?('¥'+Number(v).toLocaleString()):'—';
+}
+function deleteAssignSlot(){
+  const i=SLOTS.findIndex(x=>x.id===editingSlotId);
+  if(i>=0){ SLOTS.splice(i,1); renderBoard(); onDetailChange(); }
+  closeAssignModal();
+}
+function closeAssignModal(){
+  document.getElementById('assignModalBg').classList.remove('on');
+  editingSlotId=null;
+}
+// 保存直前に、枠(SLOTS)を「1日1行」の平らな配列に戻す（GASのslots形式に合わせる）
+function collectSlotsPayload(){
+  const ds=document.getElementById('dTimeStart').value;
+  const de=document.getElementById('dTimeEnd').value;
+  const slots=[];
+  SLOTS.forEach(s=>{
+    s.days.forEach(d=>{
+      slots.push({date:d,pos:s.pos,role:s.role,name:s.name,company:s.company,start:s.start||ds,end:s.end||de,note:''});
+    });
+  });
+  return slots;
+}
+
 // ===== モードに応じた表示切替 =====
 //   ★常時編集可能が基本方針。この2つだけは構造上の理由で新規/編集を分ける：
 //    ・送り先(rowClient)：新規は行き先SSを選ぶ必要があるが、既存案件は既にSS/タブが決まっている
 //    ・⓪原文(paneRaw)：新規案件にはまだ原文が無いので表示のしようがない
 function applyModeVisibility(){
-  const isCreate = MODE==='create';
-  document.getElementById('rowClient').style.display = isCreate?'flex':'none';
+  const isCreate=MODE==='create';
+  document.getElementById('rowClient').style.display=isCreate?'flex':'none';
 
   const tab0=document.querySelector('.navtab[data-target="paneRaw"]');
+  const tab4=document.querySelector('.navtab[data-target="block4"]');
   if(isCreate){
     tab0.classList.add('hide');
     document.getElementById('paneRaw').classList.remove('open');
+    tab4.classList.add('hide');
+    document.getElementById('block4').classList.remove('open');
   }else{
     tab0.classList.remove('hide');
+    tab4.classList.remove('hide');
   }
-  document.getElementById('genNote').style.display = isCreate ? 'block' : 'none';
+  document.getElementById('genNote').style.display=isCreate?'block':'none';
 
   document.body.classList.toggle('rawOpen',document.getElementById('paneRaw').classList.contains('open'));
   updateNavActive();
 }
 
+// ===== 日程の表示文字列 → 実際に使えるISO日付への変換（①のバグ修正） =====
+//   グレーで見せているだけだったLINE抽出済みの日程を、③プレビューやイレギュラー＋ボタンでも
+//   ちゃんと使えるようにする。年は表示文字列に無いため、直近を優先して推測する
+//   （保存時は明示的にカレンダーで選び直した時だけ実際に書き込む＝勝手に年がズレて保存される事故を防止）。
+function guessYearForMD_(month,day){
+  const now=new Date();
+  const thisYear=now.getFullYear();
+  const candidate=new Date(thisYear,month-1,day);
+  const diffDays=(now-candidate)/86400000;
+  return diffDays>200?thisYear+1:thisYear;
+}
+function parseDatesDisplayToISO_(str){
+  const out=[];
+  const re=/(\d{1,2})\/(\d{1,2})/g;
+  let m;
+  while((m=re.exec(str))){
+    const mo=Number(m[1]),da=Number(m[2]);
+    const y=guessYearForMD_(mo,da);
+    out.push(`${y}-${String(mo).padStart(2,'0')}-${String(da).padStart(2,'0')}`);
+  }
+  return [...new Set(out)].sort();
+}
+
 // ===== データ描画 =====
 function buildAll(){
-  const isEdit = MODE==='edit';
+  const isEdit=MODE==='edit';
 
   if(isEdit && CUR){
     document.getElementById('hName').textContent=CUR.settings.caseName||'(無題)';
     document.getElementById('dName').value=CUR.settings.caseName||'';
     document.getElementById('dPlace').value=CUR.settings.area||'';
 
-    // 時間は "09:00〜21:00" 形式なら分解して初期値に。それ以外は空のまま。
     const tm=(CUR.settings.time||'').match(/^(\d{2}:\d{2})[〜~-](\d{2}:\d{2})$/);
     document.getElementById('dTimeStart').value=tm?tm[1]:'';
     document.getElementById('dTimeEnd').value=tm?tm[2]:'';
 
-    // 日程は文字列でしか持っていないため、そのままでは再選択できない。
-    // 変更したい時だけカレンダーで選び直す運用にする。
-    SEL_DATES=[];
-    updateDatesDisplay(CUR.settings.dates||'');
+    // ★グレー表示だけだった既存日程を、実際に使えるISO日付に変換して反映
+    SEL_DATES=parseDatesDisplayToISO_(CUR.settings.dates||'');
+    DATES_TOUCHED=false;
+    updateDatesDisplay();
 
     IRR=[];renderIrr();
 
@@ -562,55 +892,68 @@ function buildAll(){
     document.getElementById('dWear').value=CUR.settings.wear||'';
     document.getElementById('dJob').value=CUR.settings.job||'';
 
-    const pr=CUR.settings.prices||{};
-    document.getElementById('p_self_bill').value=pr.self_bill||'';
-    document.getElementById('p_zero_bill').value=pr.zero_bill||'';
-    document.getElementById('p_han_bill').value=pr.han_bill||'';
-    document.getElementById('p_other_bill').value=pr.other_bill||'';
+    setBillPayToForm(CUR.settings.bill,CUR.settings.pay);
 
-    RAW_BASELINE=CUR.rawText||'';
-    document.getElementById('rawText').value=RAW_BASELINE;
+    // ★④アサイン盤面：CUR.slots(GASのgetCaseData_が返す平らな配列)を
+    //   pos|role|name|company でまとめて枠(SLOTS)にする（GAS側のrenderAssignTable_と同じ考え方）
+    if(CUR.masters){
+      if(CUR.masters.positions && CUR.masters.positions.length) POS_OPTIONS=CUR.masters.positions;
+      if(CUR.masters.companies && CUR.masters.companies.length) COMPANIES=CUR.masters.companies;
+    }
+    DATES=[];
+    (CUR.slots||[]).forEach(x=>{ if(x.date && DATES.indexOf(x.date)<0) DATES.push(x.date); });
+    const slotMap={};SLOTS=[];let uid=0;
+    (CUR.slots||[]).forEach(x=>{
+      const k=x.pos+'|'+x.role+'|'+x.name+'|'+x.company;
+      if(!slotMap[k]){
+        slotMap[k]={id:'s'+(uid++),pos:x.pos,role:x.role||'ST',name:x.name||'',company:x.company||'自社',start:x.start||'',end:x.end||'',days:[]};
+        SLOTS.push(slotMap[k]);
+      }
+      if(x.date && slotMap[k].days.indexOf(x.date)<0) slotMap[k].days.push(x.date);
+    });
+    document.getElementById('newGrp').innerHTML='<option value="">大項目を追加…</option>'+POS_OPTIONS.map(p=>`<option>${esc(p)}</option>`).join('');
+    renderBoard();
+
+    document.getElementById('rawHistory').textContent=CUR.rawText||'(原文の記録はまだありません)';
+    PENDING_RAW_ADD='';
+    renderRawPending();
+    document.getElementById('rawAddBox').classList.add('hide');
+    document.getElementById('rawAddInput').value='';
   }else{
     document.getElementById('hName').textContent=document.getElementById('dName').value||'(無題)';
     document.getElementById('dName').value='';
     document.getElementById('dPlace').value='';
-    SEL_DATES=[];updateDatesDisplay();
+    SEL_DATES=[];DATES_TOUCHED=false;updateDatesDisplay();
     document.getElementById('dTimeStart').value='';
     document.getElementById('dTimeEnd').value='';
     IRR=[];renderIrr();
     document.getElementById('dPeople').value='';
     document.getElementById('dWear').value='';
     document.getElementById('dJob').value='';
-    document.getElementById('p_self_bill').value='';
-    document.getElementById('p_zero_bill').value='';
-    document.getElementById('p_han_bill').value='';
-    document.getElementById('p_other_bill').value='';
-    RAW_BASELINE='';
-    document.getElementById('rawText').value='';
+    clearBillPayForm();
+    DATES=[];SLOTS=[];
     populateClientPicker();
   }
 
   DIRTY=false;updateSaveState();
+  // ★全閉：どちらのモードでも最初は何も開かない
+  document.querySelectorAll('.block').forEach(b=>b.classList.remove('open'));
   applyModeVisibility();
   renderGen();
 }
 
 // ===== 日程表示 =====
-function updateDatesDisplay(existingStr){
+function updateDatesDisplay(){
   const el=document.getElementById('dDatesDisplay');
   if(SEL_DATES.length){
     el.textContent=SEL_DATES.map(fmtDateJP).join('、');
     el.classList.remove('empty');
-  }else if(existingStr){
-    el.textContent=existingStr+'（変更する場合はタップして選び直し）';
-    el.classList.add('empty');
   }else{
     el.textContent='タップして選択';
     el.classList.add('empty');
   }
 }
 function fmtDateJP(iso){
-  // 'YYYY-MM-DD' → 'M/D(曜)'
   const d=new Date(iso+'T00:00');
   if(isNaN(d))return iso;
   const w=['日','月','火','水','木','金','土'][d.getDay()];
@@ -658,6 +1001,7 @@ function pickCal(iso){
 }
 function confirmCal(){
   SEL_DATES=CAL_TMP.slice();
+  DATES_TOUCHED=true;   // ★明示的にカレンダーで選び直した時だけ、保存時に日程を上書きする
   updateDatesDisplay();
   onDetailChange();
   closeCalModal();
@@ -677,6 +1021,33 @@ function addIrregular(){
   renderIrr();onDetailChange();
 }
 function delIrr(i){IRR.splice(i,1);renderIrr();onDetailChange();}
+
+// ===== ⓪原文：コンパクトな追記フロー =====
+function toggleRawAdd(){
+  document.getElementById('rawAddBox').classList.toggle('hide');
+}
+function cancelRawAdd(){
+  document.getElementById('rawAddInput').value='';
+  document.getElementById('rawAddBox').classList.add('hide');
+}
+function confirmRawAdd(){
+  const t=document.getElementById('rawAddInput').value.trim();
+  if(!t)return;
+  PENDING_RAW_ADD=PENDING_RAW_ADD?PENDING_RAW_ADD+'\n\n'+t:t;
+  document.getElementById('rawAddInput').value='';
+  document.getElementById('rawAddBox').classList.add('hide');
+  renderRawPending();
+  DIRTY=true;updateSaveState();
+}
+function renderRawPending(){
+  const el=document.getElementById('rawPending');
+  if(PENDING_RAW_ADD){
+    el.textContent='追加予定（保存するとこの内容が下に追記されます）：\n'+PENDING_RAW_ADD;
+    el.classList.remove('hide');
+  }else{
+    el.classList.add('hide');
+  }
+}
 
 // ===== ナビ・ブロック開閉 =====
 function toggleBlock(id){
@@ -712,14 +1083,12 @@ function toggleAll(){
 // ===== ヘッダー折りたたみ =====
 function hideHead(){
   document.getElementById('caseHead').classList.add('collapsed');
-  document.querySelector('.headShowBtn').style.display='block';
 }
 function showHead(){
   document.getElementById('caseHead').classList.remove('collapsed');
-  document.querySelector('.headShowBtn').style.display='none';
 }
 
-// ===== 向け先 =====
+// ===== 向け先（③LINE文で使う会社） =====
 function pickTarget(t){
   TARGET=t;
   document.querySelectorAll('.targetPick .tp').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
@@ -727,7 +1096,6 @@ function pickTarget(t){
 }
 
 // ===== 変更検知 =====
-function onRawChange(){DIRTY=true;updateSaveState();}
 function onDetailChange(){
   DIRTY=true;updateSaveState();
   document.getElementById('hName').textContent=document.getElementById('dName').value||'(無題)';
@@ -740,7 +1108,9 @@ function updateSaveState(){
   else{st.textContent='保存済み';st.className='st saved';btn.classList.remove('dirty');}
 }
 
-// ===== ③LINE文プレビュー（ローカル簡易生成。新規作成時は保存後に本番テンプレの結果に差し替わる） =====
+// ===== ③LINE文プレビュー =====
+//   向け先(自社/ZERO/ハン/その他)のD/AD/ST払出単価を「全部」出す。空欄は「－」。
+//   不要な行を消すのは春木さんの仕事、という運用（GAS側のbuildRateLines_と同じロジック）。
 function renderGen(){
   const name=document.getElementById('dName').value||'';
   const place=document.getElementById('dPlace').value||'';
@@ -750,9 +1120,14 @@ function renderGen(){
   const people=document.getElementById('dPeople').value||'〇名';
   const wear=document.getElementById('dWear').value||'';
   const job=document.getElementById('dJob').value||'';
-  const priceMap={self:'p_self_bill',zero:'p_zero_bill',han:'p_han_bill',other:'p_other_bill'};
-  const price=document.getElementById(priceMap[TARGET])?.value||'';
-  const priceStr=price?`${Number(price).toLocaleString()}円/日`:'○○,○○○円/日';
+
+  const idc=PAY_ID[TARGET_NAME[TARGET]];
+  const rateLines=ROLE_LIST.map(r=>{
+    const v=uncomma(document.getElementById(`pay_${idc}_${r}`).value);
+    const vs=v!==''?`${Number(v).toLocaleString()}円/日`:'－';
+    return `${r}：${vs}`;
+  }).join('\n');
+
   let irrStr='';
   if(IRR.length){
     irrStr='\n'+IRR.map(r=>`※${fmtDateJP(r.date)}のみ ${r.start}〜${r.end}`).join('\n');
@@ -774,13 +1149,15 @@ function renderGen(){
 □ご依頼人数：${people}
 □衣装：${wear}
 □内容：${job}
-□金額：${priceStr}${extraStr}`;
+□金額：
+${rateLines}${extraStr}`;
   document.getElementById('genPreview').textContent=txt;
 }
 
 // ===== 保存 =====
 function save(){
   const btn=document.getElementById('saveBtn');
+  const {bill,pay}=getBillPayFromForm();
 
   if(MODE==='create'){
     const mention=document.getElementById('dClient').value;
@@ -789,8 +1166,6 @@ function save(){
     if(!caseName){alert('案件名を入力してください');return;}
     if(!SEL_DATES.length){alert('日程を選択してください');return;}
 
-    const priceMap={self:'p_self_bill',zero:'p_zero_bill',han:'p_han_bill',other:'p_other_bill'};
-    const price=document.getElementById(priceMap[TARGET])?.value||'';
     const people=document.getElementById('dPeople').value.trim();
 
     const form={
@@ -802,9 +1177,12 @@ function save(){
       timeEnd:document.getElementById('dTimeEnd').value,
       wear:(document.getElementById('dWear').value||'').split(/[\n、,]/).map(s=>s.trim()).filter(Boolean),
       jobs:(document.getElementById('dJob').value||'').split(/\n/).map(s=>s.trim()).filter(Boolean),
-      price:price,
+      price:bill.D||'',      // 骨格生成用の代表単価（Dの請求単価）
       conditions:people?[people]:[],
       notes:'',
+      bill:bill,
+      pay:pay,
+      targetCompany:TARGET_NAME[TARGET],
     };
 
     btn.disabled=true;btn.textContent='保存中...';
@@ -830,41 +1208,21 @@ function save(){
   }
 
   // ===== 編集モード（既存案件）＝常時全項目編集可能 =====
-
-  // ⓪原文：読み込んだ時点（RAW_BASELINE）からの「追加分だけ」を送る。
-  //   実際のGASは「追記」しかできないため、全文を毎回送ると保存の度に重複してしまう。
-  //   過去の履歴部分を書き換え/削除した場合は、あいまいになるため保存をブロックする。
-  const rawNow=document.getElementById('rawText').value;
-  let rawAdd='';
-  if(rawNow!==RAW_BASELINE){
-    if(rawNow.startsWith(RAW_BASELINE)){
-      rawAdd=rawNow.slice(RAW_BASELINE.length).replace(/^\n+/,'').trim();
-    }else{
-      alert('原文の「過去の履歴部分」は編集・削除できません（追記のみ保存されます）。\n既存の文章はそのままにして、新しく伝えたい内容を一番下に追加してください。');
-      return;
-    }
-  }
-
   const meta={
     caseName:document.getElementById('dName').value.trim(),
     area:document.getElementById('dPlace').value.trim(),
-    dates:SEL_DATES.slice(),               // 変更した時だけ中身が入る
+    dates:DATES_TOUCHED?SEL_DATES.slice():[],   // ★カレンダーで明示的に変更した時だけ送る
     timeStart:document.getElementById('dTimeStart').value,
     timeEnd:document.getElementById('dTimeEnd').value,
     people:document.getElementById('dPeople').value,
     wear:document.getElementById('dWear').value,
     job:document.getElementById('dJob').value,
-    prices:{
-      self_bill:document.getElementById('p_self_bill').value,
-      zero_bill:document.getElementById('p_zero_bill').value,
-      han_bill:document.getElementById('p_han_bill').value,
-      other_bill:document.getElementById('p_other_bill').value,
-    },
   };
 
-  // ★slotsキーは意図的に含めない＝GAS側でアサインデータには一切触らせない
-  const payload={settings:{meta:meta}};
-  if(rawAdd) payload.rawAdd=rawAdd;
+  // ★④アサインが実際に編集可能になったので、slotsも常に一緒に送る
+  //   （SLOTSは開いた時にCUR.slotsから正しく復元されているので、安全に往復できる）
+  const payload={settings:{meta:meta,bill:bill,pay:pay},slots:collectSlotsPayload()};
+  if(PENDING_RAW_ADD) payload.rawAdd=PENDING_RAW_ADD;
 
   btn.disabled=true;btn.textContent='保存中...';
   postGAS({action:'saveCase',ssId:CUR_SSID,tabName:CUR_TAB,payload:payload}).then(d=>{
@@ -875,11 +1233,13 @@ function save(){
       CUR.settings.people=meta.people;
       CUR.settings.wear=meta.wear;
       CUR.settings.job=meta.job;
-      CUR.settings.prices=meta.prices;
-      if(rawAdd){
-        CUR.rawText=(CUR.rawText?CUR.rawText+'\n\n':'')+rawAdd;
-        RAW_BASELINE=CUR.rawText;
-        document.getElementById('rawText').value=RAW_BASELINE;
+      CUR.settings.bill=bill;
+      CUR.settings.pay=pay;
+      if(PENDING_RAW_ADD){
+        CUR.rawText=(CUR.rawText?CUR.rawText+'\n\n':'')+PENDING_RAW_ADD;
+        document.getElementById('rawHistory').textContent=CUR.rawText;
+        PENDING_RAW_ADD='';
+        renderRawPending();
       }
       localStorage.setItem('case_'+CUR_ID,JSON.stringify(CUR));
       DIRTY=false;updateSaveState();
@@ -893,6 +1253,7 @@ function save(){
 }
 
 // ===== 初期化 =====
+buildPayTableBody();
 loadCaseList();
 updateNavActive();
 document.body.classList.remove('rawOpen'); // 初期は⓪閉じ
