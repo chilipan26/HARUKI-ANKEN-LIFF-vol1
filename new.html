@@ -15,6 +15,7 @@ html,body{height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFo
 input,textarea,select,button{font-family:inherit;font-size:16px;text-align:left;}
 button{cursor:pointer;border:none;background:none;color:inherit;}
 .hide{display:none!important;}
+
 /* ===== 案件一覧 ===== */
 #viewList{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
 .listHead{height:var(--head-h);display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:var(--card);border-bottom:1px solid var(--line);}
@@ -28,9 +29,10 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .caseCard .cName{font-weight:600;font-size:14px;margin-bottom:2px;}
 .caseCard .cMeta{font-size:11px;color:var(--sub);}
 .caseCard.pinned{border-left:3px solid var(--warn);}
-.listLoading{text-align:center;color:var(--sub);padding:40px;font-size:13px;}
+
 /* ===== 案件詳細 ===== */
 #viewCase{height:100vh;display:flex;flex-direction:column;background:var(--bg);}
+
 /* ヘッダー（折りたたみ可能） */
 .caseHead{
   height:var(--head-h);
@@ -51,6 +53,7 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 .caseHead .st.saved{color:var(--ok);}
 .caseHead .saveBtn{padding:6px 12px;background:var(--ok);color:#fff;border-radius:8px;font-size:13px;font-weight:600;}
 .caseHead .saveBtn.dirty{background:var(--warn);}
+
 /* ナビバー */
 .navbar{
   height:var(--nav-h);
@@ -72,13 +75,16 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 }
 .headShowBtn{display:none;}
 .caseHead.collapsed ~ .caseWrap .headShowBtn{display:block;}
+
 /* 本体スクロール領域 */
 .caseWrap{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
 .scrollArea{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:0 0 8px;}
+
 /* 各ブロック共通 */
 .block{background:var(--card);border-bottom:1px solid var(--line);}
 .blockBody{padding:10px 12px;}
 .block:not(.open) .blockBody{display:none;}
+
 /* ⓪原文（開いている時 1/4 固定・上部スティッキー） */
 #paneRaw{position:relative;}
 #paneRaw.open{
@@ -90,19 +96,13 @@ button{cursor:pointer;border:none;background:none;color:inherit;}
 }
 #paneRaw.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
-  display:flex;flex-direction:column;
 }
-#rawHistory{
-  font-size:12px;line-height:1.5;color:var(--sub);white-space:pre-wrap;
-  max-height:45%;overflow-y:auto;padding:6px 8px;background:var(--off);
-  border-radius:6px;margin-bottom:6px;
-}
-#rawAddLabel{font-size:11px;color:var(--sub);margin-bottom:4px;}
 #rawText{
-  flex:1;width:100%;border:0;background:var(--field);border-radius:6px;
+  width:100%;height:100%;border:0;background:transparent;
   font-size:13px;line-height:1.5;color:var(--ink);
-  resize:none;padding:8px;min-height:60px;
+  resize:none;padding:0;
 }
+
 /* ③LINE文（開いている時 下部固定、⓪状態で高さ変化） */
 #paneGen{position:relative;}
 #paneGen.open{
@@ -125,8 +125,10 @@ body:not(.rawOpen) #paneGen.open{
 #paneGen.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
+
 /* 中央ブロック（①②④）*/
 #block1,#block2,#block4{}
+
 /* フィールド */
 .lineRow{display:flex;align-items:center;gap:8px;padding:6px 0;}
 .lineRow .lbl{width:56px;font-size:12px;color:var(--sub);flex-shrink:0;}
@@ -137,7 +139,6 @@ body:not(.rawOpen) #paneGen.open{
 }
 select.field{-webkit-appearance:none;appearance:none;}
 textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1.5;}
-.fieldHint{font-size:10px;color:var(--sub);margin-top:2px;}
 .dateDisplay{
   flex:1;padding:8px 10px;background:var(--field);border-radius:8px;
   font-size:14px;min-height:36px;cursor:pointer;
@@ -157,11 +158,13 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 .irrList{padding:4px 0 0 56px;}
 .irrItem{display:flex;align-items:center;gap:4px;padding:4px 0;font-size:12px;color:var(--sub);}
 .irrItem .del{padding:2px 6px;color:var(--warn);}
+
 /* ②単価 */
 .priceGrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
 .priceCell{background:var(--field);border-radius:8px;padding:8px;}
 .priceCell .plbl{font-size:11px;color:var(--sub);margin-bottom:4px;}
 .priceCell input{width:100%;padding:6px 8px;background:var(--card);border:0;border-radius:6px;font-size:14px;}
+
 /* ③向け先＋追加費用 */
 .targetRow{display:flex;align-items:center;gap:6px;padding:4px 0;}
 .targetRow .lbl{width:52px;font-size:11px;color:var(--sub);flex-shrink:0;}
@@ -185,8 +188,10 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
   font-family:inherit;
 }
 .genNote{font-size:10px;color:var(--sub);margin-top:4px;}
+
 /* ④アサイン */
 .assignHint{font-size:12px;color:var(--sub);padding:8px 0;}
+
 /* カレンダーモーダル */
 .modal{
   position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:50;
@@ -215,6 +220,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 </style>
 </head>
 <body>
+
 <!-- ===== 案件一覧 ===== -->
 <div id="viewList">
   <div class="listHead">
@@ -224,6 +230,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
   <div class="filterBar" id="filterBar"></div>
   <div class="caseList" id="caseList"></div>
 </div>
+
 <!-- ===== 案件詳細 ===== -->
 <div id="viewCase" class="hide">
   <div class="caseHead" id="caseHead">
@@ -234,6 +241,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
     </div>
     <button class="saveBtn" id="saveBtn" onclick="save()">保存</button>
   </div>
+
   <div class="caseWrap">
     <div class="navbar">
       <div class="navtabs" id="navtabs">
@@ -249,18 +257,20 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
         <button class="navAllBtn" onclick="hideHead()" title="ヘッダー折りたたみ">▽</button>
       </div>
     </div>
+
     <div class="scrollArea" id="scrollArea">
-      <!-- ⓪原文（既存案件を開いた時だけ使う。新規作成時は使わない） -->
+
+      <!-- ⓪原文（既存案件のみ。自由に読み書きできる1つのテキストエリア） -->
       <div class="block" id="paneRaw">
         <div class="blockBody">
-          <div id="rawHistory"></div>
-          <div id="rawAddLabel">↓追記する内容があれば貼り付け（保存すると下に追記されます）</div>
-          <textarea id="rawText" placeholder="追記するLINE原文など" oninput="onRawChange()"></textarea>
+          <textarea id="rawText" placeholder="LINE原文（貼り付け可）" oninput="onRawChange()"></textarea>
         </div>
       </div>
+
       <!-- ①案件詳細 -->
       <div class="block open" id="block1">
         <div class="blockBody">
+          <!-- 送り先：新規作成の時だけ表示（既存案件はSS/タブが既に決まっているため選び直せない） -->
           <div class="lineRow" id="rowClient">
             <span class="lbl">送り先</span>
             <div class="val"><select class="field" id="dClient"></select></div>
@@ -285,21 +295,22 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
             <button class="irrAdd" onclick="addIrregular()">＋</button>
           </div>
           <div class="irrList" id="irrList"></div>
-          <div class="lineRow" id="rowPeople">
+          <div class="lineRow">
             <span class="lbl">人数</span>
             <div class="val"><input class="field" id="dPeople" placeholder="女性ST2名（〇）" oninput="onDetailChange()"></div>
           </div>
-          <div class="lineRow" id="rowWear">
+          <div class="lineRow">
             <span class="lbl">衣装</span>
             <div class="val"><input class="field" id="dWear" oninput="onDetailChange()"></div>
           </div>
-          <div class="lineRow" id="rowJob" style="align-items:flex-start;">
+          <div class="lineRow" style="align-items:flex-start;">
             <span class="lbl" style="padding-top:8px;">仕事内容</span>
-            <div class="val"><textarea class="field" id="dJob" placeholder="1行に1項目" oninput="onDetailChange()"></textarea></div>
+            <div class="val"><textarea class="field" id="dJob" oninput="onDetailChange()"></textarea></div>
           </div>
         </div>
       </div>
-      <!-- ②単価（新規作成時のみ。既存案件の単価編集は今回未対応） -->
+
+      <!-- ②単価（常時編集可能。自社/ZERO/ハン/その他の目安値。実際の請求計算には使わない参考値） -->
       <div class="block" id="block2">
         <div class="blockBody">
           <div class="priceGrid">
@@ -322,6 +333,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
           </div>
         </div>
       </div>
+
       <!-- ③LINE文 -->
       <div class="block" id="paneGen">
         <div class="blockBody">
@@ -346,18 +358,21 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
             </label>
           </div>
           <pre class="genPreview" id="genPreview">—</pre>
-          <div class="genNote" id="genNote">※これはプレビューです。新規作成時は保存後に確定した文章に差し替わります。</div>
+          <div class="genNote" id="genNote">※新規作成時は、保存後にGASが生成した確定文に差し替わります。</div>
         </div>
       </div>
+
       <!-- ④アサイン -->
       <div class="block" id="block4">
         <div class="blockBody">
           <div class="assignHint">アサイン編集は今回スルー（後日実装）</div>
         </div>
       </div>
+
     </div>
   </div>
 </div>
+
 <!-- カレンダーモーダル -->
 <div class="modal" id="calModal">
   <div class="modalBox">
@@ -376,6 +391,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
     </div>
   </div>
 </div>
+
 <script>
 const GAS_URL='https://script.google.com/macros/s/AKfycbzX7Pzhq2TFFOHCr0saeHG7qeWA5PuBptUe4-kAtzj-kYWIkJE7z7F1vkvkAMEUzQpPcA/exec';
 
@@ -394,6 +410,7 @@ let FILTER_CLIENT='ALL';
 let CAL_TMP=[];        // カレンダー編集中の一時
 let CAL_YM={y:0,m:0};  // カレンダー表示中の年月
 let MASTERS=null;      // getMastersのキャッシュ（クライアント一覧など）
+let RAW_BASELINE='';   // ⓪原文：読み込んだ時点の内容（差分計算の基準）
 
 // ===== GAS通信共通ヘルパー =====
 // ★必ずPOST＋Content-Type:text/plainで送る（CORSプリフライト回避のため）。
@@ -421,7 +438,7 @@ function loadCaseList(){
     }
   }).catch(()=>{
     if(!CASES.length){
-      document.getElementById('caseList').innerHTML='<div class="listLoading">読み込みに失敗しました。電波の良い所で開き直してください。</div>';
+      document.getElementById('caseList').innerHTML='<div style="text-align:center;color:var(--sub);padding:40px;">読み込みに失敗しました。電波の良い所で開き直してください。</div>';
     }
   });
 }
@@ -441,7 +458,7 @@ function renderList(){
     `<div class="caseCard ${c.pinned?'pinned':''}" onclick="openCase('${c.id}')">
       <div class="cName">${c.caseName||'(無題)'}</div>
       <div class="cMeta">${c.client||''} ・ ${c.dates||''}</div>
-    </div>`).join('')||'<div class="listLoading">案件がありません</div>';
+    </div>`).join('')||'<div style="text-align:center;color:var(--sub);padding:40px;">案件がありません</div>';
 }
 function setFilter(c){FILTER_CLIENT=c;renderList();}
 
@@ -500,24 +517,22 @@ function fillClientSelect(sel){
 }
 
 // ===== モードに応じた表示切替 =====
+//   ★常時編集可能が基本方針。この2つだけは構造上の理由で新規/編集を分ける：
+//    ・送り先(rowClient)：新規は行き先SSを選ぶ必要があるが、既存案件は既にSS/タブが決まっている
+//    ・⓪原文(paneRaw)：新規案件にはまだ原文が無いので表示のしようがない
 function applyModeVisibility(){
-  const isEdit = MODE==='edit';
-  document.getElementById('rowClient').style.display = isEdit?'none':'flex';
-  document.getElementById('rowPeople').style.display = isEdit?'none':'flex';
-  document.getElementById('rowWear').style.display = isEdit?'none':'flex';
-  document.getElementById('rowJob').style.display = isEdit?'none':'flex';
+  const isCreate = MODE==='create';
+  document.getElementById('rowClient').style.display = isCreate?'flex':'none';
 
-  const tab2=document.querySelector('.navtab[data-target="block2"]');
   const tab0=document.querySelector('.navtab[data-target="paneRaw"]');
-  if(isEdit){
-    tab2.classList.add('hide');
-    document.getElementById('block2').classList.remove('open');
-    tab0.classList.remove('hide');
-  }else{
-    tab2.classList.remove('hide');
+  if(isCreate){
     tab0.classList.add('hide');
     document.getElementById('paneRaw').classList.remove('open');
+  }else{
+    tab0.classList.remove('hide');
   }
+  document.getElementById('genNote').style.display = isCreate ? 'block' : 'none';
+
   document.body.classList.toggle('rawOpen',document.getElementById('paneRaw').classList.contains('open'));
   updateNavActive();
 }
@@ -543,8 +558,18 @@ function buildAll(){
 
     IRR=[];renderIrr();
 
-    document.getElementById('rawHistory').textContent=CUR.rawText||'(原文の記録はまだありません)';
-    document.getElementById('rawText').value='';
+    document.getElementById('dPeople').value=CUR.settings.people||'';
+    document.getElementById('dWear').value=CUR.settings.wear||'';
+    document.getElementById('dJob').value=CUR.settings.job||'';
+
+    const pr=CUR.settings.prices||{};
+    document.getElementById('p_self_bill').value=pr.self_bill||'';
+    document.getElementById('p_zero_bill').value=pr.zero_bill||'';
+    document.getElementById('p_han_bill').value=pr.han_bill||'';
+    document.getElementById('p_other_bill').value=pr.other_bill||'';
+
+    RAW_BASELINE=CUR.rawText||'';
+    document.getElementById('rawText').value=RAW_BASELINE;
   }else{
     document.getElementById('hName').textContent=document.getElementById('dName').value||'(無題)';
     document.getElementById('dName').value='';
@@ -556,16 +581,14 @@ function buildAll(){
     document.getElementById('dPeople').value='';
     document.getElementById('dWear').value='';
     document.getElementById('dJob').value='';
+    document.getElementById('p_self_bill').value='';
+    document.getElementById('p_zero_bill').value='';
+    document.getElementById('p_han_bill').value='';
+    document.getElementById('p_other_bill').value='';
+    RAW_BASELINE='';
+    document.getElementById('rawText').value='';
     populateClientPicker();
   }
-
-  // 単価（新規作成モードのみ使用）
-  document.getElementById('p_self_bill').value='';
-  document.getElementById('p_zero_bill').value='';
-  document.getElementById('p_han_bill').value='';
-  document.getElementById('p_other_bill').value='';
-
-  document.getElementById('genNote').style.display = isEdit ? 'none' : 'block';
 
   DIRTY=false;updateSaveState();
   applyModeVisibility();
@@ -717,7 +740,7 @@ function updateSaveState(){
   else{st.textContent='保存済み';st.className='st saved';btn.classList.remove('dirty');}
 }
 
-// ===== ③LINE文プレビュー（ローカル簡易生成。保存後は本番テンプレの結果に差し替わる） =====
+// ===== ③LINE文プレビュー（ローカル簡易生成。新規作成時は保存後に本番テンプレの結果に差し替わる） =====
 function renderGen(){
   const name=document.getElementById('dName').value||'';
   const place=document.getElementById('dPlace').value||'';
@@ -793,8 +816,6 @@ function save(){
         CUR_TAB=d.result.tabName;
         CUR_ID=CUR_SSID+'::'+CUR_TAB;
         document.getElementById('genPreview').textContent=d.result.lineText||'';
-        document.getElementById('genNote').textContent='※この文章が確定版です。コピーしてスタッフに送ってください。';
-        document.getElementById('genNote').style.display='block';
         DIRTY=false;updateSaveState();
         applyModeVisibility();
         alert('案件タブを作成しました。③LINE文タブの文章をコピーして送ってください。');
@@ -808,15 +829,38 @@ function save(){
     return;
   }
 
-  // ===== 編集モード（既存案件） =====
+  // ===== 編集モード（既存案件）＝常時全項目編集可能 =====
+
+  // ⓪原文：読み込んだ時点（RAW_BASELINE）からの「追加分だけ」を送る。
+  //   実際のGASは「追記」しかできないため、全文を毎回送ると保存の度に重複してしまう。
+  //   過去の履歴部分を書き換え/削除した場合は、あいまいになるため保存をブロックする。
+  const rawNow=document.getElementById('rawText').value;
+  let rawAdd='';
+  if(rawNow!==RAW_BASELINE){
+    if(rawNow.startsWith(RAW_BASELINE)){
+      rawAdd=rawNow.slice(RAW_BASELINE.length).replace(/^\n+/,'').trim();
+    }else{
+      alert('原文の「過去の履歴部分」は編集・削除できません（追記のみ保存されます）。\n既存の文章はそのままにして、新しく伝えたい内容を一番下に追加してください。');
+      return;
+    }
+  }
+
   const meta={
     caseName:document.getElementById('dName').value.trim(),
     area:document.getElementById('dPlace').value.trim(),
     dates:SEL_DATES.slice(),               // 変更した時だけ中身が入る
     timeStart:document.getElementById('dTimeStart').value,
     timeEnd:document.getElementById('dTimeEnd').value,
+    people:document.getElementById('dPeople').value,
+    wear:document.getElementById('dWear').value,
+    job:document.getElementById('dJob').value,
+    prices:{
+      self_bill:document.getElementById('p_self_bill').value,
+      zero_bill:document.getElementById('p_zero_bill').value,
+      han_bill:document.getElementById('p_han_bill').value,
+      other_bill:document.getElementById('p_other_bill').value,
+    },
   };
-  const rawAdd=(document.getElementById('rawText').value||'').trim();
 
   // ★slotsキーは意図的に含めない＝GAS側でアサインデータには一切触らせない
   const payload={settings:{meta:meta}};
@@ -828,10 +872,14 @@ function save(){
     if(d.ok){
       if(meta.caseName){CUR.settings.caseName=meta.caseName;document.getElementById('hName').textContent=meta.caseName;}
       if(meta.area)CUR.settings.area=meta.area;
+      CUR.settings.people=meta.people;
+      CUR.settings.wear=meta.wear;
+      CUR.settings.job=meta.job;
+      CUR.settings.prices=meta.prices;
       if(rawAdd){
         CUR.rawText=(CUR.rawText?CUR.rawText+'\n\n':'')+rawAdd;
-        document.getElementById('rawHistory').textContent=CUR.rawText;
-        document.getElementById('rawText').value='';
+        RAW_BASELINE=CUR.rawText;
+        document.getElementById('rawText').value=RAW_BASELINE;
       }
       localStorage.setItem('case_'+CUR_ID,JSON.stringify(CUR));
       DIRTY=false;updateSaveState();
