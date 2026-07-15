@@ -11,32 +11,37 @@
     --ink:#1c1c1e; --sub:#8e8e93; --line:#e5e5ea; --line2:#d1d1d6;
     --bg:#f2f2f7; --card:#fff; --field:#f2f2f7;
     --ok:#34c759; --warn:#ff9500; --off:#f7f7f9;
-    --nav-h:40px;   /* ミニナビバーの高さ */
-    --sav-h:52px;   /* 下部保存バーの高さ（詰めた） */
+    --nav-h:40px;
+    --head-h:56px;
   }
   *{ box-sizing:border-box; margin:0; padding:0; -webkit-tap-highlight-color:transparent; }
-  input,select,textarea{ font-size:16px !important; }
+  input,select,textarea,button{ font-size:16px !important; }
   html,body{ background:var(--bg); color:var(--ink);
     font-family:-apple-system,"Hiragino Kaku Gothic ProN",sans-serif;
     font-size:14px; line-height:1.5; -webkit-font-smoothing:antialiased;
     text-align:left; }
-  body{ padding:12px 8px 68px; max-width:520px; margin:0 auto; }
+  body{ padding:12px 8px 12px; max-width:520px; margin:0 auto; }
   .hide{ display:none !important; }
 
-  /* すべて左寄せ */
   input, textarea, select { text-align:left; }
 
   /* ── ヘッダー ── */
-  .head{ padding:6px 4px 10px; display:flex; align-items:flex-start; gap:8px; }
+  .head{ padding:6px 4px 10px; display:flex; align-items:center; gap:8px; }
   .head .back{ font-size:20px; color:var(--sub); background:none; border:none; cursor:pointer; padding:0 4px 0 0; }
   .head .ttl{ flex:1; min-width:0; }
-  .head .name{ font-size:19px; font-weight:700; letter-spacing:-.01em; }
-  .head .sub{ font-size:12px; color:var(--sub); margin-top:2px; }
-  .head .newBtn{ flex:0 0 auto; font-size:13px; font-weight:600; font-family:inherit;
+  .head .name{ font-size:17px; font-weight:700; letter-spacing:-.01em; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .head .sub{ font-size:11px; color:var(--sub); margin-top:2px; }
+  .head .sub.dirty{ color:var(--warn); font-weight:600; }
+  .head .sub.saved{ color:var(--ok); }
+  .head .newBtn{ flex:0 0 auto; font-size:12px; font-weight:600; font-family:inherit;
     border:none; border-radius:8px; background:var(--ink); color:#fff;
     padding:7px 12px; cursor:pointer; }
+  .head .saveBtn{ flex:0 0 auto; font-size:12px; font-weight:600; font-family:inherit;
+    border:none; border-radius:8px; background:var(--ink); color:#fff;
+    padding:7px 14px; cursor:pointer; }
+  .head .saveBtn:disabled{ opacity:.4; }
 
-  /* ── 案件一覧 ── */
+  /* ── 一覧 ── */
   .caseItem{ background:var(--card); border-radius:12px; padding:12px 12px 12px 14px; margin-bottom:8px;
     box-shadow:0 1px 2px rgba(0,0,0,.04); cursor:pointer; display:flex; align-items:flex-start; gap:8px; }
   .caseItem:active{ background:#f0f0f5; }
@@ -54,17 +59,14 @@
     border-radius:14px; cursor:pointer; border:1px solid var(--line); }
   .clientChips .chip.on{ background:var(--ink); color:#fff; border-color:var(--ink); }
 
-  /* ══════ 案件詳細のレイアウト ══════
-     ⓪原文（上1/3固定）・中央スクロール領域（①②④）・③LINE文（下1/3固定）
-  ══════════════════════════════════════ */
+  /* ═══ 案件詳細レイアウト ═══ */
   .caseWrap{
     position:relative;
-    /* 画面の残り高さを使う（ヘッダー分ざっくり60、下保存バー分52を差し引き） */
-    height: calc(100vh - 60px - var(--sav-h));
+    height: calc(100vh - var(--head-h) - 12px);
     display:flex; flex-direction:column;
   }
 
-  /* 常駐ミニナビバー */
+  /* ミニナビバー */
   .navbar{ position:sticky; top:0; z-index:40; background:rgba(242,242,247,.95);
     backdrop-filter:blur(10px); border-bottom:1px solid var(--line);
     padding:4px 4px; height:var(--nav-h); flex:0 0 auto; }
@@ -77,37 +79,37 @@
   .navtab.active{ background:var(--ink); color:#fff; font-weight:600; }
   .navtab:not(.active):active{ background:var(--field); }
 
-  /* ⓪原文パネル（上1/3固定・展開時のみ） */
+  /* ⓪原文パネル：開いてる時に画面上1/4を固定占有 */
   .paneRaw{
     background:var(--card); border-radius:12px; margin:6px 0 0;
     box-shadow:0 1px 2px rgba(0,0,0,.04); overflow:hidden;
     max-height:0; transition:max-height .25s ease;
     flex:0 0 auto;
   }
-  .paneRaw.open{ max-height:33vh; }
+  .paneRaw.open{ max-height:25vh; }
   .paneRaw .inner{
-    padding:10px 11px; height:33vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:10px 11px; height:25vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
   }
 
-  /* 中央スクロール領域（①②④が縦に並ぶ） */
+  /* 中央スクロール領域 */
   .scrollMain{
     flex:1 1 auto; overflow-y:auto; -webkit-overflow-scrolling:touch;
     padding:6px 0 6px;
   }
 
-  /* ③LINE文パネル（下1/3固定・展開時のみ） */
+  /* ③LINE文パネル：開いてる時に画面下1/4を固定占有 */
   .paneGen{
     background:var(--card); border-radius:12px; margin:0 0 6px;
     box-shadow:0 1px 2px rgba(0,0,0,.04); overflow:hidden;
     max-height:0; transition:max-height .25s ease;
     flex:0 0 auto;
   }
-  .paneGen.open{ max-height:34vh; }
+  .paneGen.open{ max-height:26vh; }
   .paneGen .inner{
-    padding:10px 11px; height:34vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
+    padding:10px 11px; height:26vh; overflow-y:auto; -webkit-overflow-scrolling:touch;
   }
 
-  /* ①②④の中身カード */
+  /* ①②④カード */
   .block{
     background:var(--card); border-radius:12px; margin-bottom:9px;
     box-shadow:0 1px 2px rgba(0,0,0,.04);
@@ -119,29 +121,71 @@
   .hint{ font-size:12px; color:var(--sub); margin:10px 0 5px; }
   .hint:first-child{ margin-top:0; }
 
-  /* ── 入力行：ラベル1行＋入力1行の2行構造 ── */
-  .field{ margin-bottom:10px; }
-  .field .lbl{ display:block; font-size:11px; color:var(--sub); margin-bottom:4px; }
-  .field input, .field textarea, .field select{
-    display:block; width:100%; border:none; background:var(--field);
-    border-radius:8px; padding:9px 11px; font-family:inherit; color:var(--ink);
+  /* 1行フィールド */
+  .lineRow{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .lineRow .lbl{ flex:0 0 62px; font-size:12px; color:var(--sub); }
+  .lineRow input, .lineRow select{
+    flex:1; min-width:0; border:none; background:var(--field);
+    border-radius:8px; height:36px; padding:0 11px; font-family:inherit; color:var(--ink);
     text-align:left;
   }
-  .field textarea{ min-height:70px; resize:vertical; line-height:1.5; }
-  .field input:focus, .field textarea:focus, .field select:focus{ outline:1.5px solid var(--ink); }
-  .field .unit{ color:var(--sub); font-size:12px; margin-left:6px; }
-  .field .row2{ display:flex; align-items:center; gap:8px; }
-  .field .row2 input{ flex:1; }
+  .lineRow input:focus, .lineRow select:focus{ outline:1.5px solid var(--ink); }
+  .lineRow .unit{ color:var(--sub); font-size:12px; }
 
-  /* ── 単価行（コンパクト2行構造） ── */
-  .priceRow{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  /* お仕事内容（複数行） */
+  .jobsField{ margin-bottom:8px; }
+  .jobsField .lbl{ display:block; font-size:11px; color:var(--sub); margin-bottom:4px; }
+  .jobsField textarea{
+    display:block; width:100%; border:none; background:var(--field);
+    border-radius:8px; padding:9px 11px; font-family:inherit; color:var(--ink);
+    text-align:left; min-height:70px; resize:vertical; line-height:1.5;
+  }
+  .jobsField textarea:focus{ outline:1.5px solid var(--ink); }
+
+  /* ── カレンダー ── */
+  .cal{ background:var(--field); border-radius:10px; padding:8px 8px 10px; margin-bottom:6px; }
+  .calNav{ display:flex; align-items:center; justify-content:space-between; margin-bottom:6px; }
+  .calNav button{ border:none; background:transparent; color:var(--ink); font-size:15px;
+    padding:4px 12px; cursor:pointer; border-radius:6px; }
+  .calNav button:active{ background:var(--card); }
+  .calNav .ym{ font-weight:600; font-size:13px; }
+  .calWD{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; margin-bottom:2px; }
+  .calWD span{ text-align:center; font-size:10px; color:var(--sub); padding:2px 0; }
+  .calGrid{ display:grid; grid-template-columns:repeat(7,1fr); gap:2px; }
+  .calDay{ text-align:center; font-size:12px; padding:6px 0; border-radius:6px;
+    cursor:pointer; background:var(--card); user-select:none; }
+  .calDay.other{ opacity:.25; }
+  .calDay.on{ background:var(--ink); color:#fff; font-weight:600; }
+  .calDay.today{ outline:1.5px solid var(--sub); }
+  .calSelected{ display:flex; flex-wrap:wrap; gap:5px; margin-top:2px; }
+  .selChip{ display:inline-flex; align-items:center; gap:4px; background:var(--card);
+    border:1px solid var(--line); border-radius:14px; padding:4px 9px; font-size:11px; }
+  .selChip button{ border:none; background:none; color:#c7c7cc; font-size:13px;
+    cursor:pointer; padding:0; }
+
+  /* イレギュラー */
+  .irrList{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+  .irrItem{ background:var(--field); border-radius:8px; padding:8px; display:flex;
+    align-items:center; gap:6px; flex-wrap:wrap; }
+  .irrItem .irrDate{ font-size:12px; font-weight:600; flex:0 0 auto; padding:2px 6px;
+    background:var(--card); border-radius:5px; }
+  .irrItem input[type="time"]{ border:none; background:var(--card); border-radius:6px;
+    height:30px; padding:0 8px; font-family:inherit; text-align:left; width:82px; }
+  .irrItem .sep{ color:var(--sub); font-size:12px; }
+  .irrItem .del{ margin-left:auto; border:none; background:none; color:#c7c7cc;
+    font-size:14px; cursor:pointer; padding:0 4px; }
+  .irrAdd{ display:flex; align-items:center; gap:6px; margin-top:6px; }
+  .irrAdd .btnIrr{ border:none; background:var(--field); color:var(--ink);
+    border-radius:8px; font-size:12px; font-family:inherit; padding:6px 11px; cursor:pointer; }
+
+  /* 単価 */
+  .priceRow{ display:flex; align-items:center; gap:8px; margin-bottom:7px; }
   .priceRow .lbl{ flex:0 0 32px; font-size:12px; color:var(--sub); }
   .priceRow input{ flex:1; border:none; background:var(--field); border-radius:8px;
     height:36px; padding:0 11px; font-family:inherit; color:var(--ink); text-align:left; }
   .priceRow input:focus{ outline:1.5px solid var(--ink); }
   .priceRow .unit{ color:var(--sub); font-size:12px; }
 
-  /* ── 払出単価表 ── */
   .payhead,.payrow3{ display:flex; gap:6px; align-items:center; margin-bottom:5px; }
   .payhead .pco,.payrow3 .pco{ flex:0 0 44px; color:var(--sub); font-size:12px; }
   .payhead .pcol{ flex:1; text-align:left; font-size:11px; color:var(--sub); padding-left:6px; }
@@ -149,21 +193,21 @@
     height:34px; padding:0 8px; font-family:inherit; text-align:left; color:var(--ink); }
   .payrow3 .paycell:focus{ outline:1.5px solid var(--ink); }
 
-  /* ── 生成LINE文 ── */
-  .targetPick{ display:flex; gap:5px; flex-wrap:wrap; margin-bottom:8px; }
-  .targetPick .tp{ font-family:inherit; border:none; background:var(--field);
-    color:var(--sub); font-size:12px; padding:6px 10px; border-radius:8px; cursor:pointer; }
-  .targetPick .tp.on{ background:var(--ink); color:#fff; font-weight:600; }
+  /* ③LINE文 */
+  .genRow{ display:flex; align-items:center; gap:8px; margin-bottom:8px; }
+  .genRow .lbl{ flex:0 0 62px; font-size:12px; color:var(--sub); }
+  .genRow .body{ flex:1; min-width:0; display:flex; flex-wrap:wrap; gap:5px; }
+  .genRow .tp{ font-family:inherit; border:none; background:var(--field);
+    color:var(--sub); font-size:12px; padding:5px 10px; border-radius:8px; cursor:pointer; }
+  .genRow .tp.on{ background:var(--ink); color:#fff; font-weight:600; }
+  .genRow .extra{ display:inline-flex; align-items:center; gap:4px; background:var(--field);
+    border-radius:8px; padding:4px 8px; cursor:pointer; font-size:12px; }
+  .genRow .extra input[type=checkbox]{ width:14px; height:14px; margin:0; accent-color:var(--ink); }
+  .genRow .extra input[type=number]{ width:48px; text-align:left; border:none;
+    background:var(--card); border-radius:5px; padding:2px 5px; height:22px; font-size:12px !important; }
 
   .genOut{ font-family:inherit; font-size:13px; line-height:1.7; white-space:pre-wrap;
     color:#1c1c1e; background:var(--field); border-radius:8px; padding:10px; text-align:left; }
-
-  .extras{ display:flex; flex-wrap:wrap; gap:6px; margin:6px 0; }
-  .extra{ display:inline-flex; align-items:center; gap:5px; background:var(--field);
-    border-radius:8px; padding:5px 9px; cursor:pointer; font-size:12px; }
-  .extra input[type=checkbox]{ width:14px; height:14px; margin:0; accent-color:var(--ink); }
-  .extra input[type=number]{ width:52px; text-align:left; border:none;
-    background:var(--card); border-radius:5px; padding:2px 6px; height:22px; }
 
   .copyBar{ display:flex; gap:8px; margin-top:8px; }
   .copyBar button{ flex:1; border:none; border-radius:10px; font-size:13px;
@@ -171,7 +215,7 @@
   .btnCopy{ background:var(--ink); color:#fff; }
   .btnCopy.done{ background:var(--ok); color:#fff; }
 
-  /* ══════ 盤面 ══════ */
+  /* 盤面 */
   .boardWrap{ overflow-x:auto; -webkit-overflow-scrolling:touch;
     background:var(--card); border-radius:8px; }
   .board{ border-collapse:collapse; font-size:13px; }
@@ -205,7 +249,7 @@
   .addgrp .btnAdd{ border:none; border-radius:8px; background:var(--ink); color:#fff;
     font-size:13px; font-weight:600; font-family:inherit; padding:9px 14px; cursor:pointer; }
 
-  /* ═══ ポップアップ ═══ */
+  /* ポップアップ */
   .modalBg{ position:fixed; inset:0; background:rgba(0,0,0,.35);
     display:flex; align-items:flex-end; justify-content:center; z-index:100;
     opacity:0; pointer-events:none; transition:opacity .18s; }
@@ -236,7 +280,7 @@
   .mBtns .mDel{ flex:0 0 auto; background:var(--field); color:#ff3b30; padding:11px 18px; }
   .mBtns .mOk{ flex:1; background:var(--ink); color:#fff; }
 
-  /* ── 原文 ── */
+  /* 原文 */
   #rawText{ font-family:inherit; font-size:13px; line-height:1.7; white-space:pre-wrap;
     color:#3a3a3c; text-align:left; }
   .rawnote{ display:flex; gap:6px; align-items:flex-start; margin-top:8px; }
@@ -247,19 +291,7 @@
   .btn{ font-size:12px; font-family:inherit; border:none; border-radius:8px;
     background:var(--field); color:#3a3a3c; cursor:pointer; padding:6px 11px; }
 
-  /* ── 保存バー（幅・高さを詰めた） ── */
-  .savebar{ position:fixed; left:0; right:0; bottom:0; padding:6px 10px 10px;
-    background:rgba(242,242,247,.94); backdrop-filter:blur(10px);
-    border-top:1px solid var(--line); z-index:50; height:var(--sav-h); }
-  .savebar .inner{ max-width:520px; margin:0 auto; display:flex; align-items:center; gap:8px; height:100%; }
-  .savebar .status{ flex:1; font-size:11px; color:var(--sub); text-align:left; }
-  .savebar .status.dirty{ color:var(--warn); font-weight:600; }
-  .savebar .status.saved{ color:var(--ok); }
-  .savebar .save{ border:none; border-radius:8px; background:var(--ink); color:#fff;
-    font-size:13px; font-weight:600; font-family:inherit; padding:7px 18px; cursor:pointer; }
-  .savebar .save:disabled{ opacity:.4; }
-
-  /* ── 新規作成モード ── */
+  /* 新規作成 */
   .card{ background:var(--card); border-radius:12px; padding:12px 12px;
     margin-bottom:9px; box-shadow:0 1px 2px rgba(0,0,0,.04); text-align:left; }
   .card h3{ font-size:12px; font-weight:600; color:var(--sub); margin-bottom:8px; }
@@ -272,15 +304,6 @@
     color:#c7c7cc; font-size:15px; cursor:pointer; }
   .addItem{ align-self:flex-start; border:none; background:var(--field); color:#3a3a3c;
     border-radius:8px; font-size:12px; font-family:inherit; padding:6px 11px; cursor:pointer; margin-top:2px; }
-  .dates{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; }
-  .dchip{ display:inline-flex; align-items:center; gap:5px; background:var(--field);
-    border-radius:8px; padding:6px 9px; font-size:12px; }
-  .dchip button{ border:none; background:none; color:#c7c7cc; font-size:14px; cursor:pointer; padding:0; }
-  .dateAdd{ display:flex; gap:7px; }
-  .dateAdd input{ flex:1; border:none; background:var(--field); border-radius:8px;
-    height:38px; padding:0 11px; font-family:inherit; text-align:left; }
-  .dateAdd button{ border:none; background:var(--ink); color:#fff; border-radius:8px;
-    font-size:12px; font-weight:600; font-family:inherit; padding:0 14px; cursor:pointer; }
   .preview{ background:#1c1c1e; color:#e8e8ed; border-radius:10px;
     padding:11px; font-size:12px; line-height:1.7; white-space:pre-wrap;
     word-break:break-word; margin-bottom:8px; min-height:60px; text-align:left; }
@@ -310,13 +333,13 @@
     <button class="back" onclick="backToList()">‹</button>
     <div class="ttl">
       <div class="name" id="hName">—</div>
-      <div class="sub" id="hSub">—</div>
+      <div class="sub" id="saveStatus">—</div>
     </div>
+    <button class="saveBtn" id="saveBtn" onclick="save()">保存</button>
   </div>
 
   <div class="caseWrap">
 
-    <!-- 常駐ミニナビバー -->
     <div class="navbar">
       <div class="navtabs" id="navtabs">
         <button class="navtab" data-target="paneRaw">⓪ 原文</button>
@@ -327,7 +350,6 @@
       </div>
     </div>
 
-    <!-- ⓪原文（開いてる時は上1/3固定） -->
     <div class="paneRaw" id="paneRaw">
       <div class="inner">
         <div id="rawText">—</div>
@@ -336,31 +358,42 @@
       </div>
     </div>
 
-    <!-- 中央スクロール領域：①②④ -->
     <div class="scrollMain" id="scrollMain">
-
       <div id="errBox"></div>
 
       <!-- ① 案件詳細 -->
       <div class="block open" id="block1">
         <div class="inner">
-          <div class="field">
+          <div class="lineRow">
             <span class="lbl">案件名</span>
             <input id="dName" oninput="onDetailChange()">
           </div>
-          <div class="field">
+          <div class="lineRow">
             <span class="lbl">場所</span>
             <input id="dArea" oninput="onDetailChange()">
           </div>
-          <div class="field">
-            <span class="lbl">日程</span>
-            <input id="dDates" readonly>
+
+          <div class="hint">日程（複数選択可）</div>
+          <div class="cal" id="calWrap"></div>
+          <div class="calSelected" id="calSelected"></div>
+
+          <div class="hint">通常時間</div>
+          <div class="lineRow">
+            <span class="lbl">開始</span>
+            <input type="time" id="dTimeStart" oninput="onDetailChange()">
           </div>
-          <div class="field">
-            <span class="lbl">時間</span>
-            <input id="dTime" readonly>
+          <div class="lineRow">
+            <span class="lbl">終了</span>
+            <input type="time" id="dTimeEnd" oninput="onDetailChange()">
           </div>
-          <div class="field">
+
+          <div class="hint">イレギュラー時間（この日だけ違う場合）</div>
+          <div class="irrList" id="irrList"></div>
+          <div class="irrAdd">
+            <button class="btnIrr" onclick="addIrregular()">＋ イレギュラー追加</button>
+          </div>
+
+          <div class="jobsField" style="margin-top:12px;">
             <span class="lbl">お仕事内容（改行区切り）</span>
             <textarea id="dJobs" oninput="onDetailChange()"></textarea>
           </div>
@@ -390,29 +423,30 @@
           </div>
         </div>
       </div>
+    </div>
 
-    </div><!-- /scrollMain -->
-
-    <!-- ③LINE文（開いてる時は下1/3固定） -->
     <div class="paneGen" id="paneGen">
       <div class="inner">
-        <div class="hint">向け先</div>
-        <div class="targetPick" id="targetPick"></div>
-
-        <div class="hint">追加費用</div>
-        <div class="extras">
-          <label class="extra">
-            <input type="checkbox" id="exFood" onchange="renderGen()">
-            <span>＋食費</span>
-            <input type="number" id="exFoodAmt" value="1000" onchange="renderGen()" oninput="renderGen()">
-            <span>円/日</span>
-          </label>
-          <label class="extra">
-            <input type="checkbox" id="exTrans" onchange="renderGen()">
-            <span>＋交通費</span>
-            <input type="number" id="exTransAmt" value="1000" onchange="renderGen()" oninput="renderGen()">
-            <span>円/日</span>
-          </label>
+        <div class="genRow">
+          <span class="lbl">向け先</span>
+          <div class="body" id="targetPick"></div>
+        </div>
+        <div class="genRow">
+          <span class="lbl">追加費用</span>
+          <div class="body">
+            <label class="extra">
+              <input type="checkbox" id="exFood" onchange="renderGen()">
+              <span>＋食費</span>
+              <input type="number" id="exFoodAmt" value="1000" onchange="renderGen()" oninput="renderGen()">
+              <span>円/日</span>
+            </label>
+            <label class="extra">
+              <input type="checkbox" id="exTrans" onchange="renderGen()">
+              <span>＋交通費</span>
+              <input type="number" id="exTransAmt" value="1000" onchange="renderGen()" oninput="renderGen()">
+              <span>円/日</span>
+            </label>
+          </div>
         </div>
 
         <div class="genOut" id="genOut">—</div>
@@ -422,12 +456,7 @@
       </div>
     </div>
 
-  </div><!-- /caseWrap -->
-
-  <div class="savebar"><div class="inner">
-    <span class="status" id="saveStatus">—</span>
-    <button class="save" id="saveBtn" onclick="save()">保存</button>
-  </div></div>
+  </div>
 </div>
 
 <!-- ═══ 画面3：新規作成 ═══ -->
@@ -436,44 +465,41 @@
     <button class="back" onclick="backFromNew()">‹</button>
     <div class="ttl">
       <div class="name">新規案件</div>
-      <div class="sub">項目を埋めるとLINE文と案件タブが同時作成</div>
+      <div class="sub" id="newStatus">—</div>
     </div>
+    <button class="saveBtn" id="btnGoNew" onclick="createCase()">作成</button>
   </div>
 
   <div id="newErrBox"></div>
 
   <div class="card">
     <h3>基本情報</h3>
-    <div class="field"><span class="lbl">送り先</span><select id="fMention"><option value="">読み込み中…</option></select></div>
-    <div class="field"><span class="lbl">案件名</span><input id="fName" placeholder="NIKE ランイベント" oninput="previewNew()"></div>
-    <div class="field"><span class="lbl">場所</span><input id="fArea" placeholder="銀座周辺" oninput="previewNew()"></div>
+    <div class="lineRow"><span class="lbl">送り先</span><select id="fMention"><option value="">読み込み中…</option></select></div>
+    <div class="lineRow"><span class="lbl">案件名</span><input id="fName" placeholder="NIKE ランイベント" oninput="previewNew()"></div>
+    <div class="lineRow"><span class="lbl">場所</span><input id="fArea" placeholder="銀座周辺" oninput="previewNew()"></div>
   </div>
 
   <div class="card">
-    <h3>日程・時間</h3>
-    <div class="dates" id="dateChips"></div>
-    <div class="dateAdd">
-      <input id="fDate" type="date" onchange="addDateNew()">
-      <button onclick="addDateNew()">追加</button>
-    </div>
-    <div class="field" style="margin-top:10px;"><span class="lbl">時間</span>
-      <div class="row2">
-        <select id="fStart" onchange="previewNew()"></select>
-        <span style="color:var(--sub);">〜</span>
-        <select id="fEnd" onchange="previewNew()"></select>
-      </div>
-    </div>
-    <div class="field"><span class="lbl">注釈</span><input id="fTimeNote" placeholder="前後可能性大" oninput="previewNew()"></div>
+    <h3>日程（複数選択可）</h3>
+    <div class="cal" id="calWrapNew"></div>
+    <div class="calSelected" id="calSelectedNew"></div>
+  </div>
+
+  <div class="card">
+    <h3>通常時間</h3>
+    <div class="lineRow"><span class="lbl">開始</span><input type="time" id="fStart" value="09:00" onchange="previewNew()"></div>
+    <div class="lineRow"><span class="lbl">終了</span><input type="time" id="fEnd" value="18:00" onchange="previewNew()"></div>
+  </div>
+
+  <div class="card">
+    <h3>イレギュラー時間</h3>
+    <div class="irrList" id="irrListNew"></div>
+    <div class="irrAdd"><button class="btnIrr" onclick="addIrregularNew()">＋ イレギュラー追加</button></div>
   </div>
 
   <div class="card">
     <h3>金額</h3>
-    <div class="field"><span class="lbl">日当</span>
-      <div class="row2">
-        <input id="fPrice" type="text" inputmode="numeric" placeholder="25,000" oninput="fmtMoney(this); previewNew();" onfocus="this.select()">
-        <span class="unit">円/日</span>
-      </div>
-    </div>
+    <div class="lineRow"><span class="lbl">日当</span><input id="fPrice" type="text" inputmode="numeric" placeholder="25,000" oninput="fmtMoney(this); previewNew();" onfocus="this.select()"><span class="unit">円/日</span></div>
   </div>
 
   <div class="card">
@@ -501,14 +527,9 @@
       <button class="btnCopy" id="btnCopyNew" onclick="copyNew()">📋 コピー</button>
     </div>
   </div>
-
-  <div class="savebar"><div class="inner">
-    <span class="status" id="newStatus">—</span>
-    <button class="save" id="btnGoNew" onclick="createCase()">案件を作成</button>
-  </div></div>
 </div>
 
-<!-- ═══ ポップアップ ═══ -->
+<!-- ポップアップ -->
 <div class="modalBg" id="modalBg" onclick="if(event.target===this) closeModal()">
   <div class="modal">
     <h3 id="mTitle">—</h3>
@@ -538,13 +559,17 @@ let CLIENTS = [];
 let CASES = [], CURRENT = null, DATA = null;
 let CLIENT_FILTER = new Set();
 let DIRTY = false, SAVING = false, autoTimer = null;
-let DATES = [];
+let DATES = [];       // アサイン盤面が使う日付
+let SEL_DATES = [];   // ①案件詳細で選んでいる日程（"YYYY-MM-DD"）
+let IRREGULARS = [];  // [{date:"YYYY-MM-DD", start:"HH:mm", end:"HH:mm"}]
 let SLOTS = [];
 let editingId = null;
 let currentTarget = '自社';
-let currentBlock = 'block1';   // 中央スクロール領域で今アクティブなブロック
 
-/* ════ GAS通信 ════ */
+/* カレンダー描画状態 */
+let calYM = { detail:null, new:null }; // {y,m}
+
+/* ════ GAS ════ */
 async function callGas(payload){
   const res = await fetch(GAS_URL, {
     method:'POST', headers:{'Content-Type':'text/plain'}, redirect:'follow',
@@ -632,16 +657,13 @@ async function openCase(i){
   CURRENT = CASES[i];
   show('viewCase');
   document.getElementById('hName').textContent = CURRENT.caseName;
-  document.getElementById('hSub').textContent  = CURRENT.dates+' ／ '+CURRENT.time;
   document.getElementById('errBox').innerHTML = '';
-  // 初期：⓪閉じ、①開き、②閉じ、③閉じ、④閉じ
   document.getElementById('paneRaw').classList.remove('open');
   document.getElementById('paneGen').classList.remove('open');
   document.getElementById('block1').classList.add('open');
   document.getElementById('block2').classList.remove('open');
   document.getElementById('block4').classList.remove('open');
-  currentBlock = 'block1';
-  setActiveNav('block1');
+  syncNavActive();
   setStatus('読み込み中…');
   try{
     const r = await callGas({ action:'getCase', ssId:CURRENT.ssId, tabName:CURRENT.tabName });
@@ -658,45 +680,44 @@ function backToList(){
   clearAuto(); DIRTY=false; show('viewList');
 }
 
-/* ════ ミニナビ切替 ════ */
+/* ════ ナビ ════ */
 document.getElementById('navtabs').addEventListener('click', ev=>{
   const btn = ev.target.closest('.navtab');
   if(!btn) return;
-  const id = btn.dataset.target;
-  navigateTo(id);
+  navigateTo(btn.dataset.target);
 });
 
 function navigateTo(id){
-  if(id==='paneRaw'){
-    // 上パネル：トグル
-    const el = document.getElementById('paneRaw');
-    el.classList.toggle('open');
-  } else if(id==='paneGen'){
-    // 下パネル：トグル
-    const el = document.getElementById('paneGen');
+  if(id==='paneRaw' || id==='paneGen'){
+    const el = document.getElementById(id);
     el.classList.toggle('open');
   } else {
-    // 中央（①②④）：他を閉じ、対象を開いてスクロール
     ['block1','block2','block4'].forEach(b=>{
       document.getElementById(b).classList.toggle('open', b===id);
     });
-    currentBlock = id;
     setTimeout(()=>{
       const sm = document.getElementById('scrollMain');
       const el = document.getElementById(id);
       sm.scrollTo({ top: el.offsetTop - 4, behavior:'smooth' });
     }, 30);
   }
-  setActiveNav(id);
+  syncNavActive();
 }
 
-function setActiveNav(id){
+/* 表示中セクションすべてに色を付ける */
+function syncNavActive(){
+  const showing = new Set();
+  if(document.getElementById('paneRaw').classList.contains('open')) showing.add('paneRaw');
+  if(document.getElementById('paneGen').classList.contains('open')) showing.add('paneGen');
+  ['block1','block2','block4'].forEach(id=>{
+    if(document.getElementById(id).classList.contains('open')) showing.add(id);
+  });
   document.querySelectorAll('.navtab').forEach(b=>{
-    b.classList.toggle('active', b.dataset.target===id);
+    b.classList.toggle('active', showing.has(b.dataset.target));
   });
 }
 
-/* ════ 詳細 → 状態 ════ */
+/* ════ 案件データ → 状態 ════ */
 function buildAll(){
   const s = DATA.settings;
 
@@ -707,8 +728,21 @@ function buildAll(){
 
   document.getElementById('dName').value  = s.caseName || '';
   document.getElementById('dArea').value  = s.area || '';
-  document.getElementById('dDates').value = s.dates || '';
-  document.getElementById('dTime').value  = s.time || '';
+
+  // 日程復元：s.dates 文字列 "6/19(金)・6/20(土)" or "6/19, 6/20"
+  SEL_DATES = parseDatesString_(s.dates || '');
+  IRREGULARS = [];
+  const cy = SEL_DATES.length ? Number(SEL_DATES[0].split('-')[0]) : (new Date().getFullYear());
+  const cm = SEL_DATES.length ? Number(SEL_DATES[0].split('-')[1])-1 : (new Date().getMonth());
+  calYM.detail = { y:cy, m:cm };
+  renderCal('detail');
+
+  // 通常時間復元
+  const t = (s.time||'').split('〜');
+  document.getElementById('dTimeStart').value = (t[0]||'').trim();
+  document.getElementById('dTimeEnd').value   = (t[1]||'').trim();
+
+  renderIrregulars('detail');
 
   const jobs = [];
   (DATA.slots||[]).forEach(x=>{ if(x.pos && jobs.indexOf(x.pos)<0) jobs.push(x.pos); });
@@ -765,9 +799,142 @@ function buildAll(){
   renderBoard();
 }
 
+/* 「6/19(金)・6/20(土)」→ ["2026-06-19","2026-06-20"] */
+function parseDatesString_(str){
+  const out = [];
+  const y = new Date().getFullYear();
+  String(str||'').split(/[・,、\/\s]+/).forEach(chunk=>{
+    const m = chunk.match(/(\d{1,2})\/(\d{1,2})/);
+    if(m){
+      const mo = ('0'+m[1]).slice(-2);
+      const da = ('0'+m[2]).slice(-2);
+      out.push(y+'-'+mo+'-'+da);
+    }
+  });
+  return Array.from(new Set(out)).sort();
+}
+
 function onDetailChange(){ refreshGen(); markDirty(); }
 
-/* ════ ③LINE文（金額は自動抽出のみ・手修正なし） ════ */
+/* ════ カレンダー ════ */
+function renderCal(scope){
+  const wrapId = scope==='new' ? 'calWrapNew' : 'calWrap';
+  const selId  = scope==='new' ? 'calSelectedNew' : 'calSelected';
+  const wrap = document.getElementById(wrapId);
+  if(!wrap) return;
+
+  if(!calYM[scope]){
+    const t = new Date();
+    calYM[scope] = { y:t.getFullYear(), m:t.getMonth() };
+  }
+  const y = calYM[scope].y, m = calYM[scope].m;
+  const first = new Date(y, m, 1);
+  const firstWd = first.getDay(); // 0=Sun
+  const daysInMonth = new Date(y, m+1, 0).getDate();
+  const prevDays = new Date(y, m, 0).getDate();
+
+  const selected = (scope==='new') ? NEW_DATES : SEL_DATES;
+  const today = fmtYMD(new Date());
+
+  let html = '<div class="calNav">'+
+    '<button onclick="calMove(\''+scope+'\',-1)">‹</button>'+
+    '<span class="ym">'+y+'年 '+(m+1)+'月</span>'+
+    '<button onclick="calMove(\''+scope+'\',1)">›</button>'+
+    '</div>';
+  html += '<div class="calWD">'+['日','月','火','水','木','金','土'].map(w=>'<span>'+w+'</span>').join('')+'</div>';
+  html += '<div class="calGrid">';
+
+  // 前月分
+  for(let i=firstWd; i>0; i--){
+    const d = prevDays - i + 1;
+    html += '<div class="calDay other">'+d+'</div>';
+  }
+  // 当月
+  for(let d=1; d<=daysInMonth; d++){
+    const ymd = y+'-'+('0'+(m+1)).slice(-2)+'-'+('0'+d).slice(-2);
+    const on = selected.indexOf(ymd)>=0;
+    const cls = 'calDay'+(on?' on':'')+(ymd===today?' today':'');
+    html += '<div class="'+cls+'" onclick="calPick(\''+scope+'\',\''+ymd+'\')">'+d+'</div>';
+  }
+  // 翌月分（7の倍数まで埋める）
+  const cellsSoFar = firstWd + daysInMonth;
+  const trail = (7 - cellsSoFar%7) % 7;
+  for(let i=1; i<=trail; i++){
+    html += '<div class="calDay other">'+i+'</div>';
+  }
+  html += '</div>';
+  wrap.innerHTML = html;
+
+  // 選択済みチップ
+  const chips = document.getElementById(selId);
+  chips.innerHTML = selected.map(d=>
+    '<span class="selChip">'+shortDate(d)+'<button onclick="calPick(\''+scope+'\',\''+d+'\')">×</button></span>'
+  ).join('');
+}
+function calMove(scope, delta){
+  if(!calYM[scope]) return;
+  let m = calYM[scope].m + delta;
+  let y = calYM[scope].y;
+  if(m < 0){ m = 11; y--; }
+  if(m > 11){ m = 0; y++; }
+  calYM[scope] = { y, m };
+  renderCal(scope);
+}
+function calPick(scope, ymd){
+  const arr = (scope==='new') ? NEW_DATES : SEL_DATES;
+  const at = arr.indexOf(ymd);
+  if(at>=0) arr.splice(at,1); else { arr.push(ymd); arr.sort(); }
+  renderCal(scope);
+  if(scope==='new') previewNew();
+  else { renderIrregulars('detail'); onDetailChange(); }
+}
+function fmtYMD(d){
+  return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+}
+function shortDate(ymd){
+  const p = ymd.split('-');
+  const wd = ['日','月','火','水','木','金','土'][new Date(+p[0],+p[1]-1,+p[2]).getDay()];
+  return Number(p[1])+'/'+Number(p[2])+'('+wd+')';
+}
+
+/* ════ イレギュラー ════ */
+function addIrregular(){
+  IRREGULARS.push({ date: SEL_DATES[0]||'', start:'', end:'' });
+  renderIrregulars('detail');
+  markDirty();
+}
+function delIrregular(i){
+  IRREGULARS.splice(i,1);
+  renderIrregulars('detail');
+  refreshGen();
+  markDirty();
+}
+function onIrrChange(i, key, val){
+  IRREGULARS[i][key] = val;
+  refreshGen();
+  markDirty();
+}
+function renderIrregulars(scope){
+  const arr = (scope==='new') ? NEW_IRREGULARS : IRREGULARS;
+  const dates = (scope==='new') ? NEW_DATES : SEL_DATES;
+  const wrap = document.getElementById(scope==='new' ? 'irrListNew' : 'irrList');
+  const changeFn = scope==='new' ? 'onIrrChangeNew' : 'onIrrChange';
+  const delFn    = scope==='new' ? 'delIrregularNew' : 'delIrregular';
+
+  wrap.innerHTML = arr.map((r,i)=>{
+    const opts = dates.map(d=>'<option value="'+d+'"'+(d===r.date?' selected':'')+'>'+shortDate(d)+'</option>').join('');
+    return '<div class="irrItem">'+
+      '<select onchange="'+changeFn+'('+i+',\'date\',this.value)" style="border:none;background:var(--card);border-radius:6px;height:30px;padding:0 8px;font-family:inherit;">'+
+        (opts || '<option value="">日程を選択</option>') + '</select>'+
+      '<input type="time" value="'+esc(r.start||'')+'" onchange="'+changeFn+'('+i+',\'start\',this.value)">'+
+      '<span class="sep">〜</span>'+
+      '<input type="time" value="'+esc(r.end||'')+'" onchange="'+changeFn+'('+i+',\'end\',this.value)">'+
+      '<button class="del" onclick="'+delFn+'('+i+')">×</button>'+
+    '</div>';
+  }).join('');
+}
+
+/* ════ ③LINE文 ════ */
 function pickTarget(co){
   currentTarget = co;
   document.querySelectorAll('#targetPick .tp').forEach(b=>{
@@ -775,16 +942,13 @@ function pickTarget(co){
   });
   refreshGen();
 }
-
 function getPayFromTable(co, role){
   const cell = document.querySelector('.paycell[data-co="'+co+'"][data-role="'+role+'"]');
   return cell ? uncomma(cell.value) : '';
 }
-
 function refreshGen(){ renderGen(); }
 
 function renderGen(){
-  // 単価の自動決定：自社=請求単価、他=払出単価
   const priceD  = (currentTarget==='自社')
       ? uncomma(document.getElementById('billD').value)
       : getPayFromTable(currentTarget, 'D');
@@ -798,11 +962,19 @@ function renderGen(){
 
   L.push('');
   L.push('□日程');
-  L.push(document.getElementById('dDates').value || '');
+  L.push(formatDatesLine(SEL_DATES));
 
   L.push('');
   L.push('□時間');
-  L.push(document.getElementById('dTime').value || '');
+  const ts = document.getElementById('dTimeStart').value || '';
+  const te = document.getElementById('dTimeEnd').value || '';
+  L.push(ts+'〜'+te);
+  // イレギュラー
+  IRREGULARS.forEach(r=>{
+    if(r.date && r.start && r.end){
+      L.push('※'+shortDate(r.date)+' '+r.start+'-'+r.end);
+    }
+  });
 
   const area = document.getElementById('dArea').value.trim();
   if(area){ L.push(''); L.push('□場所'); L.push(area); }
@@ -828,6 +1000,19 @@ function renderGen(){
   }
 
   document.getElementById('genOut').textContent = L.join('\n').trim();
+}
+
+function formatDatesLine(dates){
+  if(!dates.length) return '（日程未選択）';
+  const byM = {};
+  dates.forEach(d=>{
+    const p = d.split('-');
+    const m = Number(p[1]), day = Number(p[2]);
+    const wd = ['日','月','火','水','木','金','土'][new Date(+p[0],+p[1]-1,+p[2]).getDay()];
+    if(!byM[m]) byM[m] = [];
+    byM[m].push(day+'('+wd+')');
+  });
+  return Object.keys(byM).map(m=> m+'/'+byM[m].join('、')).join('　');
 }
 
 async function copyGen(){
@@ -1025,27 +1210,33 @@ async function save(silent){
 function markDirty(){ DIRTY=true; setStatus('未保存の変更あり','dirty'); scheduleAuto(); }
 function scheduleAuto(){ clearAuto(); autoTimer = setTimeout(()=>{ if(DIRTY) save(true); }, 30000); }
 function clearAuto(){ if(autoTimer){ clearTimeout(autoTimer); autoTimer=null; } }
-function setStatus(t,c){ const e=document.getElementById('saveStatus'); e.textContent=t; e.className='status'+(c?' '+c:''); }
+function setStatus(t,c){ const e=document.getElementById('saveStatus'); e.textContent=t; e.className='sub'+(c?' '+c:''); }
 window.addEventListener('beforeunload', e=>{ if(DIRTY){ e.preventDefault(); e.returnValue=''; } });
 
-/* ════ 新規作成モード ════ */
+/* ════ 新規作成 ════ */
+let NEW_DATES = [];
+let NEW_IRREGULARS = [];
+
 function openNew(){
   show('viewNew');
   setNewStatus('準備中…');
-  document.getElementById('fStart').innerHTML = timeOpts('09:00');
-  document.getElementById('fEnd').innerHTML   = timeOpts('18:00');
+  document.getElementById('fStart').value = '09:00';
+  document.getElementById('fEnd').value   = '18:00';
   ['condItems','wearItems','jobItems'].forEach(id=>document.getElementById(id).innerHTML='');
   addItem('condItems','男女OK!');
   addItem('wearItems','黒パンツ');
   addItem('jobItems','受付');
-  ['fName','fArea','fTimeNote','fPrice'].forEach(id=>document.getElementById(id).value='');
-  NEW_DATES=[]; renderDatesNew();
+  ['fName','fArea','fPrice'].forEach(id=>document.getElementById(id).value='');
+  NEW_DATES=[]; NEW_IRREGULARS=[];
+  const t = new Date();
+  calYM.new = { y:t.getFullYear(), m:t.getMonth() };
+  renderCal('new');
+  renderIrregulars('new');
   loadClients();
   previewNew();
 }
 function backFromNew(){ show('viewList'); }
 
-let NEW_DATES = [];
 async function loadClients(){
   try{
     const r = await callGas({action:'getMasters'});
@@ -1056,35 +1247,25 @@ async function loadClients(){
   }catch(e){
     document.getElementById('newErrBox').innerHTML =
       '<div class="err">クライアント一覧の取得に失敗しました<br>'+esc(e.message)+'</div>';
-    setNewStatus('エラー','err');
+    setNewStatus('エラー','dirty');
   }
 }
-function timeOpts(sel){
-  let h='';
-  for(let i=0;i<24;i++) for(let m=0;m<60;m+=15){
-    const t = ('0'+i).slice(-2)+':'+('0'+m).slice(-2);
-    h += '<option'+(t===sel?' selected':'')+'>'+t+'</option>';
-  }
-  return h;
+
+function addIrregularNew(){
+  NEW_IRREGULARS.push({ date: NEW_DATES[0]||'', start:'', end:'' });
+  renderIrregulars('new');
+  previewNew();
 }
-function addDateNew(){
-  const el = document.getElementById('fDate');
-  const v = el.value; if(!v) return;
-  if(NEW_DATES.indexOf(v)<0) NEW_DATES.push(v);
-  NEW_DATES.sort();
-  el.value=''; renderDatesNew(); previewNew();
+function delIrregularNew(i){
+  NEW_IRREGULARS.splice(i,1);
+  renderIrregulars('new');
+  previewNew();
 }
-function delDateNew(d){ NEW_DATES = NEW_DATES.filter(x=>x!==d); renderDatesNew(); previewNew(); }
-function renderDatesNew(){
-  document.getElementById('dateChips').innerHTML = NEW_DATES.map(d=>
-    '<span class="dchip">'+shortDate(d)+'<button onclick="delDateNew(\''+d+'\')">×</button></span>'
-  ).join('');
+function onIrrChangeNew(i, key, val){
+  NEW_IRREGULARS[i][key] = val;
+  previewNew();
 }
-function shortDate(ymd){
-  const p = ymd.split('-');
-  const wd = ['日','月','火','水','木','金','土'][new Date(+p[0],+p[1]-1,+p[2]).getDay()];
-  return Number(p[1])+'/'+Number(p[2])+'('+wd+')';
-}
+
 function addItem(wrapId, ph){
   const w = document.getElementById(wrapId);
   const d = document.createElement('div');
@@ -1097,18 +1278,22 @@ function getItems(wrapId){
   return Array.from(document.querySelectorAll('#'+wrapId+' input'))
     .map(i=>i.value.trim()).filter(v=>v);
 }
+
 function previewNew(){
   const L=[];
   const conds = getItems('condItems');
   if(conds.length){ L.push('🙋🏽‍♂️💁🏼‍♀️'); conds.forEach(c=>L.push(c)); }
   const name = document.getElementById('fName').value.trim();
   L.push('✅【'+(name||'（案件名）')+'】');
-  L.push('□日程'); L.push(datesForLine());
+  L.push('□日程'); L.push(formatDatesLine(NEW_DATES));
   const st = document.getElementById('fStart').value;
   const en = document.getElementById('fEnd').value;
   L.push('□時間'); L.push(st+'〜'+en);
-  const tn = document.getElementById('fTimeNote').value.trim();
-  if(tn) L.push('※'+tn);
+  NEW_IRREGULARS.forEach(r=>{
+    if(r.date && r.start && r.end){
+      L.push('※'+shortDate(r.date)+' '+r.start+'-'+r.end);
+    }
+  });
   const area = document.getElementById('fArea').value.trim();
   if(area){ L.push('□場所'); L.push(area); }
   const wear = getItems('wearItems');
@@ -1122,16 +1307,7 @@ function previewNew(){
   }
   document.getElementById('newPreview').textContent = L.join('\n');
 }
-function datesForLine(){
-  if(!NEW_DATES.length) return '（日程を追加）';
-  const byM={};
-  NEW_DATES.forEach(d=>{
-    const p=d.split('-'); const m=Number(p[1]), day=Number(p[2]);
-    if(!byM[m]) byM[m]=[];
-    byM[m].push(day);
-  });
-  return Object.keys(byM).map(m=> m+'/'+byM[m].join('、')).join('　');
-}
+
 async function copyNew(){
   const btn = document.getElementById('btnCopyNew');
   const txt = document.getElementById('newPreview').textContent;
@@ -1146,13 +1322,14 @@ async function copyNew(){
     setTimeout(()=>{ btn.textContent='📋 コピー'; },2000);
   }
 }
+
 async function createCase(){
   const name = document.getElementById('fName').value.trim();
   const mention = document.getElementById('fMention').value;
-  if(!mention){ setNewStatus('送り先を選んでください','err'); return; }
-  if(!name){ setNewStatus('案件名を入れてください','err'); return; }
-  if(!NEW_DATES.length){ setNewStatus('日程を追加してください','err'); return; }
-  if(!getItems('jobItems').length){ setNewStatus('お仕事内容を1つ以上','err'); return; }
+  if(!mention){ setNewStatus('送り先を選んでください','dirty'); return; }
+  if(!name){ setNewStatus('案件名を入れてください','dirty'); return; }
+  if(!NEW_DATES.length){ setNewStatus('日程を選んでください','dirty'); return; }
+  if(!getItems('jobItems').length){ setNewStatus('お仕事内容を1つ以上','dirty'); return; }
 
   const btn = document.getElementById('btnGoNew');
   btn.disabled = true;
@@ -1164,7 +1341,8 @@ async function createCase(){
     dates: NEW_DATES.map(d=>{ const p=d.split('-'); return Number(p[1])+'/'+Number(p[2]); }),
     timeStart: document.getElementById('fStart').value,
     timeEnd:   document.getElementById('fEnd').value,
-    timeNote:  document.getElementById('fTimeNote').value.trim(),
+    timeNote: (NEW_IRREGULARS.filter(r=>r.date&&r.start&&r.end)
+      .map(r=>shortDate(r.date)+' '+r.start+'-'+r.end).join(' / ')),
     wear:  getItems('wearItems'),
     jobs:  getItems('jobItems'),
     price: uncomma(document.getElementById('fPrice').value),
@@ -1174,14 +1352,14 @@ async function createCase(){
 
   try{
     const r = await callGas({ action:'createCase', form });
-    setNewStatus('作成しました','ok');
+    setNewStatus('作成しました','saved');
     try{ localStorage.removeItem(LIST_CACHE); }catch(e){}
     await loadCaseList();
     const idx = CASES.findIndex(c=>c.ssId===r.result.ssId && c.tabName===r.result.tabName);
     if(idx>=0) openCase(idx);
     else show('viewList');
   }catch(e){
-    setNewStatus('作成に失敗しました','err');
+    setNewStatus('作成に失敗しました','dirty');
     alert('作成に失敗しました\n'+e.message);
   }finally{
     btn.disabled = false;
@@ -1190,7 +1368,7 @@ async function createCase(){
 function setNewStatus(t,c){
   const el = document.getElementById('newStatus');
   if(!el) return;
-  el.textContent=t; el.className='status'+(c?' '+c:'');
+  el.textContent=t; el.className='sub'+(c?' '+c:'');
 }
 
 /* ════ 共通 ════ */
