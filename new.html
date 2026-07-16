@@ -134,6 +134,12 @@ body.soloGen #paneGen.open{
   max-height:none;
   flex:1 1 auto;
 }
+/* ★⓪だけが開いている時は、⓪自体を残りのスペース全部まで広げる */
+body.soloRaw #paneRaw.open{
+  height:auto;
+  max-height:none;
+  flex:1 1 auto;
+}
 #paneGen.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
 }
@@ -921,6 +927,7 @@ function buildAll(){
     }
     DATES=[];
     (CUR.slots||[]).forEach(x=>{ if(x.date && DATES.indexOf(x.date)<0) DATES.push(x.date); });
+    dedupeSortDates_();   // ★念のため重複除去＋日付順ソート（シート内のデータ順に依存しないように）
     const slotMap={};SLOTS=[];let uid=0;
     (CUR.slots||[]).forEach(x=>{
       const k=x.pos+'|'+x.role+'|'+x.name+'|'+x.company;
@@ -1018,14 +1025,31 @@ function pickCal(iso){
   CAL_TMP.sort();
   renderCal();
 }
+// DATES（"7/24(金)"のような表示形式の配列）の重複除去＋日付順ソート。
+//   何度呼んでも安全。DATESをいじる箇所では必ずこれを通す。
+function dateDisplaySortKey_(d){
+  const m=String(d||'').match(/(\d{1,2})\/(\d{1,2})/);
+  return m?Number(m[1])*100+Number(m[2]):9999;
+}
+function dedupeSortDates_(){
+  DATES=[...new Set(DATES)].sort((a,b)=>dateDisplaySortKey_(a)-dateDisplaySortKey_(b));
+}
+
 function confirmCal(){
   SEL_DATES=CAL_TMP.slice();
   DATES_TOUCHED=true;   // ★明示的にカレンダーで選び直した時だけ、保存時に日程を上書きする
   updateDatesDisplay();
   renderIrr();   // ★イレギュラーの日付選択肢を最新のSEL_DATESに更新
   // ★④アサイン盤面にも即反映する（新しく増えた日付だけ追加。既存の割当は消さないので減らす方向には動かさない）
-  SEL_DATES.forEach(d=>{ if(DATES.indexOf(d)<0) DATES.push(d); });
-  DATES.sort();
+  //   ★盤面・既存アサインは "7/24(金)" のような表示形式で日付を持っているので、
+  //     ここでもISO文字列のまま入れず、必ず同じ表示形式に変換してから追加する
+  //     （ISOのまま混ぜると、盤面の表示が壊れるだけでなく、保存時にシートにもISOのまま
+  //       書き込まれてデータが壊れてしまうため）。
+  SEL_DATES.forEach(d=>{
+    const disp=fmtDateJP(d);
+    if(DATES.indexOf(disp)<0) DATES.push(disp);
+  });
+  dedupeSortDates_();   // ★重複除去＋日付順に並べ直す（何度カレンダーを開き直しても安全）
   renderBoard();
   onDetailChange();
   closeCalModal();
@@ -1109,12 +1133,19 @@ function updateNavActive(){
   const anyClosed=ids.some(id=>!document.getElementById(id).classList.contains('open'));
   document.getElementById('navAllBtn').textContent=anyClosed?'全開':'全閉';
   updateSoloGenClass();
+  updateSoloRawClass();
 }
 // ⓪原文と③LINE文の2つだけが開いている時、③を残りのスペース全部まで広げるためのフラグ
 function updateSoloGenClass(){
   const openIds=['paneRaw','block1','block2','paneGen','block4'].filter(id=>document.getElementById(id).classList.contains('open'));
   const isSolo=openIds.length===2 && openIds.indexOf('paneRaw')>=0 && openIds.indexOf('paneGen')>=0;
   document.body.classList.toggle('soloGen',isSolo);
+}
+// ⓪原文だけが開いている時、⓪自体を残りのスペース全部まで広げるためのフラグ
+function updateSoloRawClass(){
+  const openIds=['paneRaw','block1','block2','paneGen','block4'].filter(id=>document.getElementById(id).classList.contains('open'));
+  const isSolo=openIds.length===1 && openIds[0]==='paneRaw';
+  document.body.classList.toggle('soloRaw',isSolo);
 }
 function toggleAll(){
   const ids=['paneRaw','block1','block2','paneGen','block4'].filter(id=>{
