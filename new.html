@@ -130,23 +130,36 @@ body:not(.rawOpen) #paneGen.open{
   min-height:var(--fix-h);
 }
 /* ★⓪と③だけが開いている時：⓪が余ったスペースを吸収して広がり(最低25vh)、
-   ③は中身の高さなりに収まって、下に余白ができないよう自然に一番下に揃う */
+   ③は中身の高さなりに収まって、下に余白ができないよう自然に一番下に揃う。
+   ★sticky指定が残っていると環境によってflex計算が効かないことがあるため、
+     単独/2枠だけの表示の時はstaticに戻して確実にflexで広げる。 */
 body.soloGen #paneRaw.open{
+  position:static;
   height:auto;
   flex:1 1 auto;
   min-height:var(--fix-h);
 }
 body.soloGen #paneGen.open{
+  position:static;
   height:auto;
   max-height:none;
   flex:0 0 auto;
   min-height:0;
 }
-/* ★⓪だけが開いている時は、⓪自体を残りのスペース全部まで広げる */
+/* ★⓪だけが開いている時は、⓪自体を残りのスペース全部まで広げる（全画面表示） */
 body.soloRaw #paneRaw.open{
+  position:static;
   height:auto;
   max-height:none;
   flex:1 1 auto;
+}
+/* ★③だけが開いている時は、③自体を残りのスペース全部まで広げる（全画面表示） */
+body.soloGenOnly #paneGen.open{
+  position:static;
+  height:auto;
+  max-height:none;
+  flex:1 1 auto;
+  min-height:0;
 }
 #paneGen.open .blockBody{
   flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
@@ -186,7 +199,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 .irrRow1 .sep{color:var(--sub);font-size:11px;flex-shrink:0;}
 .irrRow2{display:flex;align-items:center;gap:6px;}
 .irrRow2 .irrPriceLbl{font-size:11px;color:var(--sub);flex-shrink:0;}
-.irrRow2 .irrPriceInput{flex:1;padding:5px 8px;background:var(--card);border:0;border-radius:6px;font-size:12px;text-align:right;color:var(--ink);}
+.irrRow2 .irrPriceInput{flex:1;padding:5px 8px;background:var(--card);border:0;border-radius:6px;font-size:12px;text-align:left;color:var(--ink);}
 .irrRow2 .del{padding:2px 8px;color:var(--warn);font-size:15px;flex-shrink:0;}
 
 /* ②単価：本物の請求(D/AD/ST)＋払出(会社×D/AD/ST) */
@@ -201,14 +214,17 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 .payTable td{padding:3px 2px;}
 .payTable input{width:100%;padding:6px 3px;background:var(--field);border:0;border-radius:6px;font-size:13px;text-align:center;}
 
-/* 単価の例外リスト */
-.excItem{background:var(--field);border-radius:8px;padding:6px 8px;margin-bottom:5px;}
-.excRow1{display:flex;align-items:center;gap:4px;margin-bottom:5px;}
+/* 単価の例外リスト（複数選択チップ＋モード/値） */
+.excItem{background:var(--field);border-radius:8px;padding:8px;margin-bottom:6px;}
+.excRow1{display:flex;align-items:center;gap:4px;margin-bottom:6px;}
 .excRow1 select{flex:1;min-width:0;padding:5px 4px;background:var(--card);border:0;border-radius:6px;font-size:12px;}
-.excRow2{display:flex;align-items:center;gap:6px;}
-.excRow2 input{flex:1;min-width:0;padding:5px 8px;background:var(--card);border:0;border-radius:6px;font-size:12px;text-align:right;color:var(--ink);}
-.excRow2 select{flex:1.3;min-width:0;padding:5px 4px;background:var(--card);border:0;border-radius:6px;font-size:12px;}
-.excRow2 .del{padding:2px 8px;color:var(--warn);font-size:15px;flex-shrink:0;}
+.excRow1 input{flex:1;min-width:0;padding:5px 8px;background:var(--card);border:0;border-radius:6px;font-size:12px;text-align:left;color:var(--ink);}
+.excRow1 .del{padding:2px 8px;color:var(--warn);font-size:15px;flex-shrink:0;}
+.excChipRow{display:flex;align-items:flex-start;gap:6px;padding:3px 0;}
+.excChipRow .excChipLbl{width:34px;flex-shrink:0;font-size:10px;color:var(--sub);padding-top:5px;}
+.excChips{display:flex;flex-wrap:wrap;gap:4px;flex:1;}
+.excChips .chip{padding:4px 9px;font-size:11px;background:var(--card);border-radius:12px;color:var(--sub);}
+.excChips .chip.on{background:var(--ink);color:#fff;}
 .excAddBtn{margin-top:4px;padding:6px 12px;background:var(--off);border-radius:8px;font-size:12px;color:var(--ink);}
 
 /* ③向け先＋追加費用 */
@@ -394,7 +410,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
           </div>
           <div class="irrList" id="irrList"></div>
           <div class="lineRow">
-            <span class="lbl">人数</span>
+            <span class="lbl">募集人数</span>
             <div class="val"><input class="field" id="dPeople" placeholder="女性ST2名（〇）" oninput="onDetailChange()"></div>
           </div>
           <div class="lineRow" style="align-items:flex-start;">
@@ -772,16 +788,25 @@ function buildPayTableBody(){
 
 // ===== 単価の例外リスト（イレギュラー単価・臨時の役割/会社など） =====
 //   base(②のシンプルな表)はそのまま。例外はここで別に積む方式。
+//   ★v13：役割・会社・適用日それぞれ複数選択できるチップ式に変更。
+//     単価も「絶対値」だけでなく「％調整」「円加減」から選べる。
 function renderPriceExceptions(){
   const el=document.getElementById('excList');
   if(!el) return;
   el.innerHTML=PRICE_EXCEPTIONS.map((ex,i)=>{
     const isPay=ex.type!=='請求';
-    const dateOpts=['<option value="">全日程共通</option>']
-      .concat(SEL_DATES.map(d=>{
-        const disp=fmtDateJP(d);
-        return `<option value="${disp}"${ex.date===disp?' selected':''}>${disp}</option>`;
-      })).join('');
+    const roleChips=MASTER_ROLES.map(r=>
+      `<button type="button" class="chip${(ex.roles||[]).indexOf(r)>=0?' on':''}" onclick="toggleExcChip(${i},'roles','${escAttr(r)}')">${esc(r)}</button>`
+    ).join('')||'<span style="font-size:11px;color:var(--sub);">役割マスタ未設定</span>';
+    const coChips=MASTER_PAYCOS.map(c=>
+      `<button type="button" class="chip${(ex.companies||[]).indexOf(c)>=0?' on':''}" onclick="toggleExcChip(${i},'companies','${escAttr(c)}')">${esc(c)}</button>`
+    ).join('')||'<span style="font-size:11px;color:var(--sub);">単価会社マスタ未設定</span>';
+    const dateChips=SEL_DATES.map(d=>{
+      const disp=fmtDateJP(d);
+      return `<button type="button" class="chip${(ex.dates||[]).indexOf(disp)>=0?' on':''}" onclick="toggleExcChip(${i},'dates','${escAttr(disp)}')">${esc(disp)}</button>`;
+    }).join('');
+    const allDatesChip=`<button type="button" class="chip${(ex.dates||[]).length===0?' on':''}" onclick="clearExcDates(${i})">全日程共通</button>`;
+
     return `
     <div class="excItem">
       <div class="excRow1">
@@ -789,36 +814,51 @@ function renderPriceExceptions(){
           <option value="請求"${!isPay?' selected':''}>請求</option>
           <option value="払出"${isPay?' selected':''}>払出</option>
         </select>
-        <select onchange="updateExcField(${i},'role',this.value)">
-          ${MASTER_ROLES.map(r=>`<option${ex.role===r?' selected':''}>${esc(r)}</option>`).join('')}
+        <select onchange="updateExcField(${i},'mode',this.value)">
+          <option value="absolute"${ex.mode==='absolute'?' selected':''}>絶対値</option>
+          <option value="percent"${ex.mode==='percent'?' selected':''}>％調整</option>
+          <option value="delta"${ex.mode==='delta'?' selected':''}>円加減</option>
         </select>
-        <select onchange="updateExcField(${i},'company',this.value)" ${isPay?'':'disabled'}>
-          ${MASTER_PAYCOS.map(c=>`<option${ex.company===c?' selected':''}>${esc(c)}</option>`).join('')}
-        </select>
-      </div>
-      <div class="excRow2">
-        <input type="text" inputmode="numeric" placeholder="単価" value="${ex.price!==''&&ex.price!==undefined?Number(ex.price).toLocaleString():''}"
-               oninput="onExcPriceInput(${i},this)">
-        <select onchange="updateExcField(${i},'date',this.value)">${dateOpts}</select>
+        <input type="text" inputmode="numeric" placeholder="値" value="${ex.value?ex.value:''}" oninput="onExcValueInput(${i},this)">
         <button class="del" onclick="delPriceException(${i})">×</button>
       </div>
+      <div class="excChipRow"><span class="excChipLbl">役割</span><div class="excChips">${roleChips}</div></div>
+      ${isPay?`<div class="excChipRow"><span class="excChipLbl">会社</span><div class="excChips">${coChips}</div></div>`:''}
+      <div class="excChipRow"><span class="excChipLbl">日付</span><div class="excChips">${allDatesChip}${dateChips}</div></div>
     </div>`;
   }).join('');
 }
 function addPriceException(){
-  PRICE_EXCEPTIONS.push({type:'払出',role:MASTER_ROLES[0]||'ST',company:MASTER_PAYCOS[0]||'自社',price:'',date:''});
+  PRICE_EXCEPTIONS.push({type:'払出',roles:[],companies:[],mode:'absolute',value:0,dates:[]});
+  renderPriceExceptions();
+  onDetailChange();
+}
+function toggleExcChip(i,key,val){
+  if(!PRICE_EXCEPTIONS[i])return;
+  const arr=(PRICE_EXCEPTIONS[i][key]||[]).slice();
+  const idx=arr.indexOf(val);
+  if(idx>=0) arr.splice(idx,1); else arr.push(val);
+  PRICE_EXCEPTIONS[i][key]=arr;
+  renderPriceExceptions();
+  onDetailChange();
+}
+function clearExcDates(i){
+  if(!PRICE_EXCEPTIONS[i])return;
+  PRICE_EXCEPTIONS[i].dates=[];
   renderPriceExceptions();
   onDetailChange();
 }
 function updateExcField(i,key,val){
   if(!PRICE_EXCEPTIONS[i])return;
   PRICE_EXCEPTIONS[i][key]=val;
-  if(key==='type') renderPriceExceptions();   // 請求⇔払出の切替で会社セレクトの有効/無効を作り直す
+  if(key==='type') renderPriceExceptions();   // 請求⇔払出の切替で会社チップの表示/非表示を作り直す
   onDetailChange();
 }
-function onExcPriceInput(i,el){
-  fmtMoney(el);
-  if(PRICE_EXCEPTIONS[i]) PRICE_EXCEPTIONS[i].price=uncomma(el.value);
+// 値はマイナスも許可する（％調整・円加減で「減らす」場合があるため。カンマ整形はしない）
+function onExcValueInput(i,el){
+  const v=el.value.replace(/[^\d\-]/g,'').replace(/(?!^)-/g,'');
+  el.value=v;
+  if(PRICE_EXCEPTIONS[i]) PRICE_EXCEPTIONS[i].value=(v===''||v==='-')?0:Number(v);
 }
 function delPriceException(i){
   PRICE_EXCEPTIONS.splice(i,1);
@@ -827,14 +867,28 @@ function delPriceException(i){
 }
 
 // GAS側lookupPrice_と同じロジック（④のポップアップでの単価プレビュー用）
-//   優先順位：①その日付ぴったりの例外 → ②日付指定なし(全日程共通)の例外 → ③ベース表
-function lookupPriceJS(type,role,company,date){
+//   優先順位：①対象(役割/会社)に合い、日付ぴったりの例外 → ②対象に合う「全日程共通」の例外 → ③ベース値そのまま
+//   例外がモード付き(％/円加減)ならベース値(base)に対して調整して返す。
+function lookupPriceJS(type,role,company,date,base){
   const isPay=(type==='払出');
-  let hit=PRICE_EXCEPTIONS.find(ex=>ex.type===type&&ex.role===role&&(isPay?ex.company===company:true)&&ex.date&&ex.date===date);
-  if(hit) return hit.price;
-  hit=PRICE_EXCEPTIONS.find(ex=>ex.type===type&&ex.role===role&&(isPay?ex.company===company:true)&&!ex.date);
-  if(hit) return hit.price;
-  return null;   // ベース表は呼び出し側で見る
+  const matches=PRICE_EXCEPTIONS.filter(ex=>{
+    if(ex.type!==type) return false;
+    if(ex.roles&&ex.roles.length&&ex.roles.indexOf(role)<0) return false;
+    if(isPay&&ex.companies&&ex.companies.length&&ex.companies.indexOf(company)<0) return false;
+    return true;
+  });
+  let hit=matches.find(ex=>ex.dates&&ex.dates.length&&ex.dates.indexOf(date)>=0);
+  if(!hit) hit=matches.find(ex=>!ex.dates||ex.dates.length===0);
+  if(!hit) return base;
+
+  const val=Number(hit.value)||0;
+  if(hit.mode==='percent'){
+    return (base===''||base===null||base===undefined)?'':Math.round(Number(base)*(1+val/100));
+  }else if(hit.mode==='delta'){
+    return (base===''||base===null||base===undefined)?val:(Number(base)+val);
+  }else{
+    return val;
+  }
 }
 
 function setBillPayToForm(bill,pay){
@@ -962,10 +1016,7 @@ function updateAssignModalPay(){
     document.getElementById('mPay').textContent='—';
     return;
   }
-  const resolved=s.days.map(d=>{
-    const exV=lookupPriceJS('払出',s.role,payCo,d);
-    return (exV!==null && exV!=='') ? exV : baseV;
-  });
+  const resolved=s.days.map(d=>lookupPriceJS('払出',s.role,payCo,d,baseV));
   const uniq=[...new Set(resolved.map(v=>String(v)))];
   if(uniq.length===1){
     const v=resolved[0];
@@ -1198,19 +1249,25 @@ function confirmCal(){
   updateDatesDisplay();
   renderIrr();   // ★イレギュラーの日付選択肢を最新のSEL_DATESに更新
   renderPriceExceptions();   // ★単価の例外リストの「適用日」選択肢も最新のSEL_DATESに更新
-  // ★④アサイン盤面にも即反映する（新しく増えた日付だけ追加。既存の割当は消さないので減らす方向には動かさない）
-  //   ★盤面・既存アサインは "7/24(金)" のような表示形式で日付を持っているので、
-  //     ここでもISO文字列のまま入れず、必ず同じ表示形式に変換してから追加する
-  //     （ISOのまま混ぜると、盤面の表示が壊れるだけでなく、保存時にシートにもISOのまま
-  //       書き込まれてデータが壊れてしまうため）。
+  recomputeBoardDates_();   // ★④アサイン盤面の日付列にも反映する
+  renderBoard();
+  onDetailChange();
+  closeCalModal();
+}
+
+// ④アサイン盤面のDATES（列）を、①で選んだ日程(SEL_DATES)と統合する。
+//   ★既存アサインの日付は絶対に消さない（減らす方向には動かさない）。
+//     ①で選んだ日程が新しく増えていれば、その分だけ列を追加する。
+//   ★注意：ここで列を増やしても、実際に誰かをその日に割り当てて保存するまでは
+//     スプレッドシート側には反映されない（SS側は実データが無い日の列は表示しない仕様のため）。
+//     予定として日付だけ確保しておきたい時は、「＋枠を追加」で空欄のまま1枠作ってから保存すると、
+//     その時点でSS側にも列が現れる。
+function recomputeBoardDates_(){
   SEL_DATES.forEach(d=>{
     const disp=fmtDateJP(d);
     if(DATES.indexOf(disp)<0) DATES.push(disp);
   });
   dedupeSortDates_();   // ★重複除去＋日付順に並べ直す（何度カレンダーを開き直しても安全）
-  renderBoard();
-  onDetailChange();
-  closeCalModal();
 }
 
 // ===== イレギュラー =====
@@ -1290,20 +1347,15 @@ function updateNavActive(){
   });
   const anyClosed=ids.some(id=>!document.getElementById(id).classList.contains('open'));
   document.getElementById('navAllBtn').textContent=anyClosed?'全開':'全閉';
-  updateSoloGenClass();
-  updateSoloRawClass();
+  updateSoloDisplayClasses();
 }
 // ⓪原文と③LINE文の2つだけが開いている時、③を残りのスペース全部まで広げるためのフラグ
-function updateSoloGenClass(){
+// パネルの開き方に応じて、⓪/③を全画面・優先表示するための判定をまとめて行う
+function updateSoloDisplayClasses(){
   const openIds=['paneRaw','block1','block2','paneGen','block4'].filter(id=>document.getElementById(id).classList.contains('open'));
-  const isSolo=openIds.length===2 && openIds.indexOf('paneRaw')>=0 && openIds.indexOf('paneGen')>=0;
-  document.body.classList.toggle('soloGen',isSolo);
-}
-// ⓪原文だけが開いている時、⓪自体を残りのスペース全部まで広げるためのフラグ
-function updateSoloRawClass(){
-  const openIds=['paneRaw','block1','block2','paneGen','block4'].filter(id=>document.getElementById(id).classList.contains('open'));
-  const isSolo=openIds.length===1 && openIds[0]==='paneRaw';
-  document.body.classList.toggle('soloRaw',isSolo);
+  document.body.classList.toggle('soloRaw', openIds.length===1 && openIds[0]==='paneRaw');
+  document.body.classList.toggle('soloGenOnly', openIds.length===1 && openIds[0]==='paneGen');
+  document.body.classList.toggle('soloGen', openIds.length===2 && openIds.indexOf('paneRaw')>=0 && openIds.indexOf('paneGen')>=0);
 }
 function toggleAll(){
   const ids=['paneRaw','block1','block2','paneGen','block4'].filter(id=>{
