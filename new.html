@@ -321,6 +321,15 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
 .calGrid .d.empty{background:transparent;}
 .modalFoot{display:flex;justify-content:flex-end;margin-top:12px;}
 .modalFoot .ok{padding:8px 16px;background:var(--ok);color:#fff;border-radius:8px;font-size:13px;font-weight:600;}
+
+/* ⑤見積書：内訳プレビュー＋確定ボタン */
+.estTable{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px;}
+.estTable th,.estTable td{border:1px solid var(--line);padding:6px 4px;text-align:center;}
+.estTable th{background:var(--off);color:var(--sub);font-weight:600;font-size:11px;}
+.estNote{font-size:11px;color:var(--sub);margin-top:8px;line-height:1.5;}
+.estConfirmBtn{margin-top:12px;width:100%;padding:12px;background:var(--ok);color:#fff;border-radius:10px;font-size:15px;font-weight:600;}
+.estConfirmBtn:disabled{background:var(--line);color:var(--sub);}
+.estResult{margin-top:10px;padding:10px;background:var(--off);border-radius:8px;font-size:12px;color:var(--ink);white-space:pre-wrap;}
 </style>
 </head>
 <body>
@@ -358,6 +367,7 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
         <button class="navtab" data-target="block2" onclick="toggleBlock('block2')">②単価</button>
         <button class="navtab" data-target="paneGen" onclick="toggleBlock('paneGen')">③LINE文</button>
         <button class="navtab" data-target="block4" onclick="toggleBlock('block4')">④アサイン</button>
+        <button class="navtab" data-target="block5" onclick="toggleBlock('block5')">⑤見積書</button>
       </div>
       <button class="headShowBtn" onclick="showHead()">△</button>
       <button class="navCollapseBtn" onclick="hideHead()" title="ヘッダー折りたたみ">▽</button>
@@ -484,6 +494,20 @@ textarea.field{min-height:80px;resize:vertical;font-family:inherit;line-height:1
         </div>
       </div>
 
+      <!-- ⑤見積書：④アサイン確定データ×②単価(請求)から内訳をプレビューし、確定でSSにタブ生成 -->
+      <div class="block" id="block5">
+        <div class="blockBody">
+          <div class="priceLabel">内訳（運営協力費）プレビュー</div>
+          <table class="estTable" id="estTable"></table>
+          <div class="estNote">
+            同じ日付・同じポジション・同じ単価の枠はまとめて人数を計算します。<br>
+            単価は②の請求単価（D/AD/ST）を使用します。超過勤務・深夜勤務・深夜超過勤務、金額・交通費・昼食費は見積書側で手動対応してください。
+          </div>
+          <button class="estConfirmBtn" id="estConfirmBtn" onclick="confirmEstimate()">この内容で見積書を作成</button>
+          <div class="estResult hide" id="estResult"></div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
@@ -575,6 +599,9 @@ let SLOTS=[];              // 枠 [{id,pos,role,name,company,start,end,days:[]}]
 let COMPANIES=['自社','ZERO','ten','next','ハン','その他'];   // アサインの会社プルダウン（masters.companiesで上書き）
 let POS_OPTIONS=['クローク','受付','ドリンク補充','誘導'];    // 大項目プルダウン（masters.positionsで上書き）
 let editingSlotId=null;
+
+// ===== ⑤見積書の状態 =====
+let ESTIMATING=false;   // 二重送信防止
 
 // ===== 表示・数値まわりの共通ヘルパー =====
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1047,24 +1074,100 @@ function collectSlotsPayload(){
   return slots;
 }
 
+// ===== ⑤見積書：④アサイン確定データ×②単価(請求)から内訳をプレビュー =====
+//   GAS側のbuildEstimateRows_と同じロジック：同じ 日付×ポジション×開始×終了×単価 をまとめて人数を積む。
+//   ★プレビューはSLOTS(枠単位)から作る点がGAS側(1人1行のslots)と少し違うので、
+//     collectSlotsPayload()で1人1行の形に戻してから同じロジックを通す。
+function buildEstimateRowsJS(flatSlots, bill){
+  const groups={}; const order=[];
+  flatSlots.forEach(sl=>{
+    if(!sl.pos||!sl.date) return;
+    const price=(bill&&bill[sl.role]!==undefined&&bill[sl.role]!=='')?Number(bill[sl.role]):'';
+    const key=[sl.date,sl.pos,sl.start||'',sl.end||'',price].join('|');
+    if(!groups[key]){
+      groups[key]={date:sl.date,pos:sl.pos,start:sl.start||'',end:sl.end||'',price:price,count:0};
+      order.push(key);
+    }
+    groups[key].count++;
+  });
+  return order.map(k=>groups[k]);
+}
+function renderEstimatePreview(){
+  const tbl=document.getElementById('estTable');
+  if(!tbl) return;
+
+  const {bill}=getBillPayFromForm();
+  const flat=collectSlotsPayload().map(sl=>({...sl,date:fmtDateJP(sl.date)}));
+  const rows=buildEstimateRowsJS(flat,bill);
+
+  const head='<tr><th>ポジション</th><th>日付</th><th>時間</th><th>単価</th><th>人数</th></tr>';
+  const body=rows.map(r=>{
+    const time=(r.start&&r.end)?(r.start+'〜'+r.end):'—';
+    const priceTxt=(r.price!=='')?('¥'+Number(r.price).toLocaleString()):'未設定';
+    return `<tr><td>${esc(r.pos)}</td><td>${esc(r.date)}</td><td>${esc(time)}</td><td>${priceTxt}</td><td>${r.count}名</td></tr>`;
+  }).join('')||'<tr><td colspan="5" style="color:var(--sub);">④アサインに確定データがありません</td></tr>';
+
+  tbl.innerHTML=head+body;
+
+  const btn=document.getElementById('estConfirmBtn');
+  if(btn) btn.disabled=(MODE!=='edit')||rows.length===0;
+}
+
+// ⑤見積書の「確定」：管理SSの見積書原本タブをコピーし、案件タブの右に見積書タブを作る
+function confirmEstimate(){
+  if(MODE!=='edit'){ alert('見積書の作成は、案件を保存してから行ってください。'); return; }
+  if(!CUR_SSID||!CUR_TAB) return;
+  if(ESTIMATING) return;
+
+  if(!confirm('この内容で見積書タブを作成します。よろしいですか？\\n（同名の見積書タブが既にある場合は作り直されます）')) return;
+
+  ESTIMATING=true;
+  const btn=document.getElementById('estConfirmBtn');
+  const resEl=document.getElementById('estResult');
+  btn.disabled=true;btn.textContent='作成中...';
+  resEl.classList.add('hide');
+
+  postGAS({action:'createEstimate',ssId:CUR_SSID,tabName:CUR_TAB}).then(d=>{
+    ESTIMATING=false;
+    btn.disabled=false;btn.textContent='この内容で見積書を作成';
+    if(d.ok){
+      resEl.textContent='✅ 見積書タブを作成しました：'+d.result.estimateTabName+'（'+d.result.rowCount+'行）\\nスプレッドシートを開いて内容を確認してください。';
+      resEl.classList.remove('hide');
+    }else{
+      resEl.textContent='⚠️ 作成に失敗しました：'+(d.error||'不明なエラー');
+      resEl.classList.remove('hide');
+    }
+  }).catch(e=>{
+    ESTIMATING=false;
+    btn.disabled=false;btn.textContent='この内容で見積書を作成';
+    resEl.textContent='⚠️ 通信エラー：'+e;
+    resEl.classList.remove('hide');
+  });
+}
+
 // ===== モードに応じた表示切替 =====
 //   ★常時編集可能が基本方針。この2つだけは構造上の理由で新規/編集を分ける：
 //    ・送り先(rowClient)：新規は行き先SSを選ぶ必要があるが、既存案件は既にSS/タブが決まっている
 //    ・⓪原文(paneRaw)：新規案件にはまだ原文が無いので表示のしようがない
+//    ・⑤見積書：新規案件にはまだ確定したアサインデータが無いので、既存案件のみ表示
 function applyModeVisibility(){
   const isCreate=MODE==='create';
   document.getElementById('rowClient').style.display=isCreate?'flex':'none';
 
   const tab0=document.querySelector('.navtab[data-target="paneRaw"]');
   const tab4=document.querySelector('.navtab[data-target="block4"]');
+  const tab5=document.querySelector('.navtab[data-target="block5"]');
   if(isCreate){
     tab0.classList.add('hide');
     document.getElementById('paneRaw').classList.remove('open');
     tab4.classList.add('hide');
     document.getElementById('block4').classList.remove('open');
+    tab5.classList.add('hide');
+    document.getElementById('block5').classList.remove('open');
   }else{
     tab0.classList.remove('hide');
     tab4.classList.remove('hide');
+    tab5.classList.remove('hide');
   }
   document.getElementById('genNote').style.display=isCreate?'block':'none';
 
@@ -1145,6 +1248,7 @@ function buildAll(){
     });
     document.getElementById('newGrp').innerHTML='<option value="">大項目を追加…</option>'+POS_OPTIONS.map(p=>`<option>${esc(p)}</option>`).join('');
     renderBoard();
+    renderEstimatePreview();
 
     document.getElementById('rawHistory').textContent=CUR.rawText||'(原文の記録はまだありません)';
     PENDING_RAW_ADD='';
@@ -1167,6 +1271,8 @@ function buildAll(){
     renderPriceExceptions();
     DATES=[];SLOTS=[];
     populateClientPicker();
+    document.getElementById('estTable').innerHTML='';
+    document.getElementById('estResult').classList.add('hide');
   }
 
   DIRTY=false;updateSaveState();
@@ -1341,7 +1447,7 @@ function updateNavActive(){
     const tgt=t.dataset.target;
     t.classList.toggle('active',document.getElementById(tgt).classList.contains('open'));
   });
-  const ids=['paneRaw','block1','block2','paneGen','block4'].filter(id=>{
+  const ids=['paneRaw','block1','block2','paneGen','block4','block5'].filter(id=>{
     const tab=document.querySelector('.navtab[data-target="'+id+'"]');
     return !tab || !tab.classList.contains('hide');
   });
@@ -1352,13 +1458,13 @@ function updateNavActive(){
 // ⓪原文と③LINE文の2つだけが開いている時、③を残りのスペース全部まで広げるためのフラグ
 // パネルの開き方に応じて、⓪/③を全画面・優先表示するための判定をまとめて行う
 function updateSoloDisplayClasses(){
-  const openIds=['paneRaw','block1','block2','paneGen','block4'].filter(id=>document.getElementById(id).classList.contains('open'));
+  const openIds=['paneRaw','block1','block2','paneGen','block4','block5'].filter(id=>document.getElementById(id).classList.contains('open'));
   document.body.classList.toggle('soloRaw', openIds.length===1 && openIds[0]==='paneRaw');
   document.body.classList.toggle('soloGenOnly', openIds.length===1 && openIds[0]==='paneGen');
   document.body.classList.toggle('soloGen', openIds.length===2 && openIds.indexOf('paneRaw')>=0 && openIds.indexOf('paneGen')>=0);
 }
 function toggleAll(){
-  const ids=['paneRaw','block1','block2','paneGen','block4'].filter(id=>{
+  const ids=['paneRaw','block1','block2','paneGen','block4','block5'].filter(id=>{
     const tab=document.querySelector('.navtab[data-target="'+id+'"]');
     return !tab || !tab.classList.contains('hide');
   });
@@ -1388,6 +1494,7 @@ function onDetailChange(){
   DIRTY=true;updateSaveState();
   document.getElementById('hName').textContent=document.getElementById('dName').value||'(無題)';
   renderGen();
+  renderEstimatePreview();
 }
 function updateSaveState(){
   const st=document.getElementById('hSt');
@@ -1552,6 +1659,7 @@ function save(){
       }
       localStorage.setItem('case_'+CUR_ID,JSON.stringify(CUR));
       DIRTY=false;updateSaveState();
+      renderEstimatePreview();
     }else{
       alert('保存に失敗しました: '+(d.error||'不明なエラー'));
     }
